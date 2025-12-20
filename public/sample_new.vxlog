@@ -1,0 +1,41 @@
+DAFC Serial Number		123456789
+DAFC HW Version		2.1
+DAFC SW Version		3.5.1
+DAFC FW Version		1.8.3
+MCA Build Date		2023-01-15
+GD Serial Number		987654321
+Configuration name 		DefaultConfig
+
+Test Length	Stable duration	Choke Size	UpStream Choke		DownStream Choke	PhaseWatcher		Production Rates and Fractions
+
+			WHT	WHP	WHDCP	Temp.	Press.	Flow-Rates at Line Conditions				Ratios at Line Conditions		Flow-Rates at Standard Conditions						Ratios at Standard Conditions
+
+								Oil	Water	Liquid	Gas	WLR	GVF	Oil	Water	Liquid	Total Gas	Free Gas	Solution Gas	BSW	Total GOR	GOR1	GOR 2
+
+d-hh:mm	hh:mm	/64"	°F	psia	psia	°F	psia	[bbl/d]	[bbl/d]	[bbl/d]	[Mcf/d]	[%]	[%]	[stb/d]	[stb/d]	[stb/d]	[Mmscf/d]	[Mmscf/d]	[Mmscf/d]	[%]	[scf/bbl]	[scf/bbl]	[scf/bbl]
+
+0-01:27	0-01:20	32/64"	910	595	251	0	3	2	6	1.56	43.1	98.0	2	5	7	-4.993	335.481	-340.474	73.6	-2775009	186443721	-189218731
+0-02:15	0-02:10	32/64"	912	598	253	1	4	3	7	1.62	44.2	97.5	2.5	5.5	8	-5.124	340.215	-345.339	74.8	-2810500	189500450	-192310951
+0-03:00	0-02:55	32/64"	915	601	255	2	5	4	8	1.68	45.1	97.0	3	6	9	-5.256	345.872	-351.128	76.2	-2851200	192875310	-195726511
+
+
+
+	Full Average					#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!	#VALUE!
+
+
+
+						Summary of Fluid Properties Used
+
+						Temp.	Press.	bo	bw	bg	ro	rw	rg	Rst	Z
+
+						°F	psia	STB/bbl	STB/bbl	Scf/cf	kg/m3	kg/m3	kg/m3	Scf/STB	-
+
+						251	0	-0.898	90.929	10.1	10353	-129	0.2	1809	1930.114
+
+
+
+
+
+  NOTES: FLOW RATES AND GOR GIVEN CORRESPONDS TO THE AVERAGE VALUES OVER STABLE REGIONS OF THE FLOW PERIOD
+
+               OTHER VALUES ARE THE FINAL AVAILABLE VALUES FROM THE FLOW PERIOD.
