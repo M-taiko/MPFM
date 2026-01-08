@@ -1,0 +1,421 @@
+@extends('layouts.master')
+@section('content')
+<div class="container-fluid">
+
+    <h2 class="mb-4">Well Test Summary: {{ $summary['well'] }}</h2>
+
+    <!-- Summary Table -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Well Test Summary</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Client</th><th>Field</th><th>Well Name</th>
+                        <th>Wellhead Tower</th><th>Wellhead String</th>
+                        <th>Choke Size</th><th>Upstream Choke</th><th>Downstream Choke</th>
+                        <th>Start Time</th><th>End Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ $summary['client'] }}</td>
+                        <td>{{ $summary['field'] }}</td>
+                        <td>{{ $summary['well'] }}</td>
+                        <td>{{ $summary['wellhead_tower'] }}</td>
+                        <td>{{ $summary['wellhead_string'] }}</td>
+                        <td>{{ $summary['choke_size'] }}</td>
+                        <td>{{ $summary['upstream_choke'] }}</td>
+                        <td>{{ $summary['downstream_choke'] }}</td>
+                        <td>{{ $summary['start_time'] ? $summary['start_time']->format('Y-m-d H:i') : 'N/A' }}</td>
+                        <td>{{ $summary['end_time'] ? $summary['end_time']->format('Y-m-d H:i') : 'N/A' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Enhanced Average Table -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Average Production Metrics</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped w-auto">
+                <thead>
+                    <tr>
+                        <th>Oil Rate (STB/d)</th>
+                        <th>Water Rate (STB/d)</th>
+                        <th>Gas Rate (MMScf/d)</th>
+                        <th>GOR (Scf/STB)</th>
+                        <th>BSW (%)</th>
+                        <th>WLR (%)</th>
+                        <th>GVF (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ is_numeric($averages['oil_rate']) ? number_format($averages['oil_rate'], 2) : 'N/A' }}</td>
+                        <td>{{ is_numeric($averages['water_rate']) ? number_format($averages['water_rate'], 2) : 'N/A' }}</td>
+                        <td>{{ is_numeric($averages['gas_rate']) ? number_format($averages['gas_rate'], 2) : 'N/A' }}</td>
+                        <td>{{ is_numeric($averages['gor']) ? number_format($averages['gor'], 2) : 'N/A' }}</td>
+                        <td>{{ is_numeric($averages['bsw']) ? number_format($averages['bsw'], 2) : 'N/A' }}</td>
+                        <td>{{ is_numeric($averages['wlr']) ? number_format($averages['wlr'], 2) : 'N/A' }}</td>
+                        <td>{{ is_numeric($averages['gvf']) ? number_format($averages['gvf'], 2) : 'N/A' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Derived Metrics Table -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Derived Metrics</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped w-auto">
+                <thead>
+                    <tr>
+                        <th>Calculated WLR (%)</th>
+                        <th>Calculated GOR</th>
+                        <th>Calculated BSW (%)</th>
+                        <th>Calculated GVF (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ isset($averages['wlr_formula']) && is_numeric($averages['wlr_formula']) ? number_format($averages['wlr_formula'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['gor_formula']) && is_numeric($averages['gor_formula']) ? number_format($averages['gor_formula'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['bsw_formula']) && is_numeric($averages['bsw_formula']) ? number_format($averages['bsw_formula'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['gvf_formula']) && is_numeric($averages['gvf_formula']) ? number_format($averages['gvf_formula'], 2) : 'N/A' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pressure and Temperature Metrics -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Pressure & Temperature Metrics</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped w-auto">
+                <thead>
+                    <tr>
+                        <th>Max Pressure</th>
+                        <th>Min Pressure</th>
+                        <th>Avg Pressure</th>
+                        <th>Max Temperature</th>
+                        <th>Min Temperature</th>
+                        <th>Avg Temperature</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ isset($averages['max_pressure']) && is_numeric($averages['max_pressure']) ? number_format($averages['max_pressure'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['min_pressure']) && is_numeric($averages['min_pressure']) ? number_format($averages['min_pressure'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['avg_pressure']) && is_numeric($averages['avg_pressure']) ? number_format($averages['avg_pressure'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['max_temperature']) && is_numeric($averages['max_temperature']) ? number_format($averages['max_temperature'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['min_temperature']) && is_numeric($averages['min_temperature']) ? number_format($averages['min_temperature'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['avg_temperature']) && is_numeric($averages['avg_temperature']) ? number_format($averages['avg_temperature'], 2) : 'N/A' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- H2S and Volume Metrics -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">H2S & Volume Metrics</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped w-auto">
+                <thead>
+                    <tr>
+                        <th>H2S Avg</th>
+                        <th>H2S Max</th>
+                        <th>H2S Min</th>
+                        <th>Cumulative Oil (bbl)</th>
+                        <th>Cumulative Water (bbl)</th>
+                        <th>Cumulative Gas (Mcf)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ isset($averages['h2s_avg']) && is_numeric($averages['h2s_avg']) ? number_format($averages['h2s_avg'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['h2s_max']) && is_numeric($averages['h2s_max']) ? number_format($averages['h2s_max'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['h2s_min']) && is_numeric($averages['h2s_min']) ? number_format($averages['h2s_min'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['cumulative_oil_volume']) && is_numeric($averages['cumulative_oil_volume']) ? number_format($averages['cumulative_oil_volume'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['cumulative_water_volume']) && is_numeric($averages['cumulative_water_volume']) ? number_format($averages['cumulative_water_volume'], 2) : 'N/A' }}</td>
+                        <td>{{ isset($averages['cumulative_gas_volume']) && is_numeric($averages['cumulative_gas_volume']) ? number_format($averages['cumulative_gas_volume'], 2) : 'N/A' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Safety Issues Summary -->
+    @if(isset($averages['safety_issues']) && !empty($averages['safety_issues']))
+    <div class="card mb-4">
+        <div class="card-header bg-warning"><h6 class="card-title mb-0">Safety Issues Summary</h6></div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Issue Type</th>
+                        <th>Count</th>
+                        <th>Average Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(isset($averages['safety_issues']['voltage_issues']))
+                    <tr>
+                        <td>Voltage Issues</td>
+                        <td>{{ count($averages['safety_issues']['voltage_issues']) }}</td>
+                        <td>
+                            @php
+                                $voltages = array_column($averages['safety_issues']['voltage_issues'], 'value');
+                                $avgVoltage = count($voltages) > 0 ? array_sum($voltages) / count($voltages) : 0;
+                            @endphp
+                            {{ number_format($avgVoltage, 2) }}
+                        </td>
+                    </tr>
+                    @endif
+                    
+                    @if(isset($averages['safety_issues']['pressure_issues']))
+                    <tr>
+                        <td>Pressure Issues</td>
+                        <td>{{ count($averages['safety_issues']['pressure_issues']) }}</td>
+                        <td>
+                            @php
+                                $pressures = array_column($averages['safety_issues']['pressure_issues'], 'value');
+                                $avgPressure = count($pressures) > 0 ? array_sum($pressures) / count($pressures) : 0;
+                            @endphp
+                            {{ number_format($avgPressure, 2) }}
+                        </td>
+                    </tr>
+                    @endif
+                    
+                    @if(isset($averages['safety_issues']['temperature_issues']))
+                    <tr>
+                        <td>Temperature Issues</td>
+                        <td>{{ count($averages['safety_issues']['temperature_issues']) }}</td>
+                        <td>
+                            @php
+                                $temperatures = array_column($averages['safety_issues']['temperature_issues'], 'value');
+                                $avgTemperature = count($temperatures) > 0 ? array_sum($temperatures) / count($temperatures) : 0;
+                            @endphp
+                            {{ number_format($avgTemperature, 2) }}
+                        </td>
+                    </tr>
+                    @endif
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <!-- Production Rates Chart -->
+            <div class="card mb-4">
+                <div class="card-header"><h6 class="card-title mb-0">Production Rates Chart</h6></div>
+                <div class="card-body">
+                    <canvas id="ratesChart" style="height:250px;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <!-- GOR Chart -->
+            <div class="card mb-4">
+                <div class="card-header"><h6 class="card-title mb-0">Gas-Oil Ratio (GOR) Chart</h6></div>
+                <div class="card-body">
+                    <canvas id="gorChart" style="height:250px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Average Row Table -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Full Average Row</h6></div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm mb-0">
+                    <thead>
+                        <tr>
+                            @foreach(array_keys($full_average_row) as $col)
+                                <th style="min-width: 150px;">{{ $col }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @foreach($full_average_row as $col => $value)
+                                <td style="min-width: 150px;">
+                                    @if(is_numeric($value))
+                                        {{ number_format($value, 2) }}
+                                    @else
+                                        {{ $value }}
+                                    @endif
+                                </td>
+                            @endforeach
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Test Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h6 class="card-title mb-0">
+                @if(isset($task_id))
+                    Complete Task & Save Test
+                @else
+                    Save Test
+                @endif
+            </h6>
+        </div>
+        <div class="card-body">
+            @if(isset($task_id))
+            <div class="alert alert-info">
+                <i class="fe fe-info mr-2"></i>
+                Saving this test will mark your assigned task as completed and notify the supervisor.
+            </div>
+            @endif
+
+            <form action="{{ route('tests.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="summary" value="{{ json_encode($summary) }}">
+                <input type="hidden" name="averages" value="{{ json_encode($averages) }}">
+                <input type="hidden" name="parsed_data" value="{{ json_encode($parsed_data) }}">
+                <input type="hidden" name="temp_file_path" value="{{ $temp_file_path }}">
+                <input type="hidden" name="filename" value="{{ $filename }}">
+                <input type="hidden" name="operator" value="{{ $summary['operator'] ?? 'N/A' }}">
+                <input type="hidden" name="test_date" value="{{ $summary['test_date'] ?? 'N/A' }}">
+                <input type="hidden" name="test_type" value="{{ $summary['test_type'] ?? 'N/A' }}">
+                <input type="hidden" name="full_average_row" value="{{ json_encode($full_average_row) }}">
+                @if(isset($task_id))
+                <input type="hidden" name="task_id" value="{{ $task_id }}">
+                @endif
+
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fe fe-save me-2"></i>
+                    @if(isset($task_id))
+                        Complete Task & Save Test
+                    @else
+                        Save Test to Archive
+                    @endif
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Raw Log File Content -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Uploaded Log File Content: {{ $filename }}</h6></div>
+        <div class="card-body">
+            <pre><code>{{ $raw_log_content }}</code></pre>
+        </div>
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="card mb-4">
+        <div class="card-header"><h6 class="card-title mb-0">Detailed Log Table</h6></div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-sm mb-0" id="vxDetailTable" style="width:100%;">
+                    <thead>
+                        <tr>
+                            @foreach($parsed_data['test_data']['columns'] as $col)
+                                <th style="min-width: 150px;">{{ $col }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($parsed_data['test_data']['rows'] as $row)
+                        <tr>
+                            @foreach($parsed_data['test_data']['columns'] as $col)
+                                @php
+                                    $value = $row[$col] ?? '';
+                                    $class = '';
+                                    if (is_numeric($value)) {
+                                        if (stripos($col, 'WHP') !== false && $value < 400) $class = 'table-danger';
+                                        if (stripos($col, 'Temp') !== false && $value > 200) $class = 'table-warning';
+                                        if (stripos($col, 'Press') !== false && $value < 200) $class = 'table-danger';
+                                        if (stripos($col, 'Voltage') !== false && ($value < 100 || $value > 250)) $class = 'table-warning';
+                                    }
+                                @endphp
+                                <td class="{{ $class }}" style="min-width: 150px;">{{ $value }}</td>
+                            @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ratesData = @json($rates_chart_data);
+    const gorData = @json($gor_chart_data);
+
+    // --- Production Rates Chart ---
+    const ratesCtx = document.getElementById('ratesChart');
+    if (ratesCtx && ratesData.labels && ratesData.datasets) {
+        new Chart(ratesCtx.getContext('2d'), {
+            type: 'line',
+            data: ratesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Production Rates vs Time' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Time (HH:MM)' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'Rate' } }
+                }
+            }
+        });
+    }
+
+    // --- GOR Chart ---
+    const gorCtx = document.getElementById('gorChart');
+    if (gorCtx && gorData.labels && gorData.datasets) {
+        new Chart(gorCtx.getContext('2d'), {
+            type: 'line',
+            data: gorData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'GOR vs Time' },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Time (HH:MM)' } },
+                    y: { beginAtZero: true, title: { display: true, text: 'GOR (Scf/STB)' } }
+                }
+            }
+        });
+    }
+
+    // --- Initialize DataTable ---
+    const detailTable = document.getElementById('vxDetailTable');
+    if (detailTable) {
+        $('#vxDetailTable').DataTable({
+            scrollX: true,
+            pageLength: 25,
+            lengthMenu: [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ]
+        });
+    }
+});
+</script>
+@endsection

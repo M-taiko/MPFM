@@ -1,0 +1,176 @@
+<!-- main-sidebar -->
+<div class="app-sidebar__overlay" data-toggle="sidebar"></div>
+<aside class="app-sidebar sidebar-scroll">
+    {{-- <div class="main-sidebar-header active">
+        <a class="desktop-logo logo-light active" href="{{ url('/dashboard') }}"><img src="{{URL::asset('assets/img/brand/logo.png')}}" class="main-logo" alt="logo"></a>
+        <a class="desktop-logo logo-dark active" href="{{ url('/dashboard') }}"><img src="{{URL::asset('assets/img/brand/logo-white.png')}}" class="main-logo dark-theme" alt="logo"></a>
+        <a class="logo-icon mobile-logo icon-light active" href="{{ url('/dashboard') }}"><img src="{{URL::asset('assets/img/brand/favicon.png')}}" class="logo-icon" alt="logo"></a>
+        <a class="logo-icon mobile-logo icon-dark active" href="{{ url('/dashboard') }}"><img src="{{URL::asset('assets/img/brand/favicon-white.png')}}" class="logo-icon dark-theme" alt="logo"></a>
+    </div> --}}
+    <div class="main-sidebar-header active">
+    <a class="desktop-logo logo-light active" href="{{ url('/dashboard') }}">
+        <h1 class="main-logo text-2xl font-bold text-indigo-600"><span class="text-gray-700" style="color: gray">FM</span>MP</h1>
+    </a>
+    <a class="desktop-logo logo-dark active" href="{{ url('/dashboard') }}">
+        <h1 class="main-logo dark-theme text-2xl font-bold text-white">MP<span class="text-gray-300">FM</span></h1>
+    </a>
+    <a class="logo-icon mobile-logo icon-light active" href="{{ url('/dashboard') }}">
+        <h1 class="logo-icon text-2xl font-bold text-indigo-600">MP<span class="text-gray-700">FM</span></h1>
+    </a>
+    <a class="logo-icon mobile-logo icon-dark active" href="{{ url('/dashboard') }}">
+        <h1 class="logo-icon dark-theme text-2xl font-bold text-white">MP<span class="text-gray-300">FM</span></h1>
+    </a>
+</div>
+    <div class="main-sidemenu">
+        <div class="app-sidebar__user clearfix">
+            <div class="dropdown user-pro-body">
+                <div class="">
+                    <img alt="user-img" class="avatar avatar-xl brround" src="{{URL::asset('assets/img/faces/6.jpg')}}"><span class="avatar-status profile-status bg-green"></span>
+                </div>
+                <div class="user-info">
+                    <h4 class="font-weight-semibold mt-3 mb-0">{{Auth::user()->name}}</h4>
+                    <span class="mb-0 text-muted">{{Auth::user()->email}}</span>
+                </div>
+            </div>
+        </div>
+        <ul class="side-menu">
+            <!-- Dashboard -->
+            <li class="slide">
+                <a class="side-menu__item" href="{{ url('/dashboard') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    <span class="side-menu__label">Dashboard</span>
+                </a>
+            </li>
+
+            <!-- Field Infrastructure Section -->
+            <li class="side-item side-item-category">Field Infrastructure</li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-map"></i>
+                    <span class="side-menu__label">Infrastructure</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ route('oil_fields.index') }}">Oil Fields</a></li>
+                    <li><a class="slide-item" href="{{ route('towers.index') }}">Towers</a></li>
+                    <li><a class="slide-item" href="{{ route('oil_strings.index') }}">Oil Strings</a></li>
+                </ul>
+            </li>
+
+            <!-- MPFM Operations Section -->
+            <li class="side-item side-item-category">MPFM Operations</li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-activity"></i>
+                    <span class="side-menu__label">MPFM Tests</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ url('/upload') }}">Upload Log File</a></li>
+                    <li><a class="slide-item" href="{{ route('mpfm_tests.index') }}">All Tests</a></li>
+                    <li><a class="slide-item" href="{{ route('well_tests.compare') }}">Compare Tests</a></li>
+                </ul>
+            </li>
+
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-clipboard"></i>
+                    <span class="side-menu__label">Planning</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ route('mpfm_operational_plans.index') }}">Operational Plans</a></li>
+                    <li><a class="slide-item" href="{{ route('mpfm_plans.index') }}">MPFM Plans</a></li>
+                </ul>
+            </li>
+
+            <!-- Daily Operations Section (Multi-Operator Workflow) -->
+            <li class="side-item side-item-category">Daily Operations</li>
+
+            @role('supervisor')
+            <!-- Supervisor Daily Plans -->
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-calendar"></i>
+                    <span class="side-menu__label">Supervisor</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ route('supervisor.dashboard') }}">Dashboard</a></li>
+                    <li><a class="slide-item" href="{{ route('supervisor.calendar') }}">Calendar</a></li>
+                    <li><a class="slide-item" href="{{ route('daily-plans.index') }}">Daily Plans</a></li>
+                    <li><a class="slide-item" href="{{ route('daily-plans.create') }}">Create Plan</a></li>
+                </ul>
+            </li>
+            @endrole
+
+            @role('operator')
+            <!-- Operator Tasks -->
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-check-square"></i>
+                    <span class="side-menu__label">Operator</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ route('operator.dashboard') }}">Dashboard</a></li>
+                    <li><a class="slide-item" href="{{ route('operator.tasks') }}">My Tasks</a></li>
+                </ul>
+            </li>
+            @endrole
+
+            <!-- Legacy Well Tests (for compatibility) -->
+            <li class="slide">
+                <a class="side-menu__item" href="{{ route('well_tests.index') }}">
+                    <i class="side-menu__icon fe fe-database"></i>
+                    <span class="side-menu__label">Test Archive</span>
+                </a>
+            </li>
+
+            <!-- Reports Section -->
+            <li class="side-item side-item-category">Reports & Analytics</li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-bar-chart-2"></i>
+                    <span class="side-menu__label">Reports</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    @can('view_job_officer_reports')
+                    <li><a class="slide-item" href="{{ route('reports.job_officer') }}">Job Officer</a></li>
+                    @endcan
+                    @can('view_reservoir_engineer_reports')
+                    <li><a class="slide-item" href="{{ route('reports.reservoir_engineer') }}">Reservoir Engineer</a></li>
+                    @endcan
+                    @can('view_production_supervisor_reports')
+                    <li><a class="slide-item" href="{{ route('reports.production_supervisor') }}">Production Supervisor</a></li>
+                    @endcan
+                    @can('view_mpfm_supervisor_reports')
+                    <li><a class="slide-item" href="{{ route('reports.mpfm_supervisor') }}">MPFM Supervisor</a></li>
+                    @endcan
+                    @can('view_mpfm_operator_reports')
+                    <li><a class="slide-item" href="{{ route('reports.mpfm_operator') }}">MPFM Operator</a></li>
+                    @endcan
+                </ul>
+            </li>
+
+            <!-- Administration Section -->
+            @can('manage_users')
+            <li class="side-item side-item-category">Administration</li>
+            <li class="slide">
+                <a class="side-menu__item" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-users"></i>
+                    <span class="side-menu__label">User Management</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item" href="{{ route('users.index') }}">Users</a></li>
+                    <li><a class="slide-item" href="{{ route('roles.index') }}">Roles</a></li>
+                    <li><a class="slide-item" href="{{ route('permissions.index') }}">Permissions</a></li>
+                </ul>
+            </li>
+            @endcan
+        </ul>
+    </div>
+</aside>
+<!-- main-sidebar -->

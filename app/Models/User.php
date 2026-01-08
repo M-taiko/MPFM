@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -44,5 +45,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get operational plans assigned to this user (for operators)
+     */
+    public function assignedPlans(): HasMany
+    {
+        return $this->hasMany(MPFMOperationalPlan::class, 'assigned_user_id');
+    }
+
+    /**
+     * Get MPFM tests created by this user
+     */
+    public function mpfmTests(): HasMany
+    {
+        return $this->hasMany(MPFMTest::class, 'user_id');
     }
 }

@@ -9,166 +9,173 @@ use App\Models\User;
 
 class RolePermissionController extends Controller
 {
-    /**
-     * Display a listing of roles.
-     */
+    /* ===================== ROLES ===================== */
+
     public function indexRoles()
     {
-        $roles = Role::all();
-        return view('roles.index', compact('roles'));
+        $roles = Role::with('permissions', 'users')->get();
+        $allPermissions = Permission::all();
+
+        return view('roles.index', compact('roles', 'allPermissions'));
     }
 
-    /**
-     * Show the form for creating a new role.
-     */
     public function createRole()
     {
         $permissions = Permission::all();
         return view('roles.create', compact('permissions'));
     }
 
-    /**
-     * Store a newly created role in storage.
-     */
     public function storeRole(Request $request)
     {
         $request->validate([
             'name' => 'required|unique:roles,name',
-            'permissions' => 'array'
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,name',
         ]);
 
         $role = Role::create(['name' => $request->name]);
 
-        if ($request->has('permissions')) {
+        if ($request->permissions) {
             $role->syncPermissions($request->permissions);
         }
 
-        return redirect()->route('roles.index')->with('success', 'Role created successfully');
+        return redirect()->route('roles.index')->with('success', 'Role created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified role.
-     */
     public function editRole(Role $role)
     {
         $permissions = Permission::all();
-        $rolePermissions = $role->permissions->pluck('name')->toArray();
-        return view('roles.edit', compact('role', 'permissions', 'rolePermissions'));
+        return view('roles.edit', compact('role', 'permissions'));
     }
 
-    /**
-     * Update the specified role in storage.
-     */
     public function updateRole(Request $request, Role $role)
     {
         $request->validate([
             'name' => 'required|unique:roles,name,' . $role->id,
-            'permissions' => 'array'
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,name',
         ]);
 
         $role->update(['name' => $request->name]);
+        $role->syncPermissions($request->permissions ?? []);
 
-        if ($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
-        } else {
-            $role->syncPermissions([]);
-        }
-
-        return redirect()->route('roles.index')->with('success', 'Role updated successfully');
+        return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
     }
 
-    /**
-     * Remove the specified role from storage.
-     */
     public function destroyRole(Role $role)
     {
         $role->delete();
-        return redirect()->route('roles.index')->with('success', 'Role deleted successfully');
+        return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
     }
 
-    /**
-     * Display a listing of permissions.
-     */
+    /* ===================== PERMISSIONS ===================== */
+
     public function indexPermissions()
     {
         $permissions = Permission::all();
         return view('permissions.index', compact('permissions'));
     }
 
-    /**
-     * Show the form for creating a new permission.
-     */
     public function createPermission()
     {
         return view('permissions.create');
     }
 
-    /**
-     * Store a newly created permission in storage.
-     */
     public function storePermission(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:permissions,name'
+            'name' => 'required|unique:permissions,name',
         ]);
 
         Permission::create(['name' => $request->name]);
 
-        return redirect()->route('permissions.index')->with('success', 'Permission created successfully');
+        return redirect()->route('permissions.index')->with('success', 'Permission created successfully.');
     }
 
-    /**
-     * Show the form for editing the specified permission.
-     */
     public function editPermission(Permission $permission)
     {
         return view('permissions.edit', compact('permission'));
     }
 
-    /**
-     * Update the specified permission in storage.
-     */
     public function updatePermission(Request $request, Permission $permission)
     {
         $request->validate([
-            'name' => 'required|unique:permissions,name,' . $permission->id
+            'name' => 'required|unique:permissions,name,' . $permission->id,
         ]);
 
         $permission->update(['name' => $request->name]);
 
-        return redirect()->route('permissions.index')->with('success', 'Permission updated successfully');
+        return redirect()->route('permissions.index')->with('success', 'Permission updated successfully.');
     }
 
-    /**
-     * Remove the specified permission from storage.
-     */
     public function destroyPermission(Permission $permission)
     {
         $permission->delete();
-        return redirect()->route('permissions.index')->with('success', 'Permission deleted successfully');
+        return redirect()->route('permissions.index')->with('success', 'Permission deleted successfully.');
     }
 
-    /**
-     * Display a listing of users with their roles.
-     */
+    /* ===================== USERS ===================== */
+
     public function indexUsers()
     {
         $users = User::with('roles')->get();
         $roles = Role::all();
-        return view('users.index', compact('users', 'roles'));
+        $permissions = Permission::all();
+
+        return view('users.index', compact('users', 'roles', 'permissions'));
     }
 
-    /**
-     * Assign role to user.
-     */
     public function assignRole(Request $request, User $user)
     {
         $request->validate([
-            'role' => 'required|exists:roles,name'
+            'role' => 'required|exists:roles,name',
         ]);
 
-        $user->syncRoles([$request->role]);
+        $user->assignRole($request->role);
 
-        return redirect()->route('users.index')->with('success', 'Role assigned successfully');
+        return response()->json(['success' => true, 'message' => 'Role assigned successfully.']);
+    }
+
+    public function assignPermission(Request $request, User $user)
+    {
+        $request->validate([
+            'permission' => 'required|exists:permissions,name',
+        ]);
+
+        $user->givePermissionTo($request->permission);
+
+        return response()->json(['success' => true, 'message' => 'Permission assigned successfully.']);
+    }
+
+    public function removeRole(User $user, $roleName)
+    {
+        $user->removeRole($roleName);
+        return response()->json(['success' => true, 'message' => 'Role removed successfully.']);
+    }
+
+    public function removePermission(User $user, $permissionName)
+    {
+        $user->revokePermissionTo($permissionName);
+        return response()->json(['success' => true, 'message' => 'Permission removed successfully.']);
+    }
+
+    /* ===================== API ENDPOINTS ===================== */
+
+    public function getRolePermissions(Role $role)
+    {
+        $permissions = $role->permissions;
+        return response()->json(['permissions' => $permissions]);
+    }
+
+    public function updateRolePermissions(Request $request, Role $role)
+    {
+        $request->validate([
+            'permissions' => 'array',
+            'permissions.*' => 'exists:permissions,name',
+        ]);
+
+        $role->syncPermissions($request->permissions ?? []);
+
+        return response()->json(['success' => true, 'message' => 'Permissions updated successfully.']);
     }
 }

@@ -3,246 +3,308 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use DateTime;
 use App\Models\WellTest;
+use App\Models\PlanTask;
+use App\Models\MPFMTest;
+use App\Services\MPFMCalculationService;
+use App\Services\MPFMParsingService;
+use App\Services\MPFMChartService;
+use App\Services\MPFMPreviewService;
+use App\Notifications\TaskCompletedNotification;
 
 class VxLogController extends Controller
 {
-    public function showUploadForm()
-    {
-        return view('logs.upload');
+    protected $calculationService;
+    protected $parsingService;
+    protected $chartService;
+    protected $previewService;
+
+    public function __construct(
+        MPFMCalculationService $calculationService,
+        MPFMParsingService $parsingService,
+        MPFMChartService $chartService,
+        MPFMPreviewService $previewService
+    ) {
+        $this->calculationService = $calculationService;
+        $this->parsingService = $parsingService;
+        $this->chartService = $chartService;
+        $this->previewService = $previewService;
     }
+    public function showUploadForm(Request $request)
+    {
+        $taskId = $request->get('task_id');
+        $task = null;
+        $autoFillData = [];
 
-    // public function processLogFile(Request $request)
-    // {
-    //     $request->validate([
-    //         'logfile' => 'required|file|mimes:txt,vxlog,log|max:10240',
-    //         'wellhead_tower' => 'nullable|string',
-    //         'wellhead_string' => 'nullable|string',
-    //         'choke_size' => 'nullable|string',
-    //         'upstream_choke' => 'nullable|string',
-    //         'downstream_choke' => 'nullable|string',
-    //         'client' => 'nullable|string',
-    //         'field' => 'nullable|string',
-    //         'well' => 'nullable|string',
-    //         'save_test' => 'nullable|boolean'
-    //     ]);
+        if ($taskId) {
+            $task = PlanTask::with([
+                'dailyPlan',
+                'oilString.tower.oilField',
+                'operator'
+            ])->findOrFail($taskId);
 
-    //     $file = $request->file('logfile');
-    //     if (!$file->isValid()) {
-    //         return redirect()->back()->withErrors(['logfile' => 'Invalid file upload']);
-    //     }
+            // Ensure operator can only access their task
+            if ($task->assigned_to !== auth()->id()) {
+                abort(403, 'Unauthorized access to task');
+            }
 
-    //     $content = file_get_contents($file->getRealPath());
-    //     $lines = explode("\n", $content);
-    //     $parsedData = $this->parseVxLog($lines);
-    //     $calculatedMetrics = $this->calculateMetrics($parsedData);
+            // Prepare auto-fill data
+            $autoFillData = [
+                'client' => 'ADNOC',
+                'field' => $task->oilString->tower->oilField->name,
+                'well' => $task->dailyPlan->plan_name,
+                'wellhead_tower' => $task->oilString->tower->name,
+                'wellhead_string' => $task->oilString->name,
+                'operator' => $task->operator->name,
+                'test_date' => $task->dailyPlan->plan_date->format('Y-m-d'),
+                'mpfm_device' => $task->mpfm_device,
+                'test_type' => $task->device_type ?? 'flow',
+                'expected_oil_rate' => $task->expected_oil_rate,
+                'expected_gas_rate' => $task->expected_gas_rate,
+                'expected_water_cut' => $task->expected_water_cut,
+                'expected_pressure' => $task->expected_pressure,
+                'expected_temperature' => $task->expected_temperature,
+            ];
+        }
 
-    //     $wellheadTower = $request->input('wellhead_tower','');
-    //     $wellheadString = $request->input('wellhead_string','');
-    //     $chokeSize = $request->input('choke_size','N/A');
-    //     $upstreamChoke = $request->input('upstream_choke','N/A');
-    //     $downstreamChoke = $request->input('downstream_choke','N/A');
-
-    //     $calculatedMetrics['choke_size'] = $chokeSize;
-    //     $calculatedMetrics['upstream_choke'] = $upstreamChoke;
-    //     $calculatedMetrics['downstream_choke'] = $downstreamChoke;
-
-    //     $startTimeStr = $parsedData['test_data']['rows'][0]['Date & Time'] ?? null;
-    //     $endTimeStr = end($parsedData['test_data']['rows'])['Date & Time'] ?? null;
-    //     $testDate = isset($parsedData['metadata']['Test Date']) ? Carbon::parse($parsedData['metadata']['Test Date']) : Carbon::today();
-    //     $startTime = $this->parseDateTimeSafe($startTimeStr, $testDate);
-    //     $endTime = $this->parseDateTimeSafe($endTimeStr, $testDate);
-
-    //     $chartData = $this->prepareChartData($parsedData);
-    //     $gorChartData = $this->prepareGorChartData($parsedData);
-    //     $fullAverageRow = $this->calculateFullAverage($parsedData);
-
-    //     // Save test if requested
-    //     if ($request->input('save_test', false)) {
-    //         $wellTest = WellTest::create([
-    //             'client' => $request->input('client','N/A'),
-    //             'field' => $request->input('field','N/A'),
-    //             'well' => $request->input('well','N/A'),
-    //             'wellhead_tower' => $wellheadTower,
-    //             'wellhead_string' => $wellheadString,
-    //             'choke_size' => $chokeSize,
-    //             'upstream_choke' => $upstreamChoke,
-    //             'downstream_choke' => $downstreamChoke,
-    //             'start_time' => $startTime,
-    //             'end_time' => $endTime,
-    //             'metadata' => $parsedData['metadata'],
-    //             'test_data' => $parsedData['test_data'],
-    //             'calculated_metrics' => $calculatedMetrics,
-    //             'filename' => $file->getClientOriginalName()
-    //         ]);
-
-    //         return redirect()->route('well_tests.show', $wellTest->id)
-    //             ->with('success', 'Well test saved successfully!');
-    //     }
-
-    //     return view('logs.results', [
-    //         'parsedData' => $parsedData,
-    //         'calculatedMetrics' => $calculatedMetrics,
-    //         'chartData' => $chartData,
-    //         'gorChartData' => $gorChartData,
-    //         'filename' => $file->getClientOriginalName(),
-    //         'wellheadTower' => $wellheadTower,
-    //         'wellheadString' => $wellheadString,
-    //         'startTime' => $startTime,
-    //         'endTime' => $endTime,
-    //         'chokeSize' => $chokeSize,
-    //         'upstreamChoke' => $upstreamChoke,
-    //         'downstreamChoke' => $downstreamChoke,
-    //         'wellTest' => (object)[
-    //             'client' => $request->input('client','N/A'),
-    //             'field' => $request->input('field','N/A'),
-    //             'well' => $request->input('well','N/A'),
-    //         ],
-    //         'fullAverageRow' => $fullAverageRow
-    //     ]);
-    // }
+        return view('logs.upload', compact('task', 'autoFillData'));
+    }
 
     public function processLogFile(Request $request)
     {
         $request->validate([
-            'logfile' => 'required|file|mimes:txt,vxlog,log|max:10240',
+            'logfile' => 'required|file|mimes:txt,vxlog,log,csv|max:10240',
+            'client' => 'required|string',
+            'field' => 'required|string',
+            'well' => 'required|string',
+            'operator' => 'required|string',
+            'test_date' => 'required|date',
+            'test_type' => 'nullable|string',
             'wellhead_tower' => 'nullable|string',
             'wellhead_string' => 'nullable|string',
             'choke_size' => 'nullable|string',
             'upstream_choke' => 'nullable|string',
             'downstream_choke' => 'nullable|string',
-            'client' => 'nullable|string',
-            'field' => 'nullable|string',
-            'well' => 'nullable|string',
+            'task_id' => 'nullable|exists:plan_tasks,id',
         ]);
 
-        $file = $request->file('logfile');
-        if (!$file->isValid()) {
-            return redirect()->back()->withErrors(['logfile' => 'Invalid file upload']);
+        try {
+            $file = $request->file('logfile');
+            if (!$file->isValid()) {
+                return redirect()->back()->withErrors(['logfile' => 'Invalid file upload']);
+            }
+
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $tempFilePath = $file->storeAs('temp', $fileName, 'public');
+
+            $content = file_get_contents($file->getRealPath());
+            $encoding = mb_detect_encoding($content, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+            if ($encoding !== 'UTF-8') {
+                $content = mb_convert_encoding($content, 'UTF-8', $encoding);
+            }
+
+            $lines = explode("\n", $content);
+            $parsedData = $this->parsingService->parseDynamicLog($lines);
+
+            if (empty($parsedData['test_data']['rows'])) {
+                return redirect()->back()->with('error', 'The log file could not be parsed or contains no test data.');
+            }
+
+            $displayData = $this->prepareDataForDisplay($parsedData, $request);
+
+            $displayData['raw_log_content'] = $content;
+            $displayData['temp_file_path'] = $tempFilePath;
+            $displayData['filename'] = $file->getClientOriginalName();
+            $displayData['task_id'] = $request->input('task_id');
+
+            return view('logs.results', $displayData);
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
-
-        // === حفظ الملف في مجلد مؤقت ===
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $tempFilePath = $file->storeAs('temp', $fileName, 'public');
-        // === نهاية حفظ الملف المؤقت ===
-
-        $content = file_get_contents($file->getRealPath());
-
-        // === إصلاح مشكلة الترميز ===
-        $encoding = mb_detect_encoding($content, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
-        if ($encoding !== 'UTF-8') {
-            $content = mb_convert_encoding($content, 'UTF-8', $encoding);
-        }
-        // === نهاية إصلاح الترميز ===
-
-        $lines = explode("\n", $content);
-        $parsedData = $this->parseVxLog($lines);
-        $calculatedMetrics = $this->calculateMetrics($parsedData);
-
-        $wellheadTower = $request->input('wellhead_tower','');
-        $wellheadString = $request->input('wellhead_string','');
-        $chokeSize = $request->input('choke_size','N/A');
-        $upstreamChoke = $request->input('upstream_choke','N/A');
-        $downstreamChoke = $request->input('downstream_choke','N/A');
-
-        $calculatedMetrics['choke_size'] = $chokeSize;
-        $calculatedMetrics['upstream_choke'] = $upstreamChoke;
-        $calculatedMetrics['downstream_choke'] = $downstreamChoke;
-
-        $startTimeStr = $parsedData['test_data']['rows'][0]['Date & Time'] ?? null;
-        $endTimeStr = end($parsedData['test_data']['rows'])['Date & Time'] ?? null;
-        $testDate = isset($parsedData['metadata']['Test Date']) ? Carbon::parse($parsedData['metadata']['Test Date']) : Carbon::today();
-        $startTime = $this->parseDateTimeSafe($startTimeStr, $testDate);
-        $endTime = $this->parseDateTimeSafe($endTimeStr, $testDate);
-
-        $chartData = $this->prepareChartData($parsedData);
-        $gorChartData = $this->prepareGorChartData($parsedData);
-        $fullAverageRow = $this->calculateFullAverage($parsedData);
-
-        // === عرض صفحة النتائج مع جميع البيانات والمسار المؤقت للملف ===
-        return view('logs.results', [
-            'parsedData' => $parsedData,
-            'calculatedMetrics' => $calculatedMetrics,
-            'chartData' => $chartData,
-            'gorChartData' => $gorChartData,
-            'filename' => $file->getClientOriginalName(),
-            'wellheadTower' => $wellheadTower,
-            'wellheadString' => $wellheadString,
-            'startTime' => $startTime,
-            'endTime' => $endTime,
-            'chokeSize' => $chokeSize,
-            'upstreamChoke' => $upstreamChoke,
-            'downstreamChoke' => $downstreamChoke,
-            'wellTest' => (object)[
-                'client' => $request->input('client','N/A'),
-                'field' => $request->input('field','N/A'),
-                'well' => $request->input('well','N/A'),
-            ],
-            'fullAverageRow' => $fullAverageRow,
-            'tempFilePath' => $tempFilePath // تمرير المسار المؤقت للملف
-        ]);
     }
 
-    /**
-     * دالة جديدة لحفظ الاختبار بشكل نهائي في قاعدة البيانات.
-     */
+    private function prepareDataForDisplay($parsedData, $request)
+    {
+        $rows = $parsedData['test_data']['rows'];
+        if (empty($rows)) {
+            return [];
+        }
+
+        $columns = array_keys($rows[0]);
+        $timeColumn = 'Date & Time';
+
+        $averages = $this->calculationService->calculateStandardizedMetrics($rows);
+        $ratesChartData = $this->chartService->prepareRatesChartData($columns, $rows, $timeColumn);
+        $gorChartData = $this->chartService->prepareGorChartData($columns, $rows, $timeColumn);
+        $fullAverageRow = $this->chartService->prepareFullAverageRow($parsedData);
+
+        $startTime = $this->parseDateTimeSafe($rows[0][$timeColumn] ?? null, Carbon::today());
+        $endTime = $this->parseDateTimeSafe(end($rows)[$timeColumn] ?? null, Carbon::today());
+
+        return [
+           'summary' => [
+            'client' => $request->input('client', 'N/A'),
+            'field' => $request->input('field', 'N/A'),
+            'well' => $request->input('well', 'N/A'),
+            'operator' => $request->input('operator', 'N/A'), // تمت إضافته
+            'test_date' => $request->input('test_date'), // تمت إضافته
+            'test_type' => $request->input('test_type', 'N/A'), // تمت إضافته
+            'wellhead_tower' => $request->input('wellhead_tower', ''),
+            'wellhead_string' => $request->input('wellhead_string', ''),
+            'choke_size' => $request->input('choke_size', 'N/A'),
+            'upstream_choke' => $request->input('upstream_choke', 'N/A'),
+            'downstream_choke' => $request->input('downstream_choke', 'N/A'),
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+        ],
+            'averages' => $averages,
+            'rates_chart_data' => $ratesChartData,
+            'gor_chart_data' => $gorChartData,
+            'parsed_data' => $parsedData,
+            'full_average_row' => $fullAverageRow,
+        ];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   public function storeTest(Request $request)
 {
     $request->validate([
-        'client' => 'required|string',
-        'field' => 'required|string',
-        'well' => 'required|string',
+        'summary' => 'required|string',
+        'averages' => 'required|string',
+        'parsed_data' => 'required|string',
         'temp_file_path' => 'required|string',
+        'filename' => 'required|string',
+        'task_id' => 'nullable|exists:plan_tasks,id',
     ]);
 
     $data = $request->all();
     $tempFilePath = $data['temp_file_path'];
 
-    // === نقل الملف من المجلد المؤقت إلى الدائم ===
     $permanentPath = null;
     if (Storage::disk('public')->exists($tempFilePath)) {
         $newFileName = basename($tempFilePath);
         $permanentPath = 'logs/' . $newFileName;
         Storage::disk('public')->move($tempFilePath, $permanentPath);
     } else {
-        // إذا لم يتم العثور على الملف المؤقت، أرجع خطأ
         return redirect()->back()->with('error', 'Temporary file not found. Could not save test.');
     }
-    // === نهاية نقل الملف ===
 
-    // === إنشاء سجل الاختبار في قاعدة البيانات مع معالجة أفضل لـ JSON ===
     try {
+        $summary = json_decode($data['summary'], true);
+        $averages = json_decode($data['averages'], true);
+        $parsedData = json_decode($data['parsed_data'], true);
+        $fullAverageRow = isset($data['full_average_row']) ? json_decode($data['full_average_row'], true) : [];
+
+        // Create WellTest record
         $wellTest = WellTest::create([
-            'client' => $data['client'],
-            'field' => $data['field'],
-            'well' => $data['well'],
-            'wellhead_tower' => $data['wellhead_tower'],
-            'wellhead_string' => $data['wellhead_string'],
-            'choke_size' => $data['choke_size'],
-            'upstream_choke' => $data['upstream_choke'],
-            'downstream_choke' => $data['downstream_choke'],
-            'start_time' => $data['start_time'],
-            'end_time' => $data['end_time'],
-            'metadata' => json_decode($data['metadata'], true),
-            'test_data' => json_decode($data['test_data'], true),
-            'calculated_metrics' => json_decode($data['calculated_metrics'], true),
+            'client' => $summary['client'],
+            'field' => $summary['field'],
+            'well' => $summary['well'],
+            'operator' => $summary['operator'],
+            'test_date' => $summary['test_date'],
+            'test_type' => $summary['test_type'],
+            'wellhead_tower' => $summary['wellhead_tower'],
+            'wellhead_string' => $summary['wellhead_string'],
+            'choke_size' => $summary['choke_size'],
+            'upstream_choke' => $summary['upstream_choke'],
+            'downstream_choke' => $summary['downstream_choke'],
+            'start_time' => $summary['start_time'],
+            'end_time' => $summary['end_time'],
+            'metadata' => $parsedData['metadata'] ?? [],
+            'test_data' => $parsedData['test_data'] ?? [],
+            'calculated_metrics' => $averages,
             'filename' => $data['filename'],
             'log_file_path' => $permanentPath
         ]);
+
+        // Handle task completion if task_id is present
+        if (isset($data['task_id']) && $data['task_id']) {
+            $task = PlanTask::findOrFail($data['task_id']);
+
+            // Create MPFMTest linked to task
+            $mpfmTest = MPFMTest::create([
+                'plan_task_id' => $task->id,
+                'well_test_id' => $wellTest->id,
+                'oil_rate' => $averages['oil_rate'] ?? null,
+                'gas_rate' => $averages['gas_rate'] ?? null,
+                'water_cut' => $averages['water_cut'] ?? null,
+                'pressure' => $averages['pressure'] ?? null,
+                'temperature' => $averages['temperature'] ?? null,
+                'gor' => $averages['gor'] ?? null,
+                'calculated_kpis' => $averages,
+                'log_file_path' => $permanentPath,
+                'raw_log_data' => $parsedData,
+                'test_duration_minutes' => $this->calculateTestDuration($summary['start_time'], $summary['end_time']),
+            ]);
+
+            // Mark task as completed
+            $task->complete([
+                'mpfm_test_id' => $mpfmTest->id,
+                'completion_notes' => 'Test completed successfully',
+            ]);
+
+            // Notify supervisor
+            $supervisor = $task->dailyPlan->createdBy;
+            if ($supervisor) {
+                $supervisor->notify(new TaskCompletedNotification($task, $mpfmTest));
+            }
+
+            return redirect()->route('operator.tasks.show', $task)
+                ->with('success', 'Test uploaded and task completed successfully!');
+        }
+
     } catch (\Exception $e) {
-        // في حالة فشل حفظ قاعدة البيانات، احذف الملف المنقول وأرجع خطأ
         if ($permanentPath && Storage::disk('public')->exists($permanentPath)) {
             Storage::disk('public')->delete($permanentPath);
         }
         return redirect()->back()->with('error', 'Failed to save test data to the database: ' . $e->getMessage());
     }
-    // === نهاية إنشاء السجل ===
 
-    return redirect()->route('well_tests.show', $wellTest->id)
+    return redirect()->route('well_tests.index')
         ->with('success', 'Well test saved successfully!');
 }
+
+
+
+
 
 
     public function index()
@@ -255,226 +317,113 @@ class VxLogController extends Controller
     {
         $wellTest = WellTest::findOrFail($id);
 
-        // Prepare chart data from saved test
-        $chartData = $this->prepareChartDataFromSaved($wellTest);
-        $gorChartData = $this->prepareGorChartDataFromSaved($wellTest);
+        $rows = $wellTest->test_data['rows'] ?? [];
+        $columns = $rows ? array_keys($rows[0]) : [];
+        $timeColumn = 'Date & Time';
+
+        $ratesChartData = $this->chartService->prepareRatesChartData($columns, $rows, $timeColumn);
+        $gorChartData = $this->chartService->prepareGorChartData($columns, $rows, $timeColumn);
+        $fullAverageRow = $this->chartService->prepareFullAverageRow(['test_data' => ['columns' => $columns, 'rows' => $rows]]);
 
         return view('logs.saved_results', [
             'wellTest' => $wellTest,
-            'chartData' => $chartData,
-            'gorChartData' => $gorChartData,
-            'fullAverageRow' => $this->calculateFullAverageFromSaved($wellTest)
+            'rates_chart_data' => $ratesChartData,
+            'gor_chart_data' => $gorChartData,
+            'full_average_row' => $fullAverageRow,
         ]);
     }
 
-    private function prepareChartDataFromSaved($wellTest)
-    {
-        $chartData = ['labels'=>[],'datasets'=>[]];
-        if (!empty($wellTest->test_data['rows'])) {
-            $labels=[]; $oilRates=[]; $waterRates=[]; $gasRates=[];
-            foreach ($wellTest->test_data['rows'] as $row) {
-                $labels[] = $row['Date & Time'] ?? 'N/A';
-                $oilRates[] = $this->parseNumeric($row['qo_lc[bbl/d]'] ?? 0);
-                $waterRates[] = $this->parseNumeric($row['qw_lc[bbl/d]'] ?? 0);
-                $gasRates[] = $this->parseNumeric($row['qg_lc[Mcf/d]'] ?? 0);
-            }
-            $chartData['labels']=$labels;
-            $chartData['datasets']=[
-                ['label'=>'Oil Rate','data'=>$oilRates,'borderColor'=>'green','tension'=>0.2],
-                ['label'=>'Water Rate','data'=>$waterRates,'borderColor'=>'blue','tension'=>0.2],
-                ['label'=>'Gas Rate','data'=>$gasRates,'borderColor'=>'red','tension'=>0.2],
-            ];
-        }
-        return $chartData;
-    }
+    // === Helper Functions ===
 
-    private function prepareGorChartDataFromSaved($wellTest)
-    {
-        $chartData = ['labels'=>[],'datasets'=>[]];
-        if (!empty($wellTest->test_data['rows'])) {
-            $labels=[]; $gorValues=[];
-            foreach ($wellTest->test_data['rows'] as $row) {
-                $labels[] = $row['Date & Time'] ?? 'N/A';
-                $gorValues[] = $this->parseNumeric($row['GOR[Scf/STB]'] ?? 0);
-            }
-            $chartData['labels']=$labels;
-            $chartData['datasets']=[
-                ['label'=>'GOR','data'=>$gorValues,'borderColor'=>'purple','tension'=>0.2],
-            ];
-        }
-        return $chartData;
-    }
-
-    private function calculateFullAverageFromSaved($wellTest)
-    {
-        $avgRow = [];
-        if(!empty($wellTest->test_data['rows'])){
-            $columns = $wellTest->test_data['columns'];
-            foreach($columns as $col){
-                $values = array_map(fn($r)=>$this->parseNumeric($r[$col]??0), $wellTest->test_data['rows']);
-                $avgRow[$col] = count($values)?array_sum($values)/count($values):'#N/A';
-            }
-        }
-        return $avgRow;
-    }
-
-    private function prepareGorChartData($parsedData)
-    {
-        $chartData = ['labels'=>[],'datasets'=>[]];
-        if (!empty($parsedData['test_data']['rows'])) {
-            $labels=[]; $gorValues=[];
-            foreach ($parsedData['test_data']['rows'] as $row) {
-                $labels[] = $row['Date & Time'] ?? 'N/A';
-                $gorValues[] = $this->parseNumeric($row['GOR[Scf/STB]'] ?? 0);
-            }
-            $chartData['labels']=$labels;
-            $chartData['datasets']=[
-                ['label'=>'GOR','data'=>$gorValues,'borderColor'=>'purple','tension'=>0.2],
-            ];
-        }
-        return $chartData;
-    }
-
-    // Rest of your existing methods...
+    /**
+     * Helper function to parse datetime safely
+     */
     private function parseDateTimeSafe($dateTimeStr, $defaultDate)
     {
-        if (!$dateTimeStr) return null;
+        if (!$dateTimeStr || trim($dateTimeStr) === '') {
+            return $defaultDate;
+        }
+
         try {
-            if (preg_match('/^\d{4}-\d{2}-\d{2}/', $dateTimeStr)) {
-                return Carbon::parse($dateTimeStr);
-            } else {
-                return Carbon::parse($defaultDate->format('Y-m-d') . ' ' . $dateTimeStr);
+            // Try different datetime formats
+            $formats = [
+                'Y-m-d H:i:s',
+                'd-M-Y H:i:s',
+                'd/m/Y H:i:s',
+                'm/d/Y H:i:s',
+                'Y-m-d H:i',
+                'd/m/Y H:i',
+                'm/d/Y H:i',
+            ];
+
+            foreach ($formats as $format) {
+                $date = DateTime::createFromFormat($format, trim($dateTimeStr));
+                if ($date) {
+                    return Carbon::instance($date);
+                }
             }
+
+            // Fallback to default parser
+            return Carbon::parse(trim($dateTimeStr));
+        } catch (\Exception $e) {
+            return $defaultDate;
+        }
+    }
+
+    /**
+     * Calculate test duration in minutes
+     */
+    private function calculateTestDuration($startTime, $endTime): ?int
+    {
+        try {
+            $start = $startTime instanceof Carbon ? $startTime : Carbon::parse($startTime);
+            $end = $endTime instanceof Carbon ? $endTime : Carbon::parse($endTime);
+            return $start->diffInMinutes($end);
         } catch (\Exception $e) {
             return null;
         }
     }
 
-    private function parseVxLog($lines)
-    {
-        $data = ['metadata' => [], 'test_data' => ['columns' => [], 'rows' => []], 'notes' => []];
-        $currentSection = '';
-        $columnHeaders = [];
-        $metadataKeys = ['DAFC Serial Number','DAFC HW Version','DAFC SW Version','DAFC FW Version','MCA Build Date','GD Serial Number','Configuration name','Test Date'];
 
-        foreach ($lines as $lineNum => $line) {
-            $line = trim($line);
-            if (empty($line)) continue;
 
-            foreach ($metadataKeys as $key) {
-                if (strpos($line,$key)!==false) {
-                    $parts = preg_split('/\s{2,}/', $line, 2);
-                    $data['metadata'][$key] = $parts[1] ?? trim($lines[$lineNum+1] ?? '');
-                    continue 2;
-                }
-            }
 
-            if (strpos($line,'Date & Time')!==false) {
-                $currentSection='test_data';
-                $columnHeaders = preg_split('/\t|\s{2,}/', $line);
-                $data['test_data']['columns'] = array_filter(array_map('trim',$columnHeaders));
-                continue;
-            }
 
-            if (!empty($data['test_data']['columns'])) {
-                if (preg_match('/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}/',$line) || preg_match('/\d+-\d{2}:\d{2}/',$line)) {
-                    $values = preg_split('/\t|\s{2,}/', $line);
-                    $row = [];
-                    foreach ($data['test_data']['columns'] as $i=>$col) {
-                        $row[$col] = $values[$i] ?? '';
-                    }
-                    $data['test_data']['rows'][] = $row;
-                }
-            }
 
-            if (strpos($line,'NOTES:')!==false) {
-                $currentSection='notes';
-                $data['notes'][]=$line;
-                continue;
-            }
 
-            if ($currentSection==='notes') $data['notes'][]=$line;
-        }
 
-        return $data;
-    }
 
-    private function parseNumeric($value)
-    {
-        if (is_null($value) || $value==='' || stripos($value,'N/A')!==false || stripos($value,'#VALUE!')!==false || stripos($value,'#DIV/0!')!==false) return 0;
-        return floatval(preg_replace('/[^\d\.\-]/','',$value));
-    }
 
-    private function calculateMetrics($parsedData)
-    {
-        $metrics = [
-            'oil_rate_avg'=>0,'water_rate_avg'=>0,'gas_rate_avg'=>0,
-            'wlr_avg'=>0,'gvf_avg'=>0,'bsw_avg'=>0,'total_gor_avg'=>0,
-            'whp_avg'=>0,'temp_avg'=>0,'press_avg'=>0
-        ];
 
-        if (!empty($parsedData['test_data']['rows'])) {
-            $oil=$water=$gas=$wlr=$gvf=$bsw=$gor=$whp=$temp=$press=[];
-            foreach ($parsedData['test_data']['rows'] as $row) {
-                $oil[] = $this->parseNumeric($row['qo_lc[bbl/d]'] ?? 0);
-                $water[] = $this->parseNumeric($row['qw_lc[bbl/d]'] ?? 0);
-                $gas[] = $this->parseNumeric($row['qg_lc[Mcf/d]'] ?? 0);
-                $wlr[] = $this->parseNumeric($row['WLR[%]'] ?? 0);
-                $gvf[] = $this->parseNumeric($row['GVF[%]'] ?? 0);
-                $bsw[] = $this->parseNumeric($row['BSW[%]'] ?? 0);
-                $gor[] = $this->parseNumeric($row['GOR[Scf/STB]'] ?? 0);
-                $whp[] = $this->parseNumeric($row['WHP[psi]'] ?? 0);
-                $temp[] = $this->parseNumeric($row['Temp[F]'] ?? 0);
-                $press[] = $this->parseNumeric($row['Press[psi]'] ?? 0);
-            }
 
-            $calcAvg = fn($arr)=>count($arr)?array_sum($arr)/count($arr):0;
-            $metrics['oil_rate_avg']=$calcAvg($oil);
-            $metrics['water_rate_avg']=$calcAvg($water);
-            $metrics['gas_rate_avg']=$calcAvg($gas);
-            $metrics['wlr_avg']=$calcAvg($wlr);
-            $metrics['gvf_avg']=$calcAvg($gvf);
-            $metrics['bsw_avg']=$calcAvg($bsw);
-            $metrics['total_gor_avg']=$calcAvg($gor);
-            $metrics['whp_avg']=$calcAvg($whp);
-            $metrics['temp_avg']=$calcAvg($temp);
-            $metrics['press_avg']=$calcAvg($press);
-        }
 
-        return $metrics;
-    }
 
-    private function prepareChartData($parsedData)
-    {
-        $chartData = ['labels'=>[],'datasets'=>[]];
-        if (!empty($parsedData['test_data']['rows'])) {
-            $labels=[]; $oilRates=[]; $waterRates=[]; $gasRates=[];
-            foreach ($parsedData['test_data']['rows'] as $row) {
-                $labels[] = $row['Date & Time'] ?? 'N/A';
-                $oilRates[] = $this->parseNumeric($row['qo_lc[bbl/d]'] ?? 0);
-                $waterRates[] = $this->parseNumeric($row['qw_lc[bbl/d]'] ?? 0);
-                $gasRates[] = $this->parseNumeric($row['qg_lc[Mcf/d]'] ?? 0);
-            }
-            $chartData['labels']=$labels;
-            $chartData['datasets']=[
-                ['label'=>'Oil Rate','data'=>$oilRates,'borderColor'=>'green','tension'=>0.2],
-                ['label'=>'Water Rate','data'=>$waterRates,'borderColor'=>'blue','tension'=>0.2],
-                ['label'=>'Gas Rate','data'=>$gasRates,'borderColor'=>'red','tension'=>0.2],
-            ];
-        }
-        return $chartData;
-    }
 
-    private function calculateFullAverage($parsedData)
-    {
-        $avgRow = [];
-        if(!empty($parsedData['test_data']['rows'])){
-            $columns = $parsedData['test_data']['columns'];
-            foreach($columns as $col){
-                $values = array_map(fn($r)=>$this->parseNumeric($r[$col]??0), $parsedData['test_data']['rows']);
-                $avgRow[$col] = count($values)?array_sum($values)/count($values):'#N/A';
-            }
-        }
-        return $avgRow;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

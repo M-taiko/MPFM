@@ -1,0 +1,262 @@
+@extends('layouts.master')
+
+@section('title', 'Upload Well Test Log')
+
+@section('content')
+<div class="main-container container-fluid">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-leftheader">
+            <h4 class="page-title mb-0">Upload Well Test Log</h4>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}"><i class="fe fe-home mr-2 fs-14"></i>Home</a></li>
+                @if(isset($task))
+                <li class="breadcrumb-item"><a href="{{ route('operator.tasks') }}">My Tasks</a></li>
+                <li class="breadcrumb-item active">Upload Log for {{ $task->task_identifier }}</li>
+                @else
+                <li class="breadcrumb-item active">Upload Log</li>
+                @endif
+            </ol>
+        </div>
+        @if(isset($task))
+        <div class="page-rightheader">
+            <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-outline-primary">
+                <i class="fe fe-arrow-left mr-2"></i>Back to Task
+            </a>
+        </div>
+        @endif
+    </div>
+
+    @if(isset($task))
+    <!-- Task Context Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="border-left: 4px solid #17a2b8;">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-2">
+                                <i class="fe fe-info mr-2"></i>Task: {{ $task->task_identifier }}
+                            </h5>
+                            <p class="mb-1 text-muted">
+                                <strong>Location:</strong> {{ $task->oilString->tower->oilField->name }} / {{ $task->oilString->tower->name }} / {{ $task->oilString->name }}
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <strong>MPFM Device:</strong> {{ $task->mpfm_device ?? 'N/A' }}
+                            </p>
+                            @if($task->task_instructions)
+                            <p class="mb-0 text-muted">
+                                <strong>Instructions:</strong> {{ $task->task_instructions }}
+                            </p>
+                            @endif
+                        </div>
+                        <div class="col-md-4 text-right">
+                            @if($task->expected_oil_rate || $task->expected_gas_rate)
+                            <div class="alert alert-info mb-0">
+                                <strong>Expected Values:</strong><br>
+                                @if($task->expected_oil_rate)
+                                Oil Rate: {{ number_format($task->expected_oil_rate, 2) }} STB/d<br>
+                                @endif
+                                @if($task->expected_gas_rate)
+                                Gas Rate: {{ number_format($task->expected_gas_rate, 2) }} MMScf/d<br>
+                                @endif
+                                @if($task->expected_water_cut)
+                                Water Cut: {{ number_format($task->expected_water_cut, 2) }}%
+                                @endif
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Card -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card custom-card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Well Test Information</h6>
+                </div>
+
+                <div class="card-body">
+                    <!-- عرض رسائل النجاح (إن وجدت) -->
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    <!-- عرض رسائل الخطأ العامة -->
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <strong>There were some problems with your input:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('process.log') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+
+                        @if(isset($task))
+                        <input type="hidden" name="task_id" value="{{ $task->id }}">
+                        @endif
+
+                        <!-- Manual Inputs -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Client</label>
+                                    <input type="text" name="client" class="form-control @error('client') is-invalid @enderror"
+                                           placeholder="ADNOC"
+                                           value="{{ old('client', $autoFillData['client'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }} required>
+                                    @error('client')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Field</label>
+                                    <input type="text" name="field" class="form-control @error('field') is-invalid @enderror"
+                                           placeholder="Upper Zakum"
+                                           value="{{ old('field', $autoFillData['field'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }} required>
+                                    @error('field')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Well Name</label>
+                                    <input type="text" name="well" class="form-control @error('well') is-invalid @enderror"
+                                           placeholder="ZK-23"
+                                           value="{{ old('well', $autoFillData['well'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }} required>
+                                    @error('well')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Choke Size (1/64")</label>
+                                    <input type="number" name="choke_size" class="form-control"
+                                           placeholder="32"
+                                           value="{{ old('choke_size') }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Operator Name</label>
+                                    <input type="text" name="operator" class="form-control @error('operator') is-invalid @enderror"
+                                           placeholder="Operator Name"
+                                           value="{{ old('operator', $autoFillData['operator'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }} required>
+                                    @error('operator')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Wellhead Tower</label>
+                                    <input type="text" name="wellhead_tower" class="form-control"
+                                           placeholder="Tower Name"
+                                           value="{{ old('wellhead_tower', $autoFillData['wellhead_tower'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }}>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Wellhead String</label>
+                                    <input type="text" name="wellhead_string" class="form-control"
+                                           placeholder="String Name"
+                                           value="{{ old('wellhead_string', $autoFillData['wellhead_string'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Test Date</label>
+                                    <input type="date" name="test_date" class="form-control @error('test_date') is-invalid @enderror"
+                                           value="{{ old('test_date', $autoFillData['test_date'] ?? '') }}"
+                                           {{ isset($task) ? 'readonly' : '' }} required>
+                                    @error('test_date')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Test Type</label>
+                                    <select name="test_type" class="form-control" {{ isset($task) ? 'disabled' : '' }}>
+                                        <option value="flow" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'flow' ? 'selected' : '' }}>Flow Test</option>
+                                        <option value="cleanup" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'cleanup' ? 'selected' : '' }}>Clean Up</option>
+                                        <option value="build-up" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'build-up' ? 'selected' : '' }}>Build Up</option>
+                                    </select>
+                                    @if(isset($task))
+                                    <input type="hidden" name="test_type" value="{{ $autoFillData['test_type'] ?? 'flow' }}">
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- File Upload -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>VX Log File</label>
+                                    <input type="file" name="logfile" class="form-control @error('logfile') is-invalid @enderror" accept=".vxlog,.txt" required>
+                                    @error('logfile')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="row mt-4">
+                            <div class="col-md-12 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fe fe-upload me-2"></i> Upload & Analyze
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection

@@ -1,0 +1,319 @@
+@extends('layouts.master')
+
+@section('content')
+<div class="container-fluid">
+    <h2 class="mb-4">Well Tests Comparison</h2>
+
+@php
+$metrics = [
+    'oil_rate_avg'    => 'Oil Rate (bbl/d)',
+    'water_rate_avg' => 'Water Rate (bbl/d)',
+    'gas_rate_avg'   => 'Gas Rate (Mcf/d)',
+    'total_gor_avg'  => 'GOR (Scf/STB)',
+    'bsw_avg'        => 'BSW (%)',
+    'wlr_avg'        => 'WLR (%)',
+    'gvf_avg'        => 'GVF (%)',
+];
+$derivedMetrics = [
+    'wlr_formula'    => 'Calculated WLR (%)',
+    'gor_formula'    => 'Calculated GOR',
+    'bsw_formula'    => 'Calculated BSW (%)',
+    'gvf_formula'    => 'Calculated GVF (%)',
+];
+$pressureMetrics = [
+    'max_pressure' => 'Max Pressure',
+    'min_pressure' => 'Min Pressure',
+    'avg_pressure' => 'Avg Pressure',
+];
+$temperatureMetrics = [
+    'max_temperature' => 'Max Temperature',
+    'min_temperature' => 'Min Temperature',
+    'avg_temperature' => 'Avg Temperature',
+];
+$volumeMetrics = [
+    'h2s_avg' => 'H2S Avg',
+    'cumulative_oil_volume' => 'Cumulative Oil (bbl)',
+    'cumulative_water_volume' => 'Cumulative Water (bbl)',
+    'cumulative_gas_volume' => 'Cumulative Gas (Mcf)',
+];
+$chunks = $comparisonData->chunk(2);
+@endphp
+
+@foreach($chunks as $row)
+<div class="row mb-4">
+@foreach($row as $test)
+<div class="col-md-6">
+<div class="card">
+    <div class="card-header">
+        <strong>{{ $test['well'] }}</strong> – {{ $test['client'] }}
+        <br><small>{{ $test['start_time'] }} → {{ $test['end_time'] }}</small>
+    </div>
+
+    <div class="card-body">
+        <!-- Average Production Metrics -->
+        <h6>Average Production Metrics</h6>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Avg Value</th>
+                    <th>Comparison</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($metrics as $key => $label)
+                <tr>
+                    <td><strong>{{ $label }}</strong></td>
+                    <td>
+                        @if(isset($test['metrics'][$key]) && is_numeric($test['metrics'][$key]))
+                            {{ number_format($test['metrics'][$key], 2) }}
+                        @else
+                            {{ $test['metrics'][$key] ?? 'N/A' }}
+                        @endif
+                    </td>
+                    <td>
+                        <span class="metric-diff"
+                              data-metric="{{ $key }}"
+                              data-value="{{ $test['metrics'][$key] ?? 0 }}">
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+
+        <!-- Derived Metrics -->
+        <h6>Derived Metrics</h6>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                    <th>Comparison</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($derivedMetrics as $key => $label)
+                <tr>
+                    <td><strong>{{ $label }}</strong></td>
+                    <td>
+                        @if(isset($test['metrics'][$key]) && is_numeric($test['metrics'][$key]))
+                            {{ number_format($test['metrics'][$key], 2) }}
+                        @else
+                            {{ $test['metrics'][$key] ?? 'N/A' }}
+                        @endif
+                    </td>
+                    <td>
+                        <span class="metric-diff"
+                              data-metric="{{ $key }}"
+                              data-value="{{ $test['metrics'][$key] ?? 0 }}">
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+
+        <div class="row">
+            <!-- Pressure & Temperature Metrics -->
+            <div class="col-md-6">
+                <h6>Pressure & Temperature</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach(array_merge($pressureMetrics, $temperatureMetrics) as $key => $label)
+                        <tr>
+                            <td><strong>{{ $label }}</strong></td>
+                            <td>
+                                @if(isset($test['metrics'][$key]) && is_numeric($test['metrics'][$key]))
+                                    {{ number_format($test['metrics'][$key], 2) }}
+                                @else
+                                    {{ $test['metrics'][$key] ?? 'N/A' }}
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- H2S & Volume Metrics -->
+            <div class="col-md-6">
+                <h6>H2S & Volume Metrics</h6>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($volumeMetrics as $key => $label)
+                        <tr>
+                            <td><strong>{{ $label }}</strong></td>
+                            <td>
+                                @if(isset($test['metrics'][$key]) && is_numeric($test['metrics'][$key]))
+                                    {{ number_format($test['metrics'][$key], 2) }}
+                                @else
+                                    {{ $test['metrics'][$key] ?? 'N/A' }}
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Safety Issues Summary -->
+        @if(isset($test['metrics']['safety_issues']) && !empty($test['metrics']['safety_issues']))
+        <h6>Safety Issues Summary</h6>
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Issue Type</th>
+                    <th>Count</th>
+                    <th>Average Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(isset($test['metrics']['safety_issues']['voltage_issues']))
+                <tr>
+                    <td>Voltage Issues</td>
+                    <td>{{ count($test['metrics']['safety_issues']['voltage_issues']) }}</td>
+                    <td>
+                        @php
+                            $voltages = array_column($test['metrics']['safety_issues']['voltage_issues'], 'value');
+                            $avgVoltage = count($voltages) > 0 ? array_sum($voltages) / count($voltages) : 0;
+                        @endphp
+                        {{ number_format($avgVoltage, 2) }}
+                    </td>
+                </tr>
+                @endif
+
+                @if(isset($test['metrics']['safety_issues']['pressure_issues']))
+                <tr>
+                    <td>Pressure Issues</td>
+                    <td>{{ count($test['metrics']['safety_issues']['pressure_issues']) }}</td>
+                    <td>
+                        @php
+                            $pressures = array_column($test['metrics']['safety_issues']['pressure_issues'], 'value');
+                            $avgPressure = count($pressures) > 0 ? array_sum($pressures) / count($pressures) : 0;
+                        @endphp
+                        {{ number_format($avgPressure, 2) }}
+                    </td>
+                </tr>
+                @endif
+
+                @if(isset($test['metrics']['safety_issues']['temperature_issues']))
+                <tr>
+                    <td>Temperature Issues</td>
+                    <td>{{ count($test['metrics']['safety_issues']['temperature_issues']) }}</td>
+                    <td>
+                        @php
+                            $temperatures = array_column($test['metrics']['safety_issues']['temperature_issues'], 'value');
+                            $avgTemperature = count($temperatures) > 0 ? array_sum($temperatures) / count($temperatures) : 0;
+                        @endphp
+                        {{ number_format($avgTemperature, 2) }}
+                    </td>
+                </tr>
+                @endif
+            </tbody>
+        </table>
+        @endif
+
+        <canvas id="chart-{{ $test['id'] }}" height="200"></canvas>
+    </div>
+</div>
+</div>
+@endforeach
+</div>
+@endforeach
+
+</div>
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const comparisonData = @json($comparisonData);
+    const metrics = ['oil_rate_avg','water_rate_avg','gas_rate_avg','total_gor_avg','bsw_avg','wlr_avg','gvf_avg','wlr_formula','gor_formula','bsw_formula','gvf_formula'];
+
+    /* ===== Charts ===== */
+    comparisonData.forEach(test => {
+        const ctx = document.getElementById('chart-'+test.id);
+        if (!ctx) return;
+
+        const rows = test.test_data.rows ?? [];
+
+        // Apply water metric corrections for chart data
+        const oilData = rows.map(r => {
+            const value = parseFloat(r['qo_lc[bbl/d]']) || 0;
+            return isNaN(value) ? 0 : value;
+        });
+
+        const waterData = rows.map(r => {
+            const value = parseFloat(r['qw_lc[bbl/d]']) || 0;
+            // Apply negative correction for water data
+            return isNaN(value) ? 0 : (value < 0 ? 0 : value);
+        });
+
+        const gasData = rows.map(r => {
+            const value = parseFloat(r['qg_lc[Mcf/d]']) || 0;
+            return isNaN(value) ? 0 : value;
+        });
+
+        new Chart(ctx, {
+            type:'line',
+            data:{
+                labels: rows.map(r => r['Date & Time']),
+                datasets:[
+                    {label:'Oil', data: oilData, borderColor:'green'},
+                    {label:'Water', data: waterData, borderColor:'blue'},
+                    {label:'Gas', data: gasData, borderColor:'red'}
+                ]
+            },
+            options:{responsive:true}
+        });
+    });
+
+    /* ===== % Difference ===== */
+    metrics.forEach(metric => {
+        const values = comparisonData.map(t => {
+            const val = t.metrics[metric];
+            return (typeof val === 'string' && val !== 'N/A') ? parseFloat(val) || 0 : (typeof val === 'number' ? val : 0);
+        });
+        const avg = values.reduce((a,b)=>a+b,0)/values.length;
+
+        comparisonData.forEach(test => {
+            const rawValue = test.metrics[metric];
+            const value = (typeof rawValue === 'string' && rawValue !== 'N/A') ? parseFloat(rawValue) || 0 : (typeof rawValue === 'number' ? rawValue : 0);
+            const diff = avg ? ((value - avg)/avg)*100 : 0;
+
+            const span = document.querySelector(
+                `.metric-diff[data-metric="${metric}"][data-value="${rawValue}"]`
+            );
+
+            if (!span) return;
+
+            let arrow='→', color='gray';
+            if (diff > 2) { arrow='↑'; color='green'; }
+            if (diff < -2){ arrow='↓'; color='red'; }
+
+            span.innerHTML = `<strong style="color:${color}">
+                ${arrow} ${diff.toFixed(1)}%
+            </strong>`;
+        });
+    });
+
+});
+</script>
+@endpush

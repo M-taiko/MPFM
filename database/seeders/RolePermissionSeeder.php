@@ -5,65 +5,109 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use App\Models\User;
 
 class RolePermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-        // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
-        // Create permissions
+        // Create permissions if they don't exist
         $permissions = [
-            'view-users',
-            'create-users',
-            'edit-users',
-            'delete-users',
-            'view-roles',
-            'create-roles',
-            'edit-roles',
-            'delete-roles',
-            'view-permissions',
-            'create-permissions',
-            'edit-permissions',
-            'delete-permissions',
+            // User Management Permissions
+            'manage_users',
+            'view_users',
+            'create_users',
+            'edit_users',
+            'delete_users',
+
+            // Role Management Permissions
+            'manage_roles',
+            'view_roles',
+            'create_roles',
+            'edit_roles',
+            'delete_roles',
+
+            // Permission Management Permissions
+            'manage_permissions',
+            'view_permissions',
+            'create_permissions',
+            'edit_permissions',
+            'delete_permissions',
+
+            // Well Test Permissions
+            'view_well_tests',
+            'create_well_tests',
+            'edit_well_tests',
+            'delete_well_tests',
+
+            // Report Permissions
+            'view_job_officer_reports',
+            'view_reservoir_engineer_reports',
+            'view_production_supervisor_reports',
+            'view_mpfm_supervisor_reports',
+            'view_mpfm_operator_reports',
+
+            // Well String Requirements Permissions
+            'view_well_string_requirements',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Create roles
-        $adminRole = Role::create(['name' => 'admin']);
-        $editorRole = Role::create(['name' => 'editor']);
-        $userRole = Role::create(['name' => 'user']);
+        // Create roles if they don't exist
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $jobOfficerRole = Role::firstOrCreate(['name' => 'job_officer']);
+        $reservoirEngineerRole = Role::firstOrCreate(['name' => 'reservoir_engineer']);
+        $productionSupervisorRole = Role::firstOrCreate(['name' => 'production_supervisor']);
+        $mpfmSupervisorRole = Role::firstOrCreate(['name' => 'mpfm_supervisor']);
+        $mpfmOperatorRole = Role::firstOrCreate(['name' => 'mpfm_operator']);
 
-        // Assign permissions to roles
         // Admin gets all permissions
         $adminRole->givePermissionTo(Permission::all());
 
-        // Editor gets limited permissions
-        $editorRole->givePermissionTo([
-            'view-users',
-            'edit-users',
-            'view-roles',
-            'view-permissions',
+        // Job Officer permissions
+        $jobOfficerRole->syncPermissions([
+            'view_well_tests',
+            'view_job_officer_reports',
         ]);
 
-        // User gets basic permissions
-        $userRole->givePermissionTo([
-            'view-users',
+        // Reservoir Engineer permissions
+        $reservoirEngineerRole->syncPermissions([
+            'view_well_tests',
+            'view_reservoir_engineer_reports',
+            'view_well_string_requirements',
         ]);
 
-        // Assign roles to users
-        // Get the first user (created in DatabaseSeeder)
-        $user = User::first();
-        if ($user) {
-            $user->assignRole('admin');
-        }
+        // Production Supervisor permissions
+        $productionSupervisorRole->syncPermissions([
+            'view_well_tests',
+            'view_production_supervisor_reports',
+            'view_well_string_requirements',
+        ]);
+
+        // MPFM Supervisor permissions
+        $mpfmSupervisorRole->syncPermissions([
+            'view_well_tests',
+            'view_mpfm_supervisor_reports',
+            'view_well_string_requirements',
+        ]);
+
+        // Job Officer permissions
+        $jobOfficerRole->syncPermissions([
+            'view_well_tests',
+            'view_job_officer_reports',
+            'view_well_string_requirements',
+        ]);
+
+        // MPFM Operator permissions
+        $mpfmOperatorRole->syncPermissions([
+            'view_well_tests',
+            'view_mpfm_operator_reports',
+        ]);
     }
 }

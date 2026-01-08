@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan make:controller:*)",
+      "Bash(php:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(del test_migration.php)"
+    ]
+  }
+}

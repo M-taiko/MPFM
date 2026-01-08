@@ -1,0 +1,367 @@
+MPFM Flow Testing Dec. 2025 Plan: Modified on 01-Dec-25																NOTE: If DPV is out of range (50-5000mbar) then make appropriate choke adjustment								YES
+TOTAL TESTS											285		LAST UPDATE:		23-Dec-25	to achieve this range and then test the string @the adjusted WHFP. 								NO
+Monthly Target per KPI											255					 Report the tested WHFP the test was tested on in the MPFM Plan.								Approved
+Total Approved Tests											0					NOTE: If Req. testing WHFP < SLP, then test the string at the current condition it is flowing on.								Rejected
+Total Rejected Tests											0					 Report the tested WHFP the test was tested on in the MPFM Plan.								Pending
+Total Pending Tests											0					"NOTE: Every crew is expected to carry out at least 2 flow test per day.
+If second WHT program was cancelled for any reason and crew was stuck on the first WHT, then tests can be done at current condition even if they are not included in the MPFM plan."								N/A
+Total Reported Tests "YES"											204
+Total Issues "NO"											3					ZK-17,37,39,47,56,62,95,280,290,329,375 to be tested locally only
+Ahead of KPI Target by											-51					ZK-127,234,245 Only 1 test per day as per TLM SPV request. MPFM Power Supply Issue.
+SNO	WELL	Tower	Flow route	Reservior Layer		Locally/SCADA	Electrification Status	MPFM Type	DHSV	Sub Category	Category	Dec_2025	Req. WHFP	Date	Done by	"Completed
+(yes/no)"	Final Status	"Tested
+WHFP"	MPFM Supervisor - Remarks	Additional Pressure And Notes By HQ.
+1	388/2	3	ZC	IVB-6	B	Scada	Y	Vx-Spectra	DKS	Healthy	Active  	3500	1458	7-Dec-25	Mahinth	YES		1465	Tested at CC.
+2	432/1	3	ZC	VU-6	B	Scada	Y	Vx-Spectra	FXE	Healthy 	Active	1500	743	5-Dec-25	Fouad	YES		861	Low DPV=70 mbar limitation.
+3	432/1	3	ZC	VU-6	B	Scada	Y	Vx-Spectra	FXE	Healthy 	Active	1500	743	7-Dec-25	Mahinth	YES		848	Tested at CC.
+4	432/2	3	ZC	IVC-6	B	Scada	Y	Vx-Spectra	FXE	Healthy 	Active	3500	1360	7-Dec-25	Mahinth	YES		1388	Tested at CC.
+5	432/2	3	ZC	IVC-6	B	Scada	Y	Vx-Spectra	FXE	Healthy 	Active	3500	1360	11-Dec-25	CCR	YES		1379	Tested at CC.
+6	432/2	3	ZC	IVC-6	B	Scada	Y	Vx-Spectra	FXE	Healthy 	Active	3500	1360	16-Dec-25	CCR	YES		1395	Tested at CC.
+7	432/2	3	ZC	IVC-6	B	Scada	Y	Vx-Spectra	FXE	Healthy 	Active	3500	1360	18-Dec-25	CCR	YES		1382	Tested at CC.
+8	015/1	15	ZC	VM-1	B	Scada	N	Vx-Spectra	DKS	HGOR(Wet)	Active	1100	687	4-Dec-25	Juber			596	Tested at CC.
+9	015/1	15	ZC	VM-1	B	Scada	N	Vx-Spectra	DKS	HGOR(Wet)	Active	1100	687						to be re-tested.
+10	015/2	15	ZC	VU-1	B	Scada	N	Vx-Spectra	DKS	GOR Relaxation 1	Active	1700	900	4-Dec-25	Juber	YES		850
+11	015/2	15	ZC	VU-1	B	Scada	N	Vx-Spectra	DKS	GOR Relaxation 1	Active	1700	900	10-Dec-25	SLB Enginner	YES			To be retrieved locally. SLP-
+12	017/1	17	ZC	IVB-5	A	Locally	N	Vx-Spectra	FXE	Healthy	Active	3300	1234	3-Dec-25	Juber	YES		1243	Tested at CC.
+13	406/2	33	ZC	IVB-6	B	0	Y	Vx-Spectra	FXE	Healthy	Active	3200	1365
+14	436/1	33	ZC	IVB-6	B	0	Y	Vx-Spectra	FXE	Healthy 	Active	1500	752
+15	436/2	33	ZC	IVA-6	B	0	Y	Vx-Spectra	FXE	HGOR-OPEN	Inactive	1250	1684
+16	188/1	34	ZC	VU-2	B	0	N	Vx-Spectra	FRE	HGOR-OPEN	Active	2000	818
+17	188/2	34	ZC	IVC-2	B	0	N	Vx-Spectra	FRE	HGOR-OPEN	Active	1500	1154
+18	340/1	35	ZC	IVA-1	B	Locally	Y	Vx-PW	HALLIBURTON TRSV	Healthy 	Active 	2500	1313	1-Dec-25	Thuya	YES		1263	Tested at CC.
+19	340/1	35	ZC	IVA-1	B	Locally	Y	Vx-PW	HALLIBURTON TRSV	Healthy 	Active 	2500	1313	20-Dec-25	Rafeek	YES		1115	Tested at CC.
+20	407/1	35	ZC	VU-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	764	1-Dec-25	Thuya	YES		798	Tested at CC.
+21	407/1	35	ZC	VU-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	764	10-Dec-25	Garah	YES		856	Tested at CC.
+22	407/1	35	ZC	VU-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	764	13-Dec-25	Mahinth	YES		818	Tested at CC.
+23	407/1	35	ZC	VU-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	764	20-Dec-25	Rafeek	YES		740	Tested at CC.
+24	407/1	35	ZC	VU-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	764	20-Dec-25	Rafeek	YES		720	to be retrieved locally. slp-575
+25	407/2	35	ZC	IVB-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	3500	1425	1-Dec-25	Thuya	YES		1424
+26	407/2	35	ZC	IVB-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	3500	1425	7-Dec-25	CCR	YES		1422	Tested at CC.
+27	407/2	35	ZC	IVB-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	3500	1425	10-Dec-25	Garah	YES		1407	Tested at CC.
+28	407/2	35	ZC	IVB-1	B	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	3500	1425	13-Dec-25	Mahinth	YES		1443	Tested at CC.
+29	338/1	37	ZC	IVC-1	B	Locally	N	Vx-PW	FXE	Healthy	Active	3500	722
+30	338/2	37	ZC	IVA-1	B	Locally	N	Vx-PW	FXE	Healthy	Active	2500	1103
+31	341/2	37	ZC	IVC-1	B	Locally	N	Vx-PW	FXE	HGOR-OPEN	Active	3500	1141
+32	250/1	39	ZC	VU-4	A	Locally	Y	Vx-PW	FRE	Intermittent	Active 	2000	1014
+33	308/1	39	ZC	VU-4	A	Locally	Y	Vx-PW	FXE	Intermittent	Active	1500	837	6-Dec-25	SLB Engineer	YES		852	Performance Test after CM.
+34	308/1	39	ZC	VU-4	A	Locally	Y	Vx-PW	FXE	Intermittent	Active	1500	837	15-Dec-25	Thuya	YES		865	Tested at CC.
+35	308/2	39	ZC	IVC-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3500	916	15-Dec-25	Thuya	YES		916	to be retrieved locally. slp-640
+36	308/2	39	ZC	IVC-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3500	916	18-Dec-25	CCR	YES			to be retrieved locally. 5-7
+37	345/1	39	ZC	IVC-4	A	Locally	Y	Vx-PW	WVE	Healthy	Active	3200	1288	15-Dec-25	Thuya	YES		1325	Tested at CC.
+38	357/1	39	ZC	VU-3	A	Locally	Y	Vx-PW	WX W/FORD TRSV	HGOR-OPEN	Active	1500	986
+39	185/1	42	ZC	IVC-1	B	Scada	Y	Vx-Spectra	FXE	Healthy	Active	1000	716	1-Dec-25	Siva	YES		758	Tested at CC.
+40	185/1	42	ZC	IVC-1	B	Scada	Y	Vx-Spectra	FXE	Healthy	Active	1000	716	17-Dec-25	SLB Engineer	YES		1083	Tested at CC. 185/2 well string was closed on that period.
+41	185/1	42	ZC	IVC-1	B	Scada	Y	Vx-Spectra	FXE	Healthy	Active	1000	716						Top Priority. Communication Test. 185/2 to be closed/opened only.
+42	185/2	42	ZC	IVB-1	B	Scada	Y	Vx-Spectra	FXE	Healthy	Active	3100	1202	1-Dec-25	Siva	YES		1076	Tested at CC.
+43	381/1	42	ZC	VU-1	B	Scada	Y	Vx-Spectra	FRE	Intermittent  	Active 	700	766	1-Dec-25	Siva	NO			Low DPV.
+44	381/2	42	ZC	IVC-1	B	Scada	Y	Vx-Spectra	FRE	Healthy	Active	3500	1212	1-Dec-25	Siva	YES		1220	Tested at CC.
+45	381/2	42	ZC	IVC-1	B	Scada	Y	Vx-Spectra	FRE	Healthy	Active	3500	1212	23-Dec-25	Musabah	YES			to be retrieved. slp -  14:00-16:00
+46	060/1	45	ZC	VM-1	B	0	N	Vx-PW	FXE	Intermittent	Active	2100	1479	4-Dec-25	Siva	YES		1477
+47	306/1	45	ZC	VM-1	B	0	N	Vx-PW	FXE	Healthy 	Active 	2000	721
+48	347/1	45	ZC	VM-1	B	0	N	Vx-PW	FXE	GOR Relaxation 2	Active	2000	988	4-Dec-25	Siva	YES		910	Tested at CC.
+49	047/1	47	ZW	IVC-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	2000	572	5-Dec-25	Juber	YES		500	Tested at CC.
+50	047/2	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3300	762	5-Dec-25	Juber	YES		776	Tested at CC.
+51	047/2	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3300	762	23-Dec-25	Rafeek	YES		762	to be retrieved. slp-426. 16:00-18:00
+52	048/2	47	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	3000	800	5-Dec-25	Juber	YES		852	3 MBD.
+53	048/2	47	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	3000	800	8-Dec-25	Mahinth	YES		830	Tested at CC.
+54	067/1	47	ZW	IVC-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2000	1258	8-Dec-25	Mahinth	YES		1262
+55	067/2	47	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	1700	1342	8-Dec-25	Mahinth	YES		1342
+56	071/1	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	8-Dec-25	Mahinth	YES		804
+57	071/1	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	12-Dec-25	CCR	YES		802	Tested at CC.
+58	071/1	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	16-Dec-25	CCR	YES		795	Tested at CC.
+59	071/1	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	18-Dec-25	CCR	YES		805	Tested at CC.
+60	071/1	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	22-Dec-25	CCR	YES		822	Tested at CC.
+61	071/1	47	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	23-Dec-25	Rafeek	YES		822	Tested at CC.
+62	071/2	47	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active 	2000	568	5-Dec-25	Juber	YES		576	Tested at CC.
+63	071/2	47	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active 	2000	568	23-Dec-25	Rafeek	YES		568
+64	059/1	56	ZC	IVB-6	B	Locally	N	Vx-PW	FXE	HGOR-OPEN	Active	3500	758
+65	093/2	56	ZC	IVC-6	B	Locally	N	Vx-PW	FXE	HGOR-OPEN	Active	3500	1098
+66	238/1	56	ZC	IVC-6	B	Locally	N	Vx-PW	TRSV	Healthy	Active	2000	1192
+67	334/2	56	ZC	IVB-6	B	Locally	N	Vx-PW	FXE	Healthy 	Active 	2000	1519
+68	089/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	1028	10-Dec-25	Juber	YES		1032
+69	089/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	1028	12-Dec-25	Thuya	YES		1040	Tested at CC.
+70	089/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	1028	23-Dec-25	Mahinth	YES		1053	Tested at CC.
+71	089/2	62	ZC	IVA-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	1500	1555	12-Dec-25	Thuya			1405	Tested at CC.
+72	089/2	62	ZC	IVA-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	1500	1555						Top Priority.
+73	271/1	62	ZC	VL-5	B	Locally	Y	Vx-PW	FXE	Reservoir issue	Active	1000	684	3-Dec-25	Mahinth	YES		687
+74	356/2	62	ZC	IVB-5	B	Locally	Y	Vx-PW	WX W/FORD TRSV	HGOR-OPEN	Active	3300	1587	3-Dec-25	Mahinth	YES		1586
+75	356/2	62	ZC	IVB-5	B	Locally	Y	Vx-PW	WX W/FORD TRSV	HGOR-OPEN	Active	3300	1587	23-Dec-25	Mahinth	YES		1595	Tested at CC.
+76	358/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	894	3-Dec-25	Mahinth	YES		922	3 MBD.
+77	358/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	894	7-Dec-25	CCR	YES		909	Tested at CC.
+78	358/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	894	12-Dec-25	Thuya	YES		875	Tested at CC.
+79	358/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	894	12-Dec-25	Thuya	YES		890
+80	358/1	62	ZC	IVC-5	B	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	894	23-Dec-25	Mahinth	YES		931	Tested at CC.
+81	358/2	62	ZC	IVB-5	B	Locally	Y	Vx-PW	FXE	Intermittent	Active	1700	1081	3-Dec-25	Mahinth	YES		743	Tested at CC.
+82	358/2	62	ZC	IVB-5	B	Locally	Y	Vx-PW	FXE	Intermittent	Active	1700	1081	23-Dec-25	Mahinth	YES		722	to be retrieved. slp-619. 16:00-18:00
+83	358/2	62	ZC	IVB-5	B	Locally	Y	Vx-PW	FXE	Intermittent	Active	1700	1081						To be tested for overnight.
+84	101/1	84	ZC	IVA-1	B	Scada	N	Vx-PW	FXE	Healthy 	Active	2500	1415
+85	219/1	84	ZC	IVA-1	B	Scada	N	Vx-PW	FXE	Healthy	Active	2000	699	1-Dec-25	Juber	YES		719	to be retrieved locally. slp-632. 10:30-11:45
+86	223/1	84	ZC	IVC-1	B	Scada	N	Vx-PW	FXE	Healthy 	Active 	3500	1165
+87	223/2	84	ZC	IVA-1	B	Scada	N	Vx-PW	FXE	Healthy	Active	2500	1396	1-Dec-25	Juber	YES		1430	to be retrieved locally. slp-630. 9:00 -10:15
+88	335/1	84	ZC	IVC-1	B	Scada	N	Vx-PW	FXE	Healthy	Active	3500	849
+89	092/1	88	ZW	IVC-2	C	0	Y	Vx-PW	VE	Healthy	Active	1500	805	2-Dec-25	Siva	YES		627	Tested at CC.
+90	092/1	88	ZW	IVC-2	C	0	Y	Vx-PW	VE	Healthy	Active	1500	805	9-Dec-25	Juber	YES		766	Tested at CC.
+91	092/2	88	ZW	IVB-2	C	0	Y	Vx-PW	VE	Healthy	Active	2000	988	2-Dec-25	Siva	YES		984
+92	092/2	88	ZW	IVB-2	C	0	Y	Vx-PW	VE	Healthy	Active	2000	988	5-Dec-25	Garah	YES		986
+93	092/2	88	ZW	IVB-2	C	0	Y	Vx-PW	VE	Healthy	Active	2000	988	9-Dec-25	Juber	YES		985
+94	092/2	88	ZW	IVB-2	C	0	Y	Vx-PW	VE	Healthy	Active	2000	988	24-Dec-25	Rafeek	YES		985	To be retrieved  slp-520. 8:30-10:15.
+95	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	2-Dec-25	Siva	YES		690
+96	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	5-Dec-25	Garah	YES		676	Tested at CC.
+97	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	8-Dec-25	Juber	YES		676	Tested at CC.
+98	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	9-Dec-25	Juber	YES		675	Tested at CC.
+99	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	15-Dec-25	CCR	YES		666	Tested at CC.
+100	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	18-Dec-25	CCR	YES		662	Tested at CC.
+101	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	21-Dec-25	CCR	YES		640	Tested at CC.
+102	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500	682	23-Dec-25	CCR	YES		662	Tested at CC.
+103	111/1	88	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active	1500		24-Dec-25	Rafeek	YES		660	To be retrieved  slp-523. 05:00-07:00.
+104	111/2	88	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Intermittent	Active	2000	667	8-Dec-25	Juber	YES		658
+105	111/2	88	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Intermittent	Active	2000		24-Dec-25	Rafeek	YES		660	To be retrieved  slp-667. 11:00-13:00.
+106	204/1	88	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Healthy	Active 	2000	908	8-Dec-25	Juber	YES		874	Tested at CC.
+107	204/1	88	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Healthy	Active 	2000	908	9-Dec-25	Juber	YES		880	Tested at CC.
+108	207/1	88	ZW	IVB-2	C	0	Y	Vx-PW	FXE	Healthy	Active	2500	871	2-Dec-25	Siva	YES		864	Tested at CC.
+109	207/1	88	ZW	IVB-2	C	0	Y	Vx-PW	FXE	Healthy	Active	2500	871	5-Dec-25	Garah	YES		864	Tested at CC.
+110	207/1	88	ZW	IVB-2	C	0	Y	Vx-PW	FXE	Healthy	Active	2500	871	8-Dec-25	Juber	YES		873
+111	143/1	95	ZC	IVA-1	B	Locally	N	Vx-PW	FXE	Healthy	Active	3500	953
+112	251/2	95	ZC	IVA-1	B	Locally	N	Vx-PW	FRE	Intermittent	Active	1000	801
+113	343/1	95	ZC	VU-1	B	Locally	N	Vx-PW	WFT	Intermittent	Active 	1000	842
+114	343/2	95	ZC	IVB-1	B	Locally	N	Vx-PW	WFT	Healthy	Active	2500	1358
+115	344/2	95	ZC	IVA-1	B	Locally	N	Vx-PW	FXE	HGOR-OPEN	Active	2500	1195
+116	198/1	129	ZC	VU-4	A	0	Y	Vx-Spectra	TRSV	HGOR-OPEN	Active 	1600	1006	3-Dec-25	Thuya	YES		1025	Tested at CC.
+117	198/1	129	ZC	VU-4	A	0	Y	Vx-Spectra	TRSV	HGOR-OPEN	Active 	1600	1006	6-Dec-25	Siva	YES		990
+118	198/1	129	ZC	VU-4	A	0	Y	Vx-Spectra	TRSV	HGOR-OPEN	Active 	1600	1006	6-Dec-25	Siva	YES		1030	Tested at CC.
+119	198/1	129	ZC	VU-4	A	0	Y	Vx-Spectra	TRSV	HGOR-OPEN	Active 	1600	1006	6-Dec-25	Siva	YES		1006	To be retrieved locally. SLP-650. 16:00-18:00
+120	153/2	153	ZW	IVA-2	C	0	Y	Vx-PW	VE	Intermittent	Active	1000	612	9-Dec-25	Siva	YES		616
+121	155/1	153	ZW	IVB-2	C	0	Y	Vx-PW	DKS	TTG	Active	2000	950	9-Dec-25	Siva	YES		946
+122	155/2	153	ZW	IVA-2	C	0	Y	Vx-PW	VE	Intermittent	Active	1200	511	8-Dec-25	Siva	YES		505	Tested at CC.
+123	179/1	153	ZW	IVB-3	C	0	Y	Vx-PW	FXE	Healthy	Active	3000	801	8-Dec-25	Siva	YES		824	Tested at CC
+124	179/1	153	ZW	IVB-3	C	0	Y	Vx-PW	FXE	Healthy	Active	3000	801	9-Dec-25	Siva	YES		823	Tested at CC
+125	179/2	153	ZW	IVA-3	C	0	Y	Vx-PW	FXE	Intermittent 	Active 	1400	679	8-Dec-25	Siva	YES		656	Tested at CC.
+126	203/2	153	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Intermittent	Active	1100	477						Top Priority. to be tested at CC.
+127	275/1	153	ZW	IVC-2	C	0	Y	Vx-PW	FXE	Healthy 	Active 	3500	555						Top Priority.
+128	275/2	153	ZW	IVB-2	C	0	Y	Vx-PW	FXE	Healthy 	Active 	2000	966	1-Dec-25	CCR	YES		966
+129	275/2	153	ZW	IVB-2	C	0	Y	Vx-PW	FXE	Healthy 	Active 	2000	966	8-Dec-25	Siva	YES		969
+130	360/2	153	ZW	IVA-2	C	0	Y	Vx-PW	WPE-5 TRSV	Healthy 	Active	1100	651	9-Dec-25	Siva	YES		553	Testes at CC.
+131	360/2	153	ZW	IVA-2	C	0	Y	Vx-PW	WPE-5 TRSV	Healthy 	Active	1100	651	13-Dec-25	CCR	YES		564	Testes at CC.
+132	360/2	153	ZW	IVA-2	C	0	Y	Vx-PW	WPE-5 TRSV	Healthy 	Active	1100	651	16-Dec-25	CCR	YES		566	Testes at CC.
+133	360/2	153	ZW	IVA-2	C	0	Y	Vx-PW	WPE-5 TRSV	Healthy 	Active	1100	651	19-Dec-25	CCR	YES		567	Testes at CC.
+134	360/2	153	ZW	IVA-2	C	0	Y	Vx-PW	WPE-5 TRSV	Healthy 	Active	1100	651	22-Dec-25	CCR	YES		554	Testes at CC.
+135	189/1	189	ZW	IVA-3	C	0	Y	Vx-PW	FXE	Healthy	Active	2000	711	2-Dec-25	Mahinth	YES		710
+136	189/1	189	ZW	IVA-3	C	0	Y	Vx-PW	FXE	Healthy	Active	2000		24-Dec-25	Roopesh	YES		705
+137	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	11-Dec-25	Juber	YES		934
+138	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	15-Dec-25	CCR	YES		939	Tested at CC.
+139	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	18-Dec-25	CCR	YES		944	Tested at CC.
+140	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	20-Dec-25	CCR	YES		947	Tested at CC.
+141	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	22-Dec-25	Mehnas	YES		968	Tested at CC.
+142	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	23-Dec-25	CCR	YES		960	Tested at CC.
+143	191/2	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	HGOR(Wet)	Active	1500	928	24-Dec-25	Roopesh	YES		963
+144	192/1	189	ZW	IVB-3	C	0	Y	Vx-PW	FXE	Intermittent	Active	700	612
+145	192/2	189	ZW	IVA-3	C	0	Y	Vx-PW	FXE	Healthy	Active 	1300	586	11-Dec-25	Juber	YES		580
+146	192/2	189	ZW	IVA-3	C	0	Y	Vx-PW	FXE	Healthy	Active 	1300	586	24-Dec-25	Roopesh	YES		635
+147	229/1	189	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Intermittent 	Active	2200	649	2-Dec-25	Mahinth	YES		629	Tested at CC.
+148	229/1	189	ZW	IVA-2	C	0	Y	Vx-PW	FXE	Intermittent 	Active	2200	649	24-Dec-25	Roopesh	YES		642	SLP-427. To be retrieved.
+149	231/1	189	ZW	IVA-3	C	0	Y	Vx-PW	WFT	Intermittent	Active	1600	700
+150	272/2	189	ZW	IVA-3	C	0	Y	Vx-PW	FXE	Intermittent	Active	1000	702	2-Dec-25	Mahinth	YES		702
+151	235/2	235	ZC	IVC-1	B	Locally	Y	Vx-Spectra	FXE	Healthy	Active	1000	871	6-Dec-25	Juber			868
+152	235/2	235	ZC	IVC-1	B	Locally	Y	Vx-Spectra	FXE	Healthy	Active	1000	871	10-Dec-25	Thuya	YES		870
+153	235/2	235	ZC	IVC-1	B	Locally	Y	Vx-Spectra	FXE	Healthy	Active	1000	871	13-Dec-25	Siva	YES		900
+154	235/2	235	ZC	IVC-1	B	Locally	Y	Vx-Spectra	FXE	Healthy	Active	1000	871	16-Dec-25	CCR	YES		864	Tested at CC.
+155	235/2	235	ZC	IVC-1	B	Locally	Y	Vx-Spectra	FXE	Healthy	Active	1000	871	19-Dec-25	CCR	YES		856	Tested at CC.
+156	235/2	235	ZC	IVC-1	B	Locally	Y	Vx-Spectra	FXE	Healthy	Active	1000	871	22-Dec-25	Khaled	YES		854	Tested at CC.
+157	309/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active 	500	859	12-Dec-25	Siva	YES		829	Tested at CC.
+158	309/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active 	500	859	22-Dec-25	Khaled	YES		832	Tested at CC.
+159	309/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active 	500	859	23-Dec-25	CCR	YES		831	Tested at CC.
+160	309/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active 	500	859	25-Dec-25	Rafeek	YES		823
+161	366/1	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	WX W/FORD TRSV	HGOR(Wet)	Active	1800	611	6-Dec-25	Juber	YES		653	Tested at CC.
+162	366/1	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	WX W/FORD TRSV	HGOR(Wet)	Active	1800	611	12-Dec-25	Siva	YES		627	Tested at CC.
+163	366/1	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	WX W/FORD TRSV	HGOR(Wet)	Active	1800	611	25-Dec-25	Rafeek	YES		626
+164	379/2	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	1100	971	10-Dec-25	Thuya	YES		951	Tested at CC.
+165	379/2	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	1100	971	13-Dec-25	Thuya	YES		957	Tested at CC.
+166	379/2	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	1100	971	25-Dec-25	Rafeek	YES		930
+167	379/2	235	ZC	VM-2	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	1100		25-Dec-25	Rafeek			930	SLP-576. To be retrieved.
+168	380/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FRE	Intermittent	Active	1000	871	10-Dec-25	Thuya	YES		821	Tested at CC.
+169	380/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FRE	Intermittent	Active	1000	871	11-Dec-25	Siva	YES		820	Tested at CC.
+170	380/1	235	ZC	VU-2	B	Locally	Y	Vx-Spectra	FRE	Intermittent	Active	1000	871	25-Dec-25	Rafeek	YES		750
+171	380/2	235	ZC	IVB-2	B	Locally	Y	Vx-Spectra	FRE	Healthy	Active	2000	1062	25-Dec-25	Rafeek	YES		1035
+172	380/2	235	ZC	IVB-2	B	Locally	Y	Vx-Spectra	FRE	Healthy	Active	2000	1062	6-Dec-25	Juber	YES		1057
+173	380/2	235	ZC	IVB-2	B	Locally	Y	Vx-Spectra	FRE	Healthy	Active	2000	1062	12-Dec-25	Siva	YES		1050	Tested at CC.
+174	296/1	237	ZC	VL-3	B	Scada	Y	Vx-PW	FXE	HGOR 	Inactive 	700	1593						Top Priority. to be tested until 21-dec closure.
+175	351/1	237	ZC	VL-3	B	Scada	Y	Vx-PW	FXE	Healthy 	Active 	1000	724	15-Dec-25	Siva	YES			Low DPV whenever 2nd string 351/2 is opened. Communication is suspected.
+176	351/2	237	ZC	VM-3	B	Scada	Y	Vx-PW	FXE	Healthy 	Active 	3500	1171	15-Dec-25	Siva	YES		1170
+177	424/1	237	ZC	VIVI-1	B	Scada	Y	Vx-PW	HALLIBURTON TRSV	HGOR	Inactive	1000	726
+178	245/1	245	ZW	IVA-3	C	Scada	N	Vx-PW	FXE	HGOR-OPEN	Active	2500	680
+179	247/1	245	ZW	IVA-3	C	Scada	N	Vx-PW	DKS	Healthy 	Active	1000	809
+180	273/1	245	ZW	IVA-3	C	Scada	N	Vx-PW	FXE	HGOR-OPEN	Active 	1050	638
+181	274/1	245	ZW	IVA-2	C	Scada	N	Vx-PW	FXE	Healthy	Active	1900	626
+182	278/1	245	ZW	IVA-2	C	Scada	N	Vx-PW	TRSV	Healthy	Active 	2500	837	7-Dec-25	Garah	YES		838
+183	279/1	245	ZW	IVA-3	C	Scada	N	Vx-PW	TRSV	Healthy 	Active 	2500	1327	2-Dec-25	Juber			1014	Tested at CC. abnormal low rate.
+184	279/1	245	ZW	IVA-3	C	Scada	N	Vx-PW	TRSV	Healthy 	Active 	2500	1327
+185	276/1	276	ZW	IVA-3	C	Locally	N	Vx-Spectra	FXE	Healthy 	Active	2400	671	8-Dec-25	Thuya	YES		683	Tested at CC.
+186	287/1	276	ZW	IVA-3	C	Locally	N	Vx-Spectra	FXE	Healthy	Active	3000	792
+187	319/1	276	ZW	IVA-3	C	Locally	N	Vx-Spectra	WFT	Healthy 	Active 	3000	972
+188	319/1	276	ZW	IVA-3	C	Locally	N	Vx-Spectra	WFT	Healthy 	Active 		1.5 MBD						Top Priority.
+189	319/1	276	ZW	IVA-3	C	Locally	N	Vx-Spectra	WFT	Healthy 	Active 		2.5 MBD	8-Dec-25	Thuya	YES		909	2.5 MBD.
+190	319/1	276	ZW	IVA-3	C	Locally	N	Vx-Spectra	WFT	Healthy 	Active 		3.5 MBD	11-Dec-25	Thuya	YES		840	3.5 MBD.
+191	280/1	280	ZC	VU-5	A	Locally	Y	Vx-PW	FXE	HGOR(Wet)	Active	1000	900	5-Dec-25	Rakesh	YES		908
+192	280/1	280	ZC	VU-5	A	Locally	Y	Vx-PW	FXE	HGOR(Wet)	Active	1000	900	6-Dec-25	Garah	YES		907
+193	280/1	280	ZC	VU-5	A	Locally	Y	Vx-PW	FXE	HGOR(Wet)	Active	1000	900	15-Dec-25	SLB Engineer	YES		906	Performance Test after PM/CM.
+194	280/2	280	ZC	IVA-5	A	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	1229	5-Dec-25	Rakesh	YES		1248	Tested at CC.
+195	303/1	280	ZC	VU-5	A	Locally	Y	Vx-PW	FXE	GOR Relaxation 2	Active	1800	840	6-Dec-25	Garah	YES		849
+196	303/1	280	ZC	VU-5	A	Locally	Y	Vx-PW	FXE	GOR Relaxation 2	Active	1800	840	22-Dec-25	Ramesh	YES		862	Tested at CC.
+197	303/2	280	ZC	IVA-5	A	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	985	6-Dec-25	Garah	YES		923	Tested at CC.
+198	303/2	280	ZC	IVA-5	A	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2500	985	23-Dec-25	Ramesh	YES		991	to be retrieved. slp-723. 15:45-17:45
+199	346/2	280	ZC	IVC-5	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3500	1080	1-Dec-25	Rakesh	YES		1094	Tested at CC.
+200	346/2	280	ZC	IVC-5	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3500	1080	23-Dec-25	Ramesh	YES		1085	to be retrieved. slp-738. 9:00-11:00
+201	369/1	286	ZC	VM-4	A	0	N	Vx-PW	WFT	Healthy	Active  	2000	734
+202	409/1	286	ZC	VU-4	A	0	N	Vx-PW	FXE	HGOR-OPEN	Active	2000	1086
+203	439/1	286	ZC	VU-4	A	0	N	Vx-PW	FXE	Healthy 	Active 	2200	1301
+204	454/1	286	ZC	-	A	0	N	Vx-PW	FXE	New WO 	Active	2000	1546
+205	288/1	288	ZW	IVA-1	C	0	Y	Vx-Spectra	WX W/FORD TRSV	Healthy 	Active	2000	1100	11-Dec-25	Siva	YES		1110
+206	288/1	288	ZW	IVA-1	C	0	Y	Vx-Spectra	WX W/FORD TRSV	Healthy 	Active	2000	1100	21-Dec-25	SLB Engineer	YES		1100	to be retrieved locally.  slp-. 14:00-16:00
+207	288/1	288	ZW	IVA-1	C	0	Y	Vx-Spectra	WX W/FORD TRSV	Healthy 	Active	2000		24-Dec-25	Mahinth	YES		1117
+208	361/1	288	ZW	IVB-1	C	0	Y	Vx-Spectra	TRSV	Healthy	Active	5000	1269	24-Dec-25	Mahinth	YES		1315
+209	361/1	288	ZW	IVB-1	C	0	Y	Vx-Spectra	TRSV	Healthy	Active	5000
+210	362/1	288	ZW	VU-2	C	0	Y	Vx-Spectra	WPE-5 TRSV	Intermittent 	Active 	1100	710
+211	387/2	288	ZW	IVA-1	C	0	Y	Vx-Spectra	VE	HGOR-OPEN	Active	2000	1376	11-Dec-25	Siva	YES		1379
+212	387/2	288	ZW	IVA-1	C	0	Y	Vx-Spectra	VE	HGOR-OPEN	Active	2000		24-Dec-25	Mahinth	YES		1379
+213	412/1	288	ZW	IVA-2	C	0	Y	Vx-Spectra	BAKER TRSV	Intermittent 	Active			24-Dec-25	Mahinth	YES		910	to be retrieved locally.  slp-550.
+214	412/1	288	ZW	IVA-2	C	0	Y	Vx-Spectra	BAKER TRSV	Intermittent 	Active	2500	903	5-Dec-25	Thuya	YES		956	2.5 MBD.
+215	290/2	290	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	2500	687	2-Dec-25	Garah	YES		669	Tested at CC.
+216	290/2	290	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	2500	687	5-Dec-25	Mahinth	YES		692
+217	290/2	290	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	2500	687	8-Dec-25	CCR	YES		684	Tested at CC.
+218	342/2	290	ZW	IVB-3	C	Locally	Y	Vx-PW	FXE	Healthy	Active	4000	765	5-Dec-25	Mahinth	YES		773	Tested at CC.
+219	365/1	290	ZW	IVC-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	1500	906
+220	365/2	290	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active	2000	813	5-Dec-25	Mahinth	YES		828	Tested at CC.
+221	382/2	290	ZW	IVA-3	C	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active 	2500	851	2-Dec-25	Garah	YES		798	Tested at CC.
+222	431/1	290	ZW	IVB-3	C	Locally	Y	Vx-PW	W/FORD TRSV	Healthy	Active	3000	1191	5-Dec-25	Mahinth	YES		1155	Tested at CC.
+223	425/1	293	ZW	IVC-2	C	Scada	Y	Vx-Spectra	HALLIBURTON TRSV	Healthy	Active	2500	819	2-Dec-25	Thuya	YES		660	Tested at CC.
+224	425/1	293	ZW	IVC-2	C	Scada	Y	Vx-Spectra	HALLIBURTON TRSV	Healthy	Active	2500	819	4-Dec-25	Garah	YES		684	Tested at CC.
+225	425/1	293	ZW	IVC-2	C	Scada	Y	Vx-Spectra	HALLIBURTON TRSV	Healthy	Active	2500	819	4-Dec-25	Garah	YES		696	2.6 MBD.
+226	425/1	293	ZW	IVC-2	C	Scada	Y	Vx-Spectra	HALLIBURTON TRSV	Healthy	Active	2500	819	11-Dec-25	Garah	YES		698	Tested at CC.
+227	425/1	293	ZW	IVC-2	C	Scada	Y	Vx-Spectra	HALLIBURTON TRSV	Healthy	Active	2500	819	23-Dec-25	Sumith	YES			to be retrieved. slp-443. dpv-320. 09:00-11:00.
+228	444/1	293	ZW	IVB-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	2500	954	2-Dec-25	Thuya	YES		950
+229	444/1	293	ZW	IVB-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	2500	954	4-Dec-25	Garah	YES		972	Tested at CC.
+230	444/1	293	ZW	IVB-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	2500	954	11-Dec-25	Garah	YES		959	to be retrieved locally. slp-430
+231	444/1	293	ZW	IVB-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	2500	954	18-Dec-25	CCR	YES		959	to be retrieved locally. slp-430
+232	444/1	293	ZW	IVB-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	2500	954	21-Dec-25	Sumith	YES		964	to be retrieved locally. slp-379. 11:45-13:45
+233	444/1	293	ZW	IVB-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	2500	954	23-Dec-25	Sumith	YES		960	to be retrieved locally.  slp-400. 05:00-07:00
+234	447/1	293	ZW	IVA-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	1500	732	2-Dec-25	Thuya	YES		721	Tested at CC.
+235	447/1	293	ZW	IVA-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	1500	732	4-Dec-25	Garah	YES		721	Tested at CC.
+236	447/1	293	ZW	IVA-2	C	Scada	Y	Vx-Spectra	FXE	New WO 	Active	1500	732	11-Dec-25	Garah	YES		720	Tested at CC.
+237	301/1	300	ZC	VL-4	A	0	Y	Vx-PW	FXE	Healthy 	Active	1000	852
+238	301/2	300	ZC	VM-4	A	0	Y	Vx-PW	FXE	HGOR(Wet)	Active  	2500	1449
+239	416/1	300	ZC	VIVI-4	A	0	Y	Vx-PW	BAKER TITAN 6.5E TRSV 	Intermittent	Active	1000	34
+240	327/1	304	ZC	VU-4	A	Scada	Y	Vx-Spectra	WFT	HGOR-OPEN	Active	2000	667
+241	327/2	304	ZC	IVC-4	A	Scada	Y	Vx-Spectra	WFT	Healthy	Active	2300	1324
+242	333/1	304	ZC	IVC-4	A	Scada	Y	Vx-Spectra	FXE	Healthy	Active 	2500	962
+243	333/2	304	ZC	IVA-4	A	Scada	Y	Vx-Spectra	FXE	Healthy 	Active 	2000	1492
+244	363/1	304	ZC	IVC-4	A	Scada	Y	Vx-Spectra	FXE	Healthy	Active	2500	1333
+245	363/2	304	ZC	IVA-4	A	Scada	Y	Vx-Spectra	FXE	Healthy	Active	2000	1047
+246	364/2	304	ZC	IVB-4	A	Scada	Y	Vx-Spectra	WX W/FORD TRSV	Healthy	Active	2500	798
+247	386/1	304	ZC	VM-4	A	Scada	Y	Vx-Spectra	VE	Intermittent	Active	1300	1020
+248	386/2	304	ZC	IVB-4	A	Scada	Y	Vx-Spectra	VE	HGOR-OPEN	Active	3000	894
+249	374/1	374	ZC	VL-5	A	Scada	Y	Vx-Spectra	FXE	Intermittent	Active  	1500	790	3-Dec-25	Garah	NO			Low DPV.
+250	374/1	374	ZC	VL-5	A	Scada	Y	Vx-Spectra	FXE	Intermittent	Active  	1500	790	6-Dec-25	Mahinth	NO			Low DPV at WHFP=745 psi & SLP=626 psi. CV=40%.
+251	383/1	374	ZC	VL-4	A	Scada	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	1600	1555	3-Dec-25	Garah	YES		1432	Tested at CC. CV=97%
+252	420/1	374	ZC	DiyabDiyab-6	A	Scada	Y	Vx-Spectra	W/FORD TRSV	High H2S	Active	1500	1273	5-Dec-25	Mahinth	YES		1138	1.5 MBD.
+253	420/1	374	ZC	DiyabDiyab-6	A	Scada	Y	Vx-Spectra	W/FORD TRSV	High H2S	Active	1500	1273	6-Dec-25	Mahinth	YES		1125	Tested at CC.
+254	420/1	374	ZC	DiyabDiyab-6	A	Scada	Y	Vx-Spectra	W/FORD TRSV	High H2S	Active	1500	1273	22-Dec-25	Jeyasingh	YES		1214	Tested at CC.
+255	420/1	374	ZC	DiyabDiyab-6	A	Scada	Y	Vx-Spectra	W/FORD TRSV	High H2S	Active	1500	1273	23-Dec-25	Jeyasingh	YES		1184	Tested at CC.
+256	445/1	374	ZC	-	A	Scada	Y	Vx-Spectra	W/FORD TRSV	New WO 	Active	1500	1606
+257	375/2	375	ZC	IVB-6	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	3020	973
+258	392/2	375	ZC	VM-6	B	Locally	Y	Vx-Spectra	FXE	HGOR(Wet)	Active	2100	1201
+259	396/1	375	ZC	VM-1	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	2100	1621	4-Dec-25	Thuya	YES		1615	Tested at CC. CV=57%.
+260	396/1	375	ZC	VM-1	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	2100	1621	23-Dec-25	Pitchaimani	YES		1616	to be retrieved. slp-873. CV=55%. 14:00-16:00
+261	396/2	375	ZC	IVB-1	B	Locally	Y	Vx-Spectra	FXE	HGOR-OPEN	Active	1000	2001	4-Dec-25	Thuya	YES		2018	Tested at CC. CV=36%.
+262	414/1	375	ZC	VIVI-6	B	Locally	Y	Vx-Spectra	WFT	HGOR-Open	Active	1500	1935
+263	433/1	375	ZC	VM-1	B	Locally	Y	Vx-Spectra	FXE	Healthy 	Active 	3500	932	4-Dec-25	Thuya	YES		947	SLP=915 psi.
+264	433/2	375	ZC	IVB-1	B	Locally	Y	Vx-Spectra	FXE	Healthy 	Active 	2000	1693	4-Dec-25	Thuya	YES		1689	Tested at CC.
+265	064/1	19/19A	ZW	VU-3	C	0	N	Vx-PW	FXE	HGOR-Open	Active	1800	879
+266	236/1	19/19A	ZW	VU-3	C	0	N	Vx-PW	VE	HGOR-OPEN	Active	2000	403
+267	236/2	19/19A	ZW	VU-3	C	0	N	Vx-PW	DKS	GOR Relaxation 3	Active	600	934
+268	026/1	26/26A	ZC	IVA-5	A	Locally	Y	Vx-PW	FXE	Healthy 	Active 	2000	1456	23-Dec-25	SLB Engineer	YES		1454	slp-630. Performance Test.
+269	026/1	26/26A	ZC	IVA-5	A	Locally	Y	Vx-PW	FXE	Healthy 	Active 	2000	1456	25-Dec-25	Mahinth	YES		1480
+270	055/1	26/26A	ZC	IVB-4	A	Locally	Y	Vx-PW	FXE	Healthy 	Active 	2000	903	6-Dec-25	Thuya			932	on hold. Abnormal BSW increase.
+271	055/1	26/26A	ZC	IVB-4	A	Locally	Y	Vx-PW	FXE	Healthy 	Active 	2000	903
+272	103/2	26/26A	ZC	IVA-4	A	Locally	Y	Vx-PW	FXE	Healthy 	Active 	2000	1283
+273	205/1	26/26A	ZC	IVB-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	2000	1307
+274	339/2	26/26A	ZC	IVC-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	1149	3-Dec-25	Rafeek	YES		1149
+275	339/2	26/26A	ZC	IVC-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	1149	6-Dec-25	Thuya	YES		1167	Tested at CC
+276	359/1	26/26A	ZC	IVC-5	A	Locally	Y	Vx-PW	FXE	HGOR-OPEN	Active 	2000	1285
+277	359/2	26/26A	ZC	IVB-5	A	Locally	Y	Vx-PW	FXE	Healthy 	Active 	3000	971
+278	377/1	26/26A	ZC	IVC-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	25-Dec-25	Mahinth				To be retrieved.18:00-20:00.
+279	377/1	26/26A	ZC	IVC-4	A	Locally	Y	Vx-PW	FXE	Healthy	Active	3000	799	6-Dec-25	Thuya			811	abnormal BSW increase.
+280	049/1	43/43A	ZC	VU-1	B	Locally	N	Vx-PW	DKS	Intermittent	Active	907	610
+281	049/2	43/43A	ZC	VU-1	B	Locally	N	Vx-PW	VE	GOR Relaxation 2	Active	500	838
+282	057/1	43/43A	ZC	IVC-1	B	Locally	N	Vx-PW	FXE	Healthy 	Active 	2500	934	1-Dec-25	Mahinth	YES		847	Tested at CC.
+283	061/1	43/43A	ZC	IVC-2	B	Locally	N	Vx-PW	FXE	Healthy	Active 	2500	848	1-Dec-25	Mahinth	YES		804	Tested at CC.
+284	061/2	43/43A	ZC	IVA-2	B	Locally	N	Vx-PW	FXE	HGOR-Open	Active 	1500	1417	4-Dec-25	Mahinth	YES		1386	Tested at CC.
+285	180/2	43/43A	ZC	IVB-1	B	Locally	N	Vx-PW	FXE	HGOR-OPEN	Active	2600	1163	4-Dec-25	Mahinth	YES		1181	Tested at CC.
+286	398/1	AGI	UZ	IVB-3	-	Locally	Y	Vx-Spectra	BAKER TITAN-6.5 TRSSV - BA	Healthy 	Active 	5000	1065	13-Dec-25	SLB Engineer	YES		1745	CV=29/64".  After MPFM SOftware Update #2. H2S measurement.
+287	398/1	AGI	UZ	IVB-3	-	Locally	Y	Vx-Spectra	BAKER TITAN-6.5 TRSSV - BA	Healthy 	Active 	5000	1065	22-Dec-25	Siva	YES		1790	CV=29/64".  H2S measurement.
+288	400/1	AGI	UZ	IVC-2	-	Locally	Y	Vx-Spectra	HAL NE TRSV - R	Healthy 	Active 	3500	1544	3-Dec-25	Siva	YES		1562	CV=36%
+289	401/1	AGI	UZ	IVB-2	-	Locally	Y	Vx-Spectra	HAL NE TRSV - R	Healthy	Active	3000	1437	3-Dec-25	Siva	YES		1483	CV=47%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
