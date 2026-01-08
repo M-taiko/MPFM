@@ -191,7 +191,7 @@ class OperatorDashboardController extends Controller
     }
 
     /**
-     * Start a task (marks as in_progress and redirects to upload)
+     * Start a task (marks as in_progress and redirects to unified upload page)
      */
     public function startTask(PlanTask $planTask)
     {
@@ -207,8 +207,8 @@ class OperatorDashboardController extends Controller
         try {
             $planTask->update(['completion_status' => 'in_progress']);
 
-            // Redirect to upload page with auto-filled data
-            return redirect()->route('operator.tasks.upload', $planTask)
+            // Redirect to centralized upload page at /upload with task_id parameter
+            return redirect()->route('upload.form', ['task_id' => $planTask->id])
                 ->with('success', 'Task started successfully. Please upload the log file.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to start task: ' . $e->getMessage());

@@ -42,32 +42,33 @@ class VxLogController extends Controller
 
         if ($taskId) {
             $task = PlanTask::with([
-                'dailyPlan',
-                'oilString.tower.oilField',
-                'operator'
+                'monthlyPlan',
+                'towerModel',
+                'oilString',
+                'operators'
             ])->findOrFail($taskId);
 
-            // Ensure operator can only access their task
-            if ($task->assigned_to !== auth()->id()) {
+            // Ensure operator can only access their task (multi-operator support)
+            if (!$task->isAssignedTo(auth()->id())) {
                 abort(403, 'Unauthorized access to task');
             }
 
-            // Prepare auto-fill data
+            // Prepare auto-fill data from monthly plan task structure
             $autoFillData = [
                 'client' => 'ADNOC',
-                'field' => $task->oilString->tower->oilField->name,
-                'well' => $task->dailyPlan->plan_name,
-                'wellhead_tower' => $task->oilString->tower->name,
-                'wellhead_string' => $task->oilString->name,
-                'operator' => $task->operator->name,
-                'test_date' => $task->dailyPlan->plan_date->format('Y-m-d'),
-                'mpfm_device' => $task->mpfm_device,
-                'test_type' => $task->device_type ?? 'flow',
-                'expected_oil_rate' => $task->expected_oil_rate,
-                'expected_gas_rate' => $task->expected_gas_rate,
-                'expected_water_cut' => $task->expected_water_cut,
-                'expected_pressure' => $task->expected_pressure,
-                'expected_temperature' => $task->expected_temperature,
+                'field' => $task->towerModel?->oilField?->name ?? 'N/A',
+                'well' => $task->towerModel?->well_name ?? 'N/A',
+                'wellhead_tower' => $task->towerModel?->name ?? 'N/A',
+                'wellhead_string' => $task->oilString?->string_identifier ?? 'N/A',
+                'operator' => auth()->user()->name,
+                'test_date' => $task->scheduled_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
+                'mpfm_device' => $task->category ?? 'MPFM Test',
+                'test_type' => $task->category ?? 'flow',
+                'expected_oil_rate' => $task->expected_oil_rate ?? null,
+                'expected_gas_rate' => $task->expected_gas_rate ?? null,
+                'expected_water_cut' => $task->expected_water_cut ?? null,
+                'expected_pressure' => $task->expected_pressure ?? null,
+                'expected_temperature' => $task->expected_temperature ?? null,
             ];
         }
 
@@ -120,6 +121,18 @@ class VxLogController extends Controller
             $displayData['temp_file_path'] = $tempFilePath;
             $displayData['filename'] = $file->getClientOriginalName();
             $displayData['task_id'] = $request->input('task_id');
+
+            // Mark task as completed if task_id is provided
+            if ($request->input('task_id')) {
+                $task = PlanTask::find($request->input('task_id'));
+                if ($task && $task->isAssignedTo(auth()->id())) {
+                    $task->update([
+                        'completion_status' => 'completed',
+                        'completed_at' => now(),
+                        'operator_notes' => 'File uploaded via ' . $file->getClientOriginalName(),
+                    ]);
+                }
+            }
 
             return view('logs.results', $displayData);
 
