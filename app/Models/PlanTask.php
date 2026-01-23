@@ -278,4 +278,48 @@ class PlanTask extends Model
     {
         return $query->whereIn('state', $states);
     }
+
+    /**
+     * Get task identifier (friendly name)
+     */
+    public function getTaskIdentifierAttribute(): string
+    {
+        return $this->well_full_name ?? $this->sno ?? "Task #{$this->id}";
+    }
+
+    /**
+     * Accessor for status (maps completion_status)
+     */
+    public function getStatusAttribute(): string
+    {
+        return $this->completion_status;
+    }
+
+    /**
+     * Get badge class for status
+     */
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match($this->completion_status) {
+            'pending' => 'warning',
+            'in_progress' => 'info',
+            'completed' => 'success',
+            'failed' => 'danger',
+            default => 'secondary',
+        };
+    }
+
+    /**
+     * Get badge class for priority
+     */
+    public function getPriorityBadgeClassAttribute(): string
+    {
+        return match($this->priority) {
+            'high' => 'danger',
+            'top' => 'danger',
+            'normal' => 'info',
+            'low' => 'secondary',
+            default => 'info',
+        };
+    }
 }
