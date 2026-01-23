@@ -11,9 +11,8 @@ class OilFieldApiController extends Controller
     /**
      * Get towers for a specific oil field
      */
-    public function getTowers($oilFieldId)
+    public function getTowers(OilField $oilField)
     {
-        $oilField = OilField::findOrFail($oilFieldId);
         $towers = $oilField->towers()->select('id', 'name', 'oil_field_id')->get();
 
         return response()->json($towers);
@@ -22,9 +21,9 @@ class OilFieldApiController extends Controller
     /**
      * Get oil strings for a specific oil field
      */
-    public function getOilStrings($oilFieldId)
+    public function getOilStrings(OilField $oilField)
     {
-        $oilField = OilField::with('towers.oilStrings')->findOrFail($oilFieldId);
+        $oilField->load('towers.oilStrings');
 
         $oilStrings = collect();
         foreach ($oilField->towers as $tower) {
