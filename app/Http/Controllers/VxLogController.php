@@ -270,6 +270,13 @@ class VxLogController extends Controller
         $parsedData = json_decode($data['parsed_data'], true);
         $fullAverageRow = isset($data['full_average_row']) ? json_decode($data['full_average_row'], true) : [];
 
+        // Recalculate full metrics including fluid properties
+        if (isset($parsedData['test_data']['rows'])) {
+            $rows = $parsedData['test_data']['rows'];
+            $fullMetrics = $this->calculationService->calculateStandardizedMetrics($rows);
+            $averages = $fullMetrics;
+        }
+
         // Create WellTest record
         $wellTest = WellTest::create([
             'client' => $summary['client'],

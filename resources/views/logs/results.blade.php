@@ -464,6 +464,101 @@ table.modern-table tbody tr:hover {
         </div>
     </div>
 
+    <!-- Fluid Properties & PVT Data -->
+    <h3 class="section-title"><i class="fe fe-zap mr-2"></i>Fluid Properties & PVT Data</h3>
+    <div class="row">
+        <!-- Formation Volume Factors -->
+        <div class="col-md-6">
+            <div class="metric-card-modern" style="--header-color-1: #06b6d4; --header-color-2: #0891b2; border-left-color: #06b6d4;">
+                <div class="metric-card-header">
+                    <i class="fe fe-droplet mr-2"></i>Formation Volume Factors
+                </div>
+                <div class="metric-grid">
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['bo']) && is_numeric($averages['bo']) ? number_format($averages['bo'], 4) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Oil (bo)</div>
+                        <div class="metric-unit">Sm³/m³</div>
+                    </div>
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['bw']) && is_numeric($averages['bw']) ? number_format($averages['bw'], 4) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Water (bw)</div>
+                        <div class="metric-unit">Sm³/m³</div>
+                    </div>
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['bg']) && is_numeric($averages['bg']) ? number_format($averages['bg'], 4) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Gas (bg)</div>
+                        <div class="metric-unit">Sm³/m³</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fluid Densities -->
+        <div class="col-md-6">
+            <div class="metric-card-modern" style="--header-color-1: #8b5cf6; --header-color-2: #7c3aed; border-left-color: #8b5cf6;">
+                <div class="metric-card-header">
+                    <i class="fe fe-activity mr-2"></i>Fluid Densities
+                </div>
+                <div class="metric-grid">
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['po']) && is_numeric($averages['po']) ? number_format($averages['po'], 2) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Oil (ρo)</div>
+                        <div class="metric-unit">kg/m³</div>
+                    </div>
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['pw']) && is_numeric($averages['pw']) ? number_format($averages['pw'], 2) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Water (ρw)</div>
+                        <div class="metric-unit">kg/m³</div>
+                    </div>
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['pg']) && is_numeric($averages['pg']) ? number_format($averages['pg'], 4) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Gas (ρg)</div>
+                        <div class="metric-unit">kg/m³</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gas Properties -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="metric-card-modern" style="--header-color-1: #10b981; --header-color-2: #059669; border-left-color: #10b981;">
+                <div class="metric-card-header">
+                    <i class="fe fe-wind mr-2"></i>Gas Properties & Solution GOR
+                </div>
+                <div class="metric-grid">
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['rst']) && is_numeric($averages['rst']) ? number_format($averages['rst'], 2) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Solution GOR (Rst)</div>
+                        <div class="metric-unit">Scf/STB</div>
+                    </div>
+                    <div class="metric-item-box">
+                        <div class="metric-value-large" style="font-size: 1.5rem;">
+                            {{ isset($averages['z_factor']) && is_numeric($averages['z_factor']) ? number_format($averages['z_factor'], 4) : 'N/A' }}
+                        </div>
+                        <div class="metric-label-small">Compressibility (Z)</div>
+                        <div class="metric-unit">Dimensionless</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- H2S Metrics (if available) -->
     @if(isset($averages['h2s_avg']) || isset($averages['h2s_max']) || isset($averages['h2s_min']))
     <div class="metric-card-modern" style="--header-color-1: #14b8a6; --header-color-2: #0f766e; border-left-color: #14b8a6;">

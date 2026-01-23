@@ -170,6 +170,16 @@
             </li>
             @endif
 
+            <!-- Task Archive (Surveillance Supervisor) -->
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor'))
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('task-archive*') ? 'active' : '' }}" href="{{ route('task-archive.index') }}">
+                    <i class="side-menu__icon fe fe-archive"></i>
+                    <span class="side-menu__label">Tasks Archive</span>
+                </a>
+            </li>
+            @endif
+
             <!-- User Management (Admin Only) -->
             @can('manage_users')
             <li class="side-item side-item-category">Administration</li>

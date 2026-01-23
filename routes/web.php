@@ -218,6 +218,7 @@ use App\Http\Controllers\PlanTaskController;
 use App\Http\Controllers\MonthlyPlanController;
 use App\Http\Controllers\MPFMSupervisorController;
 use App\Http\Controllers\SurveillanceSupervisorController;
+use App\Http\Controllers\TaskArchiveController;
 
 Route::middleware('auth')->group(function () {
     // Supervisor Routes
@@ -293,6 +294,12 @@ Route::middleware('auth')->group(function () {
         // AJAX endpoints for cascading dropdowns
         Route::get('/api/wells-by-tower/{tower}', [MonthlyPlanController::class, 'getWellsByTower'])->name('api.wells-by-tower');
         Route::get('/api/strings-by-well', [MonthlyPlanController::class, 'getStringsByWell'])->name('api.strings-by-well');
+    });
+
+    // Task Archive Routes - View completed tasks
+    Route::prefix('task-archive')->name('task-archive.')->group(function () {
+        Route::get('/', [TaskArchiveController::class, 'index'])->name('index');
+        Route::get('/{task}', [TaskArchiveController::class, 'show'])->name('show');
     });
 
     // Surveillance Supervisor Routes - Review and Approve

@@ -281,15 +281,134 @@ For issues or questions:
 3. Check `QUICK_START.md` for usage help
 4. Use `php artisan tinker` for database debugging
 
+## Latest Session Updates (January 23, 2026 - Continued)
+
+### MPFM Test Data Visualization & Fluid Properties Enhancement
+
+#### New Features Added
+
+1. **Comprehensive Fluid Properties Calculations** ✅
+   - Enhanced `MPFMCalculationService` to calculate all PVT (Pressure-Volume-Temperature) data
+   - Implemented flexible keyword-based column matching for log file compatibility
+   - Added support for Formation Volume Factors: bo, bw, bg
+   - Added support for Fluid Densities: ρo, ρw, ρg (calculated from cumulative mass/volume)
+   - Added support for Gas Properties: Rst (Solution GOR), Z-factor
+   - **Files Modified**: `app/Services/MPFMCalculationService.php`
+
+2. **Upload Preview Page Enhancement** ✅
+   - Added "Fluid Properties & PVT Data" section to upload preview (results.blade.php)
+   - Displays all calculated metrics before database storage
+   - Modern UI/UX with color-coded cards:
+     - Formation Volume Factors (cyan)
+     - Fluid Densities (purple)
+     - Gas Properties & Solution GOR (green)
+   - **File Modified**: `resources/views/logs/results.blade.php`
+
+3. **MPFM Test View Charts Implementation** ✅
+   - Added 7 interactive Chart.js visualizations to test view page (/mpfm-tests/:id)
+   - Charts included:
+     1. Production Rates Over Time (Oil + Water)
+     2. Gas-Oil Ratio (GOR) Trend
+     3. Pressure Trend Over Time
+     4. Temperature Trend Over Time
+     5. Basic Sediment & Water (BSW) Trend
+     6. Water-Liquid Ratio (WLR) Trend
+     7. Gas Void Fraction (GVF) Trend
+   - Flexible column extraction with support for multiple naming conventions
+   - Responsive design with 350px chart heights
+   - Color-coded by metric type for easy visual distinction
+   - **File Modified**: `resources/views/mpfm_tests/show.blade.php`
+
+#### Technical Implementation
+
+**MPFMCalculationService Enhancements:**
+```php
+// Fluid Properties with flexible keyword matching
+$averages['bo'] = $this->findAndCalculateAverage($rows, ['bo[Sm3/m3]', 'bo', 'BO', 'formation_oil']);
+$averages['bw'] = $this->findAndCalculateAverage($rows, ['bw[Sm3/m3]', 'bw', 'BW', 'formation_water']);
+$averages['bg'] = $this->findAndCalculateAverage($rows, ['bg[Sm3/m3]', 'bg', 'BG', 'formation_gas']);
+
+// Density calculations with unit conversion
+$oilDensity = $this->calculateDensity($rows,
+  ['cmo_lc[kg]', 'cmo_lc', 'cmo', 'cum_oil_mass'],
+  ['cvo_lc[bbl]', 'cvo_lc', 'cvo', 'cum_oil_vol'],
+  0.158987  // bbl to m³ conversion
+);
+```
+
+**Chart.js Implementation:**
+- Responsive container with fixed 350px height for consistent layout
+- Smooth line tension (0.4) for natural-looking curves
+- Fill areas under lines for better visual depth
+- Flexible label extraction supporting time columns or sequential numbering
+- Legend positioning at bottom with optimal padding
+- Conditional rendering (charts only render if data exists)
+
+#### Data Flow Architecture
+
+```
+Log File Upload
+    ↓
+VxLogController (processLogFile())
+    ↓
+MPFMCalculationService::calculateStandardizedMetrics()
+  ├─ Production Data (qo, qw, qg, gor, bsw, wlr, gvf)
+  ├─ Fluid Properties (bo, bw, bg, po, pw, pg, rst, z_factor)
+  ├─ Pressure & Temperature Data
+  └─ Safety Checks
+    ↓
+results.blade.php (Upload Preview)
+  ├─ Production Rates Cards
+  ├─ Fluid Properties Cards ← NEW
+  └─ User Verification
+    ↓
+Database Storage (mpfm_tests.test_data JSON)
+    ↓
+mpfm_tests/show.blade.php (Test View)
+  ├─ Fluid Properties Summary Cards
+  └─ Production Analysis Charts ← NEW
+```
+
+#### User-Facing Improvements
+
+1. **Upload Workflow**
+   - Users now see ALL calculated metrics before confirming storage
+   - Includes formation volume factors, fluid densities, and gas properties
+   - Modern card-based design with color coding
+   - Ensures data accuracy before database commit
+
+2. **Test Review Experience**
+   - Surveillance supervisors can view comprehensive production trends
+   - 7 interactive charts show equipment behavior over test duration
+   - Charts automatically extract data from stored test_data JSON
+   - Color-coded by parameter type for quick visual assessment
+
+3. **Data Verification**
+   - All fluid properties displayed consistently across upload and test view
+   - Calculations use precise conversion factors (bbl to m³, cf to m³)
+   - Flexible column matching handles various VX log file formats
+
+#### Testing & Compatibility
+
+- ✅ Works with multiple VX log file column name formats
+- ✅ Handles missing data gracefully (displays N/A when data unavailable)
+- ✅ Backward compatible with existing test data
+- ✅ No breaking changes to existing functionality
+- ✅ Responsive design (350px charts on desktop, mobile-friendly)
+
 ## Conclusion
 
-The MPFM system is now **fully operational** with:
+The MPFM system is now **fully operational with advanced data visualization** featuring:
 - ✅ Complete database schema
 - ✅ All 8 roles configured
 - ✅ State machine workflow
 - ✅ SLA monitoring
 - ✅ Role-based authorization
 - ✅ Enhanced UI with navigation
+- ✅ Comprehensive MPFM test data processing
+- ✅ Fluid properties calculations with PVT data
+- ✅ Interactive production analysis charts
+- ✅ Modern upload preview with metric verification
 - ✅ Comprehensive documentation
 
 The system is ready for production testing and deployment.
@@ -298,6 +417,13 @@ The system is ready for production testing and deployment.
 
 **Session Status**: ✅ COMPLETE
 **Date Completed**: January 23, 2026
-**System Version**: MPFM v2.0
+**System Version**: MPFM v2.1 (with Advanced Data Visualization)
 **PHP Version**: 8.2.12
 **Laravel Version**: 11.47.0
+
+### Latest Changes Summary
+- ✅ Enhanced fluid properties calculations (8 new metrics)
+- ✅ Added interactive charts to test view page (7 visualizations)
+- ✅ Improved upload preview with metric verification cards
+- ✅ Flexible column matching for log file compatibility
+- ✅ Modern UI/UX for surveillance supervisor review

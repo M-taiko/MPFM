@@ -59,6 +59,26 @@ class MPFMCalculationService
         $averages['h2s_max'] = $this->findAndCalculateMaxWithNegativeCorrection($rows, $h2sCols);
         $averages['h2s_min'] = $this->findAndCalculateMinWithNegativeCorrection($rows, $h2sCols);
 
+        // Fluid Properties - PVT Data
+        $averages['bo'] = $this->findAndCalculateAverage($rows, ['bo[Sm3/m3]', 'bo', 'BO', 'formation_oil']);
+        $averages['bw'] = $this->findAndCalculateAverage($rows, ['bw[Sm3/m3]', 'bw', 'BW', 'formation_water']);
+        $averages['bg'] = $this->findAndCalculateAverage($rows, ['bg[Sm3/m3]', 'bg', 'BG', 'formation_gas']);
+        $averages['z_factor'] = $this->findAndCalculateAverage($rows, ['Z', 'Z-factor', 'compressibility', 'z_factor']);
+        $averages['rst'] = $this->findAndCalculateAverage($rows, ['Rst[Scf/STB]', 'Rst', 'RST', 'solution_gor']);
+
+        // Calculate densities from cumulative mass and volume
+        // Oil density (kg/m³) - from cumulative oil mass and volume
+        $oilDensity = $this->calculateDensity($rows, ['cmo_lc[kg]', 'cmo_lc', 'cmo', 'cum_oil_mass'], ['cvo_lc[bbl]', 'cvo_lc', 'cvo', 'cum_oil_vol'], 0.158987); // conversion factor bbl to m³
+        $averages['po'] = $oilDensity;
+
+        // Water density (kg/m³) - from cumulative water mass and volume
+        $waterDensity = $this->calculateDensity($rows, ['cmw_lc[kg]', 'cmw_lc', 'cmw', 'cum_water_mass'], ['cvw_lc[bbl]', 'cvw_lc', 'cvw', 'cum_water_vol'], 0.158987);
+        $averages['pw'] = $waterDensity;
+
+        // Gas density (kg/m³) - from cumulative gas mass and volume
+        $gasDensity = $this->calculateDensity($rows, ['cmg_lc[kg]', 'cmg_lc', 'cmg', 'cum_gas_mass'], ['cvg_lc[cf]', 'cvg_lc', 'cvg', 'cum_gas_vol'], 0.0283168); // conversion factor cf to m³
+        $averages['pg'] = $gasDensity;
+
         // Derived metrics
         $derivedMetrics = $this->calculateDerivedMetrics($rows);
         $averages = array_merge($averages, $derivedMetrics);
@@ -710,5 +730,62 @@ class MPFMCalculationService
         }
 
         return false;
+    }
+
+    /**
+     * Calculate density from cumulative mass and volume data
+     * @param array $rows Data rows
+     * @param string|array $massColumn Cumulative mass column name or keywords to search for
+     * @param string|array $volumeColumn Cumulative volume column name or keywords to search for
+     * @param float $conversionFactor Conversion factor from source unit to m³
+     * @return float Calculated density in kg/m³ or 0 if calculation fails
+     */
+    private function calculateDensity($rows, $massColumn, $volumeColumn, $conversionFactor = 1.0)
+    {
+        if (empty($rows)) {
+            return 0;
+        }
+
+        // Get the last row which contains cumulative totals
+        $lastRow = end($rows);
+        $columns = array_keys($rows[0] ?? []);
+
+        // Find the mass column (support both exact match and keyword search)
+        if (is_array($massColumn)) {
+            $actualMassCol = $this->findColumnByKeywords($columns, $massColumn);
+        } else {
+            $actualMassCol = isset($lastRow[$massColumn]) ? $massColumn : $this->findColumnByKeywords($columns, [$massColumn]);
+        }
+
+        // Find the volume column (support both exact match and keyword search)
+        if (is_array($volumeColumn)) {
+            $actualVolumeCol = $this->findColumnByKeywords($columns, $volumeColumn);
+        } else {
+            $actualVolumeCol = isset($lastRow[$volumeColumn]) ? $volumeColumn : $this->findColumnByKeywords($columns, [$volumeColumn]);
+        }
+
+        // If columns not found, return 0
+        if (!$actualMassCol || !$actualVolumeCol) {
+            return 0;
+        }
+
+        $mass = $this->parseNumeric($lastRow[$actualMassCol] ?? 0);
+        $volume = $this->parseNumeric($lastRow[$actualVolumeCol] ?? 0);
+
+        // Avoid division by zero
+        if (!$this->isValidNumber($volume) || $volume == 0) {
+            return 0;
+        }
+
+        // Convert volume to m³ and calculate density
+        $volumeInM3 = $volume * $conversionFactor;
+        if ($volumeInM3 == 0) {
+            return 0;
+        }
+
+        $density = $mass / $volumeInM3;
+
+        // Return the density or 0 if invalid
+        return $this->isValidNumber($density) ? round($density, 2) : 0;
     }
 }
