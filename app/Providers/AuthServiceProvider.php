@@ -28,6 +28,9 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        // Gate for reviewing tests
+        Gate::define('review-test', function ($user) {
+            return $user && $user->hasPermissionTo('review-test');
+        });
     }
 }

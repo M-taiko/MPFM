@@ -65,6 +65,20 @@
             </li>
             @endif
 
+            <!-- Surveillance Supervisor - Review Plans (Admin or Surveillance Supervisor can see) -->
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('production_supervisor'))
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('surveillance*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-eye"></i>
+                    <span class="side-menu__label">Surveillance Review</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->is('surveillance') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
+                </ul>
+            </li>
+            @endif
+
             <!-- MPFM Supervisor - Review & Assign (Admin or MPFM Supervisor can see) -->
             @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_mpfm_supervisor_reports'))
             <li class="slide">

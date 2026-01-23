@@ -420,4 +420,41 @@ class MonthlyPlanController extends Controller
             return back()->with('error', 'Failed to submit plan: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Get task details as modal content with timeline
+     */
+    public function getTaskDetails($monthlyPlan, $task)
+    {
+        try {
+            // Handle both model instances and IDs
+            if (!$monthlyPlan instanceof MonthlyPlan) {
+                $monthlyPlan = MonthlyPlan::findOrFail($monthlyPlan);
+            }
+
+            if (!$task instanceof PlanTask) {
+                $task = PlanTask::findOrFail($task);
+            }
+
+            // Verify task belongs to this plan
+            if ($task->monthly_plan_id != $monthlyPlan->id) {
+                abort(403, 'Task does not belong to this plan');
+            }
+
+            // Load state histories with relationships
+            $task->load([
+                'stateHistories' => function ($query) {
+                    $query->latest('created_at');
+                },
+                'stateHistories.changedBy',
+                'monthlyPlan',
+                'operator',
+                'mpfmTest'
+            ]);
+
+            return view('monthly_plans.task_modal_content', compact('task', 'monthlyPlan'));
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
 }

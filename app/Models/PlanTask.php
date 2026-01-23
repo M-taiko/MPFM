@@ -62,7 +62,7 @@ class PlanTask extends Model
     public function oilString() { return $this->belongsTo(OilString::class, 'oil_string_id'); }
     public function parentTask() { return $this->belongsTo(PlanTask::class, 'parent_task_id'); }
     public function childTasks() { return $this->hasMany(PlanTask::class, 'parent_task_id'); }
-    public function mpfmTest() { return $this->belongsTo(WellTest::class, 'mpfm_test_id'); }
+    public function mpfmTest() { return $this->belongsTo(MPFMTest::class, 'mpfm_test_id'); }
 
     // State machine relationships
     public function surveillanceSupervisor() { return $this->belongsTo(User::class, 'surveillance_supervisor_id'); }

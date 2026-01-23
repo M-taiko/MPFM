@@ -116,6 +116,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/process-log', [VxLogController::class, 'processLogFile'])->name('process.log');
     Route::get('/chart-data', [VxLogController::class, 'getChartDataForUnit'])->name('chart.data');
     Route::post('/tests/store', [VxLogController::class, 'storeTest'])->name('tests.store');
+    Route::get('/mpfm-tests/{mpfmTest}/view', [VxLogController::class, 'viewTest'])->name('mpfm-tests.view');
+    Route::post('/mpfm-tests/{mpfmTest}/approve', [VxLogController::class, 'approveTest'])->name('mpfm-tests.approve');
 });
 
 /*
@@ -215,6 +217,7 @@ use App\Http\Controllers\DailyPlanController;
 use App\Http\Controllers\PlanTaskController;
 use App\Http\Controllers\MonthlyPlanController;
 use App\Http\Controllers\MPFMSupervisorController;
+use App\Http\Controllers\SurveillanceSupervisorController;
 
 Route::middleware('auth')->group(function () {
     // Supervisor Routes
@@ -278,7 +281,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{monthlyPlan}', [MonthlyPlanController::class, 'destroy'])->name('destroy');
 
         // Add tasks to plan
+        // More specific routes first
         Route::get('/{monthlyPlan}/tasks/create', [MonthlyPlanController::class, 'createTask'])->name('tasks.create');
+        Route::get('/{monthlyPlan}/tasks/{task}/details', [MonthlyPlanController::class, 'getTaskDetails'])->name('tasks.details');
         Route::post('/{monthlyPlan}/tasks', [MonthlyPlanController::class, 'storeTask'])->name('tasks.store');
         Route::delete('/{monthlyPlan}/tasks/{task}', [MonthlyPlanController::class, 'deleteTask'])->name('tasks.destroy');
 
@@ -288,6 +293,17 @@ Route::middleware('auth')->group(function () {
         // AJAX endpoints for cascading dropdowns
         Route::get('/api/wells-by-tower/{tower}', [MonthlyPlanController::class, 'getWellsByTower'])->name('api.wells-by-tower');
         Route::get('/api/strings-by-well', [MonthlyPlanController::class, 'getStringsByWell'])->name('api.strings-by-well');
+    });
+
+    // Surveillance Supervisor Routes - Review and Approve
+    Route::prefix('surveillance')->name('surveillance.')->group(function () {
+        Route::get('/', [SurveillanceSupervisorController::class, 'index'])->name('index');
+        Route::get('/plans/{monthlyPlan}/review', [SurveillanceSupervisorController::class, 'reviewPlan'])->name('review');
+        Route::get('/plans/{monthlyPlan}/tasks/{planTask}/details', [SurveillanceSupervisorController::class, 'getTaskDetails'])->name('task-details');
+        Route::post('/plans/{monthlyPlan}/tasks/{planTask}/approve', [SurveillanceSupervisorController::class, 'approveTask'])->name('approve-task');
+        Route::post('/plans/{monthlyPlan}/tasks/{planTask}/reject', [SurveillanceSupervisorController::class, 'rejectTask'])->name('reject-task');
+        Route::post('/plans/{monthlyPlan}/approve', [SurveillanceSupervisorController::class, 'approvePlan'])->name('approve');
+        Route::post('/plans/{monthlyPlan}/reject', [SurveillanceSupervisorController::class, 'rejectPlan'])->name('reject');
     });
 
     // MPFM Supervisor Routes - Review and Assign

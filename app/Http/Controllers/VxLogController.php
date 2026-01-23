@@ -296,10 +296,19 @@ class VxLogController extends Controller
         if (isset($data['task_id']) && $data['task_id']) {
             $task = PlanTask::findOrFail($data['task_id']);
 
+            // Get oil field ID from the tower
+            $tower = $task->towerModel;
+            $oilFieldId = $tower ? $tower->oil_field_id : null;
+
             // Create MPFMTest linked to task
             $mpfmTest = MPFMTest::create([
+                'user_id' => auth()->id(),
+                'oil_field_id' => $oilFieldId,
+                'tower_id' => $task->tower_id,
+                'oil_string_id' => $task->oil_string_id,
                 'plan_task_id' => $task->id,
                 'well_test_id' => $wellTest->id,
+                'test_date' => $summary['test_date'] ?? now()->format('Y-m-d'),
                 'oil_rate' => $averages['oil_rate'] ?? null,
                 'gas_rate' => $averages['gas_rate'] ?? null,
                 'water_cut' => $averages['water_cut'] ?? null,
@@ -313,15 +322,16 @@ class VxLogController extends Controller
             ]);
 
             // Mark task as completed
-            $task->complete([
+            $task->update([
                 'mpfm_test_id' => $mpfmTest->id,
-                'completion_notes' => 'Test completed successfully',
+                'completion_status' => 'completed',
+                'completed_at' => now(),
+                'state' => TaskState::COMPLETED,
             ]);
 
-            // Notify supervisor
-            $supervisor = $task->dailyPlan->createdBy;
-            if ($supervisor) {
-                $supervisor->notify(new TaskCompletedNotification($task, $mpfmTest));
+            // Notify supervisor if daily plan exists
+            if ($task->monthlyPlan && $task->monthlyPlan->createdBy) {
+                $task->monthlyPlan->createdBy->notify(new TaskCompletedNotification($task, $mpfmTest));
             }
 
             return redirect()->route('operator.tasks.show', $task)
@@ -339,8 +349,98 @@ class VxLogController extends Controller
         ->with('success', 'Well test saved successfully!');
 }
 
+/**
+ * View test result for supervisor review
+ */
+public function viewTest($mpfmTestId)
+{
+    $mpfmTest = MPFMTest::findOrFail($mpfmTestId);
+    $task = $mpfmTest->planTask;
 
+    // Check authorization - only supervisors and task creator
+    if (!auth()->check() || !auth()->user()->hasPermissionTo('review-test')) {
+        abort(403, 'Unauthorized to view this test');
+    }
 
+    $wellTest = $mpfmTest->wellTest;
+    $rows = $wellTest->test_data['rows'] ?? [];
+    $columns = $wellTest->test_data['columns'] ?? [];
+    $timeColumn = 'Date & Time';
+
+    $ratesChartData = $this->chartService->prepareRatesChartData($columns, $rows, $timeColumn);
+    $gorChartData = $this->chartService->prepareGorChartData($columns, $rows, $timeColumn);
+
+    return view('mpfm_tests.show', [
+        'mpfmTest' => $mpfmTest,
+        'task' => $task,
+        'wellTest' => $wellTest,
+        'rates_chart_data' => $ratesChartData,
+        'gor_chart_data' => $gorChartData,
+    ]);
+}
+
+/**
+ * Approve or reject test result
+ */
+public function approveTest(Request $request, $mpfmTestId)
+{
+    $mpfmTest = MPFMTest::findOrFail($mpfmTestId);
+    $task = $mpfmTest->planTask;
+
+    // Check authorization
+    if (!auth()->check() || !auth()->user()->hasPermissionTo('review-test')) {
+        abort(403, 'Unauthorized to review this test');
+    }
+
+    $request->validate([
+        'action' => 'required|in:approve,reject',
+        'remarks' => 'required_if:action,reject|nullable|string|max:1000',
+    ]);
+
+    $action = $request->input('action');
+    $remarks = $request->input('remarks');
+
+    if ($action === 'approve') {
+        // Mark test as approved
+        $mpfmTest->update([
+            'status' => 'approved',
+        ]);
+
+        // Update task state to SURVEILLANCE_REVIEWED (next state in workflow)
+        if ($task) {
+            $task->update([
+                'state' => TaskState::SURVEILLANCE_REVIEWED,
+            ]);
+        }
+
+        // Notify operator about approval
+        if ($task && $task->operator) {
+            $task->operator->notify(new \App\Notifications\TestApprovedNotification($task, $mpfmTest));
+        }
+
+        return redirect()->back()->with('success', 'Test approved successfully! Operator has been notified.');
+    } else {
+        // Mark test as rejected and reset to draft
+        $mpfmTest->update([
+            'status' => 'rejected',
+        ]);
+
+        // Update task to allow re-upload
+        if ($task) {
+            $task->update([
+                'state' => TaskState::IN_PROGRESS,
+                'completion_status' => 'in_progress',
+            ]);
+        }
+
+        // Notify operator to re-upload test
+        if ($task && $task->operator) {
+            $task->operator->notify(new \App\Notifications\TestRejectedNotification($task, $mpfmTest, $remarks));
+        }
+
+        return redirect()->back()->with('success', 'Test rejected. Operator has been notified to re-upload.');
+    }
+}
 
 
 

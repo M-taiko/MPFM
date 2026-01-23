@@ -313,6 +313,11 @@
                                         <button type="button" class="btn btn-sm btn-info" onclick="viewTask({{ $task->id }})" title="View Details">
                                             <i class="fe fe-eye"></i>
                                         </button>
+                                        @if($task->mpfm_test_id)
+                                        <a href="{{ route('mpfm-tests.view', $task->mpfm_test_id) }}" class="btn btn-sm btn-success" title="View Test Result">
+                                            <i class="fe fe-check-circle"></i>
+                                        </a>
+                                        @endif
                                         @if($monthlyPlan->isEditable())
                                         <button type="button" class="btn btn-sm btn-danger" onclick="deleteTask({{ $task->id }})" title="Delete">
                                             <i class="fe fe-trash"></i>
@@ -344,7 +349,7 @@
 
 <!-- Task Details Modal -->
 <div class="modal fade" id="taskModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 600px;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Task Details</h5>
@@ -378,11 +383,17 @@ function viewTask(taskId) {
     $('#taskModal').modal('show');
     $('#taskModalBody').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div></div>');
 
-    // You can implement AJAX to fetch task details
-    // For now, just showing a placeholder
-    setTimeout(function() {
-        $('#taskModalBody').html('<div class="alert alert-info">Task detail view will be implemented here. Task ID: ' + taskId + '</div>');
-    }, 500);
+    // Fetch task details via AJAX
+    $.ajax({
+        url: '/monthly-plans/{{ $monthlyPlan->id }}/tasks/' + taskId + '/details',
+        method: 'GET',
+        success: function(html) {
+            $('#taskModalBody').html(html);
+        },
+        error: function() {
+            $('#taskModalBody').html('<div class="alert alert-danger">Failed to load task details. Please try again.</div>');
+        }
+    });
 }
 
 function deleteTask(taskId) {

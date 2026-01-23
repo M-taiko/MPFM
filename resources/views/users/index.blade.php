@@ -1,57 +1,243 @@
 @extends('layouts.master')
 
+@section('title', 'Users Management')
+
+@section('css')
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 2.2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .page-header p {
+        margin: 8px 0 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .user-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .user-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .user-card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #f9fafb 100%);
+        padding: 20px;
+        border-bottom: 1px solid #e8ecf1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user-info {
+        flex: 1;
+    }
+
+    .user-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #333;
+        margin: 0;
+    }
+
+    .user-email {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 4px 0 0 0;
+    }
+
+    .user-date {
+        color: #999;
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+
+    .user-card-body {
+        padding: 15px 20px;
+    }
+
+    .roles-section {
+        margin-bottom: 15px;
+    }
+
+    .roles-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #667eea;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .role-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .role-badge {
+        display: inline-block;
+        padding: 5px 12px;
+        background: #e3f2fd;
+        color: #1976d2;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: 1px solid #90caf9;
+    }
+
+    .role-badge.admin {
+        background: #ffebee;
+        color: #c62828;
+        border-color: #ef5350;
+    }
+
+    .role-badge.supervisor {
+        background: #f3e5f5;
+        color: #6a1b9a;
+        border-color: #ce93d8;
+    }
+
+    .role-badge.operator {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #81c784;
+    }
+
+    .actions-section {
+        display: flex;
+        gap: 8px;
+        padding-top: 15px;
+        border-top: 1px solid #e8ecf1;
+    }
+
+    .action-btn {
+        flex: 1;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: white;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+        background: #f5f7fa;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .action-btn.danger {
+        color: #dc3545;
+        border-color: #f5c6cb;
+    }
+
+    .action-btn.danger:hover {
+        background: #fff5f7;
+        border-color: #dc3545;
+    }
+
+    .users-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .users-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header {
+            padding: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Users Management</h4>
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fe fe-users mr-2"></i>Users Management</h1>
+        <p>Manage user accounts, roles, and permissions</p>
+    </div>
+
+    <!-- Users Grid -->
+    <div class="users-grid">
+        @forelse($users as $user)
+        <div class="card user-card">
+            <div class="user-card-header">
+                <div class="user-info">
+                    <p class="user-name">{{ $user->name }}</p>
+                    <p class="user-email">{{ $user->email }}</p>
+                    <p class="user-date">
+                        <i class="fe fe-calendar"></i> {{ $user->created_at->format('M d, Y') }}
+                    </p>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped text-nowrap mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Roles</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($users as $user)
-                                <tr>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>
-                                        @foreach($user->roles as $role)
-                                            <span class="badge bg-primary me-1">{{ $role->name }}</span>
-                                        @endforeach
-                                    </td>
-                                    <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Actions
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);" onclick="showRoleAssignModal({{ $user->id }})">Assign Role</a>
-                                                <a class="dropdown-item" href="javascript:void(0);" onclick="showPermissionAssignModal({{ $user->id }})">Assign Permission</a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="confirmDelete({{ $user->id }})">Delete</a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+            </div>
+
+            <div class="user-card-body">
+                <!-- Roles -->
+                <div class="roles-section">
+                    <span class="roles-label">Roles ({{ $user->roles->count() }})</span>
+                    <div class="role-badges">
+                        @forelse($user->roles as $role)
+                            <span class="role-badge {{ str_contains($role->name, 'admin') ? 'admin' : (str_contains($role->name, 'supervisor') ? 'supervisor' : 'operator') }}">
+                                {{ str_replace('_', ' ', ucfirst($role->name)) }}
+                            </span>
+                        @empty
+                            <span style="color: #999; font-size: 0.9rem;">No roles assigned</span>
+                        @endforelse
                     </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions-section">
+                    <button class="action-btn" onclick="showRoleAssignModal({{ $user->id }})" title="Assign or change user role">
+                        <i class="fe fe-plus"></i> Assign Role
+                    </button>
+                    <button class="action-btn" onclick="showPermissionAssignModal({{ $user->id }})" title="Give specific permissions">
+                        <i class="fe fe-lock"></i> Permission
+                    </button>
+                    <button class="action-btn danger" onclick="confirmDelete({{ $user->id }})" title="Permanently delete user">
+                        <i class="fe fe-trash"></i> Delete
+                    </button>
                 </div>
             </div>
         </div>
+        @empty
+        <div class="col-12">
+            <div class="card text-center py-5">
+                <i class="fe fe-users" style="font-size: 48px; color: #ccc;"></i>
+                <h3 class="mt-3">No Users Found</h3>
+                <p class="text-muted">There are no users in the system yet.</p>
+            </div>
+        </div>
+        @endforelse
     </div>
 </div>
 

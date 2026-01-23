@@ -17,6 +17,50 @@
         border-radius: 5px;
         margin-bottom: 10px;
     }
+
+    /* Timeline Styles */
+    .timeline {
+        position: relative;
+        padding: 10px 0;
+    }
+
+    .timeline-item {
+        display: flex;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .timeline-marker {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 3px #ddd;
+        margin-top: 2px;
+        margin-right: 15px;
+    }
+
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 26px;
+        bottom: -20px;
+        width: 2px;
+        background: #ddd;
+    }
+
+    .timeline-content h6 {
+        margin-bottom: 5px;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .timeline-content p {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
 </style>
 @endsection
 
@@ -259,6 +303,74 @@
                         <span class="float-right">{{ $task->completed_at->format('H:i') }}</span>
                     </div>
                     @endif
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fe fe-clock mr-2"></i>Timeline
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <!-- Assignment -->
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Assigned</h6>
+                                <p class="text-muted mb-0 small">
+                                    @if($task->assigned_at)
+                                        {{ $task->assigned_at->format('d M Y H:i') }}
+                                    @else
+                                        Pending
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- State History -->
+                        @forelse($task->stateHistories()->latest()->get() as $history)
+                        <div class="timeline-item">
+                            <div class="timeline-marker" style="background-color: {{ $history->fromState?->color() ?? '#6c757d' }}"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">
+                                    {{ str_replace('_', ' ', ucfirst($history->to_state)) }}
+                                </h6>
+                                <p class="text-muted mb-0 small">
+                                    {{ $history->created_at->format('d M Y H:i') }}
+                                    @if($history->changedBy)
+                                        <br>by {{ $history->changedBy->name }}
+                                    @endif
+                                </p>
+                                @if($history->notes)
+                                    <p class="mt-1 mb-0 small">{{ $history->notes }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        @empty
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-secondary"></div>
+                            <div class="timeline-content">
+                                <p class="text-muted mb-0 small">No state history available</p>
+                            </div>
+                        </div>
+                        @endforelse
+
+                        <!-- Completion -->
+                        @if($task->completed_at)
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Completed</h6>
+                                <p class="text-muted mb-0 small">
+                                    {{ $task->completed_at->format('d M Y H:i') }}
+                                </p>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
                 </div>
             </div>
 
