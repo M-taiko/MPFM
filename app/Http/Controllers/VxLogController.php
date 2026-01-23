@@ -14,6 +14,8 @@ use App\Services\MPFMCalculationService;
 use App\Services\MPFMParsingService;
 use App\Services\MPFMChartService;
 use App\Services\MPFMPreviewService;
+use App\Services\TaskStateService;
+use App\Enums\TaskState;
 use App\Notifications\TaskCompletedNotification;
 
 class VxLogController extends Controller
@@ -21,18 +23,21 @@ class VxLogController extends Controller
     protected $calculationService;
     protected $parsingService;
     protected $chartService;
-    protected $previewService; 
+    protected $previewService;
+    protected $taskStateService;
 
     public function __construct(
         MPFMCalculationService $calculationService,
         MPFMParsingService $parsingService,
         MPFMChartService $chartService,
-        MPFMPreviewService $previewService
+        MPFMPreviewService $previewService,
+        TaskStateService $taskStateService
     ) {
         $this->calculationService = $calculationService;
         $this->parsingService = $parsingService;
         $this->chartService = $chartService;
         $this->previewService = $previewService;
+        $this->taskStateService = $taskStateService;
     }
     public function showUploadForm(Request $request)
     {
@@ -134,15 +139,22 @@ class VxLogController extends Controller
             $displayData['filename'] = $file->getClientOriginalName();
             $displayData['task_id'] = $request->input('task_id');
 
-            // Mark task as completed if task_id is provided
+            // Transition task to MPFM_REVIEWED when file is uploaded
             if ($request->input('task_id')) {
                 $task = PlanTask::find($request->input('task_id'));
                 if ($task && $task->isAssignedTo(auth()->id())) {
-                    $task->update([
-                        'completion_status' => 'completed',
-                        'completed_at' => now(),
-                        'operator_notes' => 'File uploaded via ' . $file->getClientOriginalName(),
-                    ]);
+                    try {
+                        // Transition from IN_PROGRESS to MPFM_REVIEWED
+                        $this->taskStateService->transition(
+                            $task,
+                            TaskState::MPFM_REVIEWED,
+                            auth()->user(),
+                            'Test log file uploaded: ' . $file->getClientOriginalName()
+                        );
+                    } catch (\Exception $e) {
+                        // Log error but continue with upload
+                        \Log::warning('Failed to transition task state: ' . $e->getMessage());
+                    }
                 }
             }
 
