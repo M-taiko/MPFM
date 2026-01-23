@@ -379,6 +379,10 @@
 
     <!-- Upload Form Card -->
     <div class="upload-form-card">
+        <!-- Debug: Show the form action URL -->
+        <div style="display: none;" id="debugInfo">
+            Form action URL: {{ route('process.log') }}
+        </div>
         <form action="{{ route('process.log') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
             @csrf
 
@@ -564,7 +568,7 @@
 
             <!-- Submit Button -->
             <div class="text-center mt-5">
-                <button type="submit" class="btn-modern-primary">
+                <button type="button" class="btn-modern-primary" id="submitBtn" onclick="validateAndSubmit(event)">
                     <i class="fe fe-upload"></i>
                     Upload & Analyze Log File
                 </button>
@@ -576,11 +580,45 @@
 </div>
 
 <script>
+// Global validation function called directly from button
+function validateAndSubmit(event) {
+    const fileInput = document.getElementById('logfile');
+    const uploadForm = document.getElementById('uploadForm');
+
+    console.log('=== Submit Button Clicked ===');
+    console.log('File input value:', fileInput.value);
+    console.log('Files selected:', fileInput.files.length);
+    console.log('Form method:', uploadForm.method);
+    console.log('Form action:', uploadForm.action);
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        console.log('VALIDATION FAILED: No file selected');
+        event.preventDefault();
+        alert('Please select a log file to upload');
+        return false;
+    }
+
+    console.log('VALIDATION PASSED: File selected, submitting form');
+    console.log('File name:', fileInput.files[0].name);
+    console.log('File size:', fileInput.files[0].size);
+
+    // Explicitly submit the form
+    uploadForm.submit();
+    return false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('logfile');
     const fileSelected = document.getElementById('fileSelected');
     const fileName = document.getElementById('fileName');
     const fileSize = document.getElementById('fileSize');
+    const uploadForm = document.getElementById('uploadForm');
+    const debugInfo = document.getElementById('debugInfo');
+
+    console.log('Page loaded, form setup starting');
+    console.log('DEBUG INFO FROM HTML:', debugInfo.textContent);
+    console.log('Form action from JavaScript:', uploadForm.action);
+    console.log('Form method from JavaScript:', uploadForm.method);
 
     fileInput.addEventListener('change', function(e) {
         if (this.files && this.files[0]) {
@@ -600,38 +638,45 @@ document.addEventListener('DOMContentLoaded', function() {
             fileSize.textContent = sizeText;
 
             fileSelected.classList.add('active');
+            console.log('File selected:', file.name);
         }
     });
 
     // Prevent form submission on drag and drop
     const uploadArea = document.querySelector('.file-upload-area');
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.style.borderColor = '#667eea';
-        this.style.background = 'linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%)';
-    });
+    if (uploadArea) {
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#667eea';
+            this.style.background = 'linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%)';
+        });
 
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.style.borderColor = '#cbd5e1';
-        this.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)';
-    });
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#cbd5e1';
+            this.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)';
+        });
 
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.style.borderColor = '#cbd5e1';
-        this.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)';
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.style.borderColor = '#cbd5e1';
+            this.style.background = 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)';
 
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            fileInput.files = files;
-            const event = new Event('change');
-            fileInput.dispatchEvent(event);
-        }
-    });
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+    }
+
+    console.log('Form setup complete');
+    console.log('Form action:', uploadForm.action);
+    console.log('Form method:', uploadForm.method);
 });
 </script>
 @endsection
