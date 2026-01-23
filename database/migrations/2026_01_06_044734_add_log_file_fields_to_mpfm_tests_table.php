@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::table('mpfm_tests', function (Blueprint $table) {
             // Log file storage (for log-driven tests)
-            $table->string('log_file_path')->nullable()->after('status');
-            $table->json('raw_log_data')->nullable()->after('log_file_path');
+            // Only add log_file_path - raw_log_data already exists in original create migration
+            if (!Schema::hasColumn('mpfm_tests', 'log_file_path')) {
+                $table->string('log_file_path')->nullable()->after('status');
+            }
         });
     }
 
@@ -24,7 +26,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('mpfm_tests', function (Blueprint $table) {
-            $table->dropColumn(['log_file_path', 'raw_log_data']);
+            // Only drop log_file_path - raw_log_data should remain as it's part of original schema
+            if (Schema::hasColumn('mpfm_tests', 'log_file_path')) {
+                $table->dropColumn('log_file_path');
+            }
         });
     }
 };

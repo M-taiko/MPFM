@@ -107,15 +107,95 @@
             <div class="stat-card danger">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 text-white-50">Avg. Duration</h6>
+                        <h6 class="mb-1 text-white-50">In Progress</h6>
                         <h2 class="mb-0 font-weight-bold">
-                            {{ $performance['average_duration'] ? number_format($performance['average_duration'], 0) : '-' }}
+                            {{ $performance['in_progress_tasks'] }}
                         </h2>
-                        <small class="text-white-50">Minutes per task</small>
+                        <small class="text-white-50">Tasks in progress</small>
                     </div>
                     <div>
                         <i class="fe fe-activity" style="font-size: 3rem; opacity: 0.3;"></i>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLA Compliance Stats -->
+    @php
+        $userTasks = \App\Models\PlanTask::where('assigned_operator_id', auth()->user()->id)->get();
+        $overdueTasks = $userTasks->where('overdue_flag', true)->count();
+        $totalTasks = $userTasks->count();
+        $slaCompliance = $totalTasks > 0 ? (($totalTasks - $overdueTasks) / $totalTasks) * 100 : 100;
+    @endphp
+    <div class="row">
+        <div class="col-xl-6 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fe fe-trending-up mr-2"></i> SLA Compliance Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 8px; color: white; padding: 15px;">
+                                <h3 class="mb-0 font-weight-bold">{{ number_format($slaCompliance, 1) }}%</h3>
+                                <small>Compliance Rate</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 8px; color: white; padding: 15px;">
+                                <h3 class="mb-0 font-weight-bold">{{ $overdueTasks }}</h3>
+                                <small>Overdue Tasks</small>
+                            </div>
+                        </div>
+                    </div>
+                    @if($overdueTasks > 0)
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <i class="fe fe-alert-triangle mr-2"></i>
+                            <strong>{{ $overdueTasks }} task(s) need immediate attention</strong>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fe fe-alert-circle mr-2"></i> Overdue Tasks
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @php
+                        $myOverdueTasks = $userTasks->where('overdue_flag', true)->sortBy('expected_completion_at');
+                    @endphp
+                    @if($myOverdueTasks->isEmpty())
+                        <div class="text-center py-3">
+                            <i class="fe fe-check-circle" style="font-size: 2rem; opacity: 0.2; color: #28a745;"></i>
+                            <p class="text-muted mt-2 mb-0">No overdue tasks</p>
+                        </div>
+                    @else
+                        <div class="list-group list-group-sm">
+                            @foreach($myOverdueTasks->take(5) as $task)
+                                <a href="{{ route('operator.tasks.show', $task) }}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ $task->well_number ?? 'Task #' . $task->sno }}</h6>
+                                            <small class="text-muted">{{ $task->getOverdueDurationFormatted() ?? 'Status unknown' }}</small>
+                                        </div>
+                                        <x-sla-badge :task="$task" size="sm" />
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                        @if($myOverdueTasks->count() > 5)
+                            <a href="{{ route('operator.tasks') }}" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                                View All {{ $myOverdueTasks->count() }} Overdue Tasks
+                            </a>
+                        @endif
+                    @endif
                 </div>
             </div>
         </div>
@@ -183,23 +263,17 @@
 
                                         <div class="d-flex justify-content-between align-items-center">
                                             @if($task->status === 'pending')
-                                                <form action="{{ route('operator.tasks.start', $task) }}" method="POST" style="display: inline;">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-sm btn-primary">
-                                                        <i class="fe fe-play mr-1"></i>Start Task
-                                                    </button>
-                                                </form>
+                                                <button type="button" class="btn btn-sm btn-primary" onclick="event.stopPropagation(); window.location.href='/upload?task_id={{ $task->id }}'">
+                                                    <i class="fe fe-play mr-1"></i>Start Task
+                                                </button>
                                             @elseif($task->status === 'in_progress')
-                                                <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-sm btn-success">
+                                                <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-sm btn-success" onclick="event.stopPropagation()">
                                                     <i class="fe fe-check mr-1"></i>Complete Task
                                                 </a>
                                             @elseif($task->status === 'completed')
                                                 <span class="text-success small">
                                                     <i class="fe fe-check-circle mr-1"></i>Completed
                                                 </span>
-                                                <small class="text-muted">
-                                                    {{ $task->duration_minutes }} min
-                                                </small>
                                             @endif
                                         </div>
                                     </div>
@@ -272,12 +346,9 @@
                                             <i class="fe fe-eye"></i>
                                         </a>
                                         @if($task->status === 'pending')
-                                        <form action="{{ route('operator.tasks.start', $task) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-primary">
-                                                <i class="fe fe-play"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="window.location.href='/upload?task_id={{ $task->id }}'">
+                                            <i class="fe fe-play"></i>
+                                        </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -362,14 +433,14 @@ const perfCtx = document.getElementById('performanceChart').getContext('2d');
 new Chart(perfCtx, {
     type: 'bar',
     data: {
-        labels: ['Total Tasks', 'Completed', 'Pending', 'Avg Duration (min)'],
+        labels: ['Total Tasks', 'Completed', 'Pending', 'In Progress'],
         datasets: [{
             label: 'Performance Metrics',
             data: [
                 {{ $performance['total_tasks'] }},
                 {{ $performance['completed_tasks'] }},
                 {{ $performance['pending_tasks'] }},
-                {{ $performance['average_duration'] ?? 0 }}
+                {{ $performance['in_progress_tasks'] }}
             ],
             backgroundColor: [
                 'rgba(102, 126, 234, 0.8)',

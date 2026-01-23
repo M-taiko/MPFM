@@ -88,6 +88,7 @@
                                     <th>Device</th>
                                     <th>Priority</th>
                                     <th>Status</th>
+                                    <th>SLA Status</th>
                                     <th>Duration</th>
                                     <th>Actions</th>
                                 </tr>
@@ -121,6 +122,9 @@
                                         <span class="badge badge-{{ $task->status_badge_class }}">
                                             {{ ucfirst($task->status) }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        <x-sla-badge :task="$task" size="sm" />
                                     </td>
                                     <td>
                                         @if($task->duration_minutes)

@@ -11,13 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('plan_tasks', function (Blueprint $table) {
-            // Make assigned_to nullable since tasks don't need to be assigned immediately
-            $table->bigInteger('assigned_to')->unsigned()->nullable()->change();
+        // Only run this migration if we're using the old plan_tasks schema
+        // (Skip if we're using the new monthly_plans system schema)
+        if (Schema::hasColumn('plan_tasks', 'assigned_to')) {
+            Schema::table('plan_tasks', function (Blueprint $table) {
+                // Make assigned_to nullable since tasks don't need to be assigned immediately
+                $table->bigInteger('assigned_to')->unsigned()->nullable()->change();
 
-            // Make oil_string_id nullable since it might not exist yet
-            $table->bigInteger('oil_string_id')->unsigned()->nullable()->change();
-        });
+                // Make oil_string_id nullable since it might not exist yet
+                if (Schema::hasColumn('plan_tasks', 'oil_string_id')) {
+                    $table->bigInteger('oil_string_id')->unsigned()->nullable()->change();
+                }
+            });
+        }
     }
 
     /**

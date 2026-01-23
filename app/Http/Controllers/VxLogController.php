@@ -21,7 +21,7 @@ class VxLogController extends Controller
     protected $calculationService;
     protected $parsingService;
     protected $chartService;
-    protected $previewService;
+    protected $previewService; 
 
     public function __construct(
         MPFMCalculationService $calculationService,
@@ -53,21 +53,26 @@ class VxLogController extends Controller
                 abort(403, 'Unauthorized access to task');
             }
 
+            // Mark task as in_progress if it's pending
+            if ($task->completion_status === 'pending') {
+                $task->update(['completion_status' => 'in_progress']);
+            }
+
             // Prepare auto-fill data from monthly plan task structure
             $autoFillData = [
                 'client' => 'ADNOC',
-                'field' => $task->towerModel?->oilField?->name ?? 'N/A',
-                'well' => $task->towerModel?->well_name ?? 'N/A',
-                'wellhead_tower' => $task->towerModel?->name ?? 'N/A',
-                'wellhead_string' => $task->oilString?->string_identifier ?? 'N/A',
+                'field' => $task->towerModel?->oilField?->name ?? $task->tower ?? 'N/A',
+                'well' => $task->well_full_name ?? $task->well_number ?? $task->towerModel?->well_name ?? 'N/A',
+                'wellhead_tower' => $task->towerModel?->name ?? $task->tower ?? 'N/A',
+                'wellhead_string' => $task->oilString?->string_identifier ?? $task->string_number ?? 'N/A',
                 'operator' => auth()->user()->name,
                 'test_date' => $task->scheduled_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
-                'mpfm_device' => $task->category ?? 'MPFM Test',
+                'mpfm_device' => $task->mpfm_type ?? $task->category ?? 'MPFM',
                 'test_type' => $task->category ?? 'flow',
-                'expected_oil_rate' => $task->expected_oil_rate ?? null,
+                'expected_oil_rate' => $task->expected_oil_rate ?? $task->production_rate ?? null,
                 'expected_gas_rate' => $task->expected_gas_rate ?? null,
                 'expected_water_cut' => $task->expected_water_cut ?? null,
-                'expected_pressure' => $task->expected_pressure ?? null,
+                'expected_pressure' => $task->required_whfp ?? null,
                 'expected_temperature' => $task->expected_temperature ?? null,
             ];
         }
@@ -78,7 +83,7 @@ class VxLogController extends Controller
     public function processLogFile(Request $request)
     {
         $request->validate([
-            'logfile' => 'required|file|mimes:txt,vxlog,log,csv|max:10240',
+            'logfile' => 'required|file|max:10240',
             'client' => 'required|string',
             'field' => 'required|string',
             'well' => 'required|string',
@@ -93,8 +98,15 @@ class VxLogController extends Controller
             'task_id' => 'nullable|exists:plan_tasks,id',
         ]);
 
+        // Validate file extension
+        $file = $request->file('logfile');
+        $allowedExtensions = ['txt', 'vxlog', 'log', 'csv'];
+        $fileExtension = strtolower($file->getClientOriginalExtension());
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            return redirect()->back()->withErrors(['logfile' => 'Invalid file type. Allowed: ' . implode(', ', $allowedExtensions)]);
+        }
+
         try {
-            $file = $request->file('logfile');
             if (!$file->isValid()) {
                 return redirect()->back()->withErrors(['logfile' => 'Invalid file upload']);
             }

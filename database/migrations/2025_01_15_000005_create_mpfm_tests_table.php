@@ -36,7 +36,7 @@ return new class extends Migration
             $table->enum('status', ['draft', 'submitted', 'approved', 'rejected'])->default('draft');
 
             // Log file storage (for log-driven tests)
-            $table->string('log_file_path')->nullable();
+
             $table->json('raw_log_data')->nullable();
 
             $table->timestamps();

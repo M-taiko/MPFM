@@ -140,6 +140,31 @@
                     </div>
                 </div>
 
+                <!-- SLA Status Summary -->
+                @php
+                    $overdueTasks = $monthlyPlan->tasks()->where('overdue_flag', true)->count();
+                    $totalTasks = $monthlyPlan->tasks()->count();
+                    $slaCompliance = $totalTasks > 0 ? (($totalTasks - $overdueTasks) / $totalTasks) * 100 : 100;
+                @endphp
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="p-3" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); border-radius: 8px; color: white;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-white-80">SLA Compliance</small>
+                                    <h3 class="mb-0 font-weight-bold">{{ number_format($slaCompliance, 1) }}%</h3>
+                                </div>
+                                <div class="text-right">
+                                    <div>
+                                        <small>On Track: <strong>{{ $totalTasks - $overdueTasks }}</strong></small><br>
+                                        <small>Overdue: <strong>{{ $overdueTasks }}</strong></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- KPI Section -->
                 <div class="row mt-3">
                     <div class="col-12">
@@ -222,6 +247,7 @@
                                 <th>Assigned To</th>
                                 <th>Priority</th>
                                 <th>Status</th>
+                                <th>SLA Status</th>
                                 <th width="100">Actions</th>
                             </tr>
                         </thead>
@@ -278,6 +304,9 @@
                                     @else
                                     <span class="badge badge-warning">Pending</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <x-sla-badge :task="$task" size="sm" />
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">

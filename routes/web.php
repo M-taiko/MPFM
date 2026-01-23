@@ -16,6 +16,7 @@ use App\Http\Controllers\OilStringController;
 use App\Http\Controllers\MPFMOperationalPlanController;
 use App\Http\Controllers\MPFMTestController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TaskStateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -336,6 +337,49 @@ Route::middleware('auth')->group(function () {
         Route::get('/calendar', [OperatorDashboardController::class, 'calendar'])->name('calendar');
         Route::get('/history', [OperatorDashboardController::class, 'history'])->name('history');
     });
+
+    // ============================================================
+    // Task State Management Routes (State Machine)
+    // ============================================================
+    Route::prefix('tasks/{task}/state')->name('tasks.state.')->group(function () {
+        // Job Officer Actions
+        Route::post('submit-to-surveillance', [TaskStateController::class, 'submitToSurveillance'])
+            ->name('submit-to-surveillance');
+
+        // Surveillance Supervisor Actions
+        Route::post('assign-to-mpfm', [TaskStateController::class, 'assignToMPFM'])
+            ->name('assign-to-mpfm');
+        Route::post('send-back-to-draft', [TaskStateController::class, 'sendBackToDraft'])
+            ->name('send-back-to-draft');
+
+        // Operator Actions
+        Route::post('start', [TaskStateController::class, 'startTask'])
+            ->name('start');
+
+        // MPFM Supervisor Actions
+        Route::post('review-mpfm', [TaskStateController::class, 'reviewAsMPFM'])
+            ->name('review-mpfm');
+
+        // Surveillance Supervisor Review
+        Route::post('review-surveillance', [TaskStateController::class, 'reviewAsSurveillance'])
+            ->name('review-surveillance');
+
+        // Job Officer Final Approval
+        Route::post('final-approve', [TaskStateController::class, 'finalApprove'])
+            ->name('final-approve');
+
+        // View State History
+        Route::get('history', [TaskStateController::class, 'showHistory'])
+            ->name('history');
+    });
+
+    // Bulk Operations
+    Route::post('tasks/bulk-transition', [TaskStateController::class, 'bulkTransition'])
+        ->name('tasks.bulk-transition');
+
+    // Workflow Dashboard
+    Route::get('workflow/dashboard', [TaskStateController::class, 'dashboard'])
+        ->name('workflow.dashboard');
 });
 
 /*

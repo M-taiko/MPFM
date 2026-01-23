@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\TaskState;
 
 class MonthlyPlan extends Model
 {
@@ -112,5 +113,100 @@ class MonthlyPlan extends Model
     public function isActive()
     {
         return $this->status === 'active';
+    }
+
+    //================================================================================
+    // Workflow State Management
+    //================================================================================
+
+    /**
+     * Get workflow progress breakdown by state
+     *
+     * @return array
+     */
+    public function getWorkflowProgress(): array
+    {
+        return [
+            'draft' => $this->tasks()->where('state', TaskState::DRAFT)->count(),
+            'submitted_to_surveillance' => $this->tasks()->where('state', TaskState::SUBMITTED_TO_SURVEILLANCE)->count(),
+            'assigned_to_mpfm' => $this->tasks()->where('state', TaskState::ASSIGNED_TO_MPFM)->count(),
+            'in_progress' => $this->tasks()->where('state', TaskState::IN_PROGRESS)->count(),
+            'mpfm_reviewed' => $this->tasks()->where('state', TaskState::MPFM_REVIEWED)->count(),
+            'surveillance_reviewed' => $this->tasks()->where('state', TaskState::SURVEILLANCE_REVIEWED)->count(),
+            'job_officer_approved' => $this->tasks()->where('state', TaskState::JOB_OFFICER_APPROVED)->count(),
+            'completed' => $this->tasks()->where('state', TaskState::COMPLETED)->count(),
+        ];
+    }
+
+    /**
+     * Get workflow completion percentage
+     *
+     * @return float
+     */
+    public function getWorkflowCompletionPercentage(): float
+    {
+        $total = $this->total_tests;
+        if ($total === 0) {
+            return 0.0;
+        }
+
+        $completed = $this->tasks()->where('state', TaskState::COMPLETED)->count();
+        return round(($completed / $total) * 100, 2);
+    }
+
+    /**
+     * Get workflow bottlenecks (states with most tasks)
+     *
+     * @return array
+     */
+    public function getWorkflowBottlenecks(): array
+    {
+        $progress = $this->getWorkflowProgress();
+
+        // Exclude draft and completed, focus on in-process states
+        $inProcessStates = [
+            'submitted_to_surveillance',
+            'assigned_to_mpfm',
+            'in_progress',
+            'mpfm_reviewed',
+            'surveillance_reviewed',
+            'job_officer_approved',
+        ];
+
+        $bottlenecks = [];
+        foreach ($inProcessStates as $state) {
+            if ($progress[$state] > 0) {
+                $bottlenecks[$state] = $progress[$state];
+            }
+        }
+
+        // Sort by count descending
+        arsort($bottlenecks);
+
+        return $bottlenecks;
+    }
+
+    /**
+     * Check if all tasks have been completed
+     *
+     * @return bool
+     */
+    public function areAllTasksCompleted(): bool
+    {
+        $total = $this->tasks()->count();
+        $completed = $this->tasks()->where('state', TaskState::COMPLETED)->count();
+
+        return $total > 0 && $total === $completed;
+    }
+
+    /**
+     * Get tasks in specific workflow state
+     *
+     * @param TaskState $state
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function tasksInState(TaskState $state)
+    {
+        return $this->tasks()->where('state', $state);
     }
 }

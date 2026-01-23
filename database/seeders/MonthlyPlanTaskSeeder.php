@@ -115,7 +115,7 @@ class MonthlyPlanTaskSeeder extends Seeder
                     'category' => 'Complex',
                     'required_whfp' => 150,
                     'scheduled_date' => now()->addDays(3),
-                    'priority' => 'urgent',
+                    'priority' => 'top',
                     'completion_status' => 'pending',
                     'operators' => [
                         [$op1->id, true],  // Operator 1 (primary)

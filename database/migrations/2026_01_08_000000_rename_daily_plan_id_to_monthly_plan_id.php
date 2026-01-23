@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,28 +12,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // First, drop the foreign key constraint if it exists
-        Schema::table('plan_tasks', function (Blueprint $table) {
-            // Drop foreign key if it exists (check common naming conventions)
-            try {
-                $table->dropForeign(['daily_plan_id']);
-            } catch (\Exception $e) {
-                // Foreign key might not exist or have different name
-            }
-        });
+        // Check if the old plan_tasks table structure exists (daily_plan_id column)
+        if (Schema::hasTable('plan_tasks') && Schema::hasColumn('plan_tasks', 'daily_plan_id')) {
+            // First, drop the foreign key constraint if it exists
+            Schema::table('plan_tasks', function (Blueprint $table) {
+                // Drop foreign key if it exists (check common naming conventions)
+                // Use raw query to safely drop FK if it exists
+                DB::statement('ALTER TABLE plan_tasks DROP FOREIGN KEY IF EXISTS plan_tasks_daily_plan_id_foreign');
+            });
 
-        // Rename the column
-        Schema::table('plan_tasks', function (Blueprint $table) {
-            $table->renameColumn('daily_plan_id', 'monthly_plan_id');
-        });
+            // Rename the column
+            Schema::table('plan_tasks', function (Blueprint $table) {
+                $table->renameColumn('daily_plan_id', 'monthly_plan_id');
+            });
 
-        // Add the foreign key back with the new column name
-        Schema::table('plan_tasks', function (Blueprint $table) {
-            $table->foreign('monthly_plan_id')
-                  ->references('id')
-                  ->on('monthly_plans')
-                  ->onDelete('cascade');
-        });
+            // Add the foreign key back with the new column name
+            Schema::table('plan_tasks', function (Blueprint $table) {
+                $table->foreign('monthly_plan_id')
+                      ->references('id')
+                      ->on('monthly_plans')
+                      ->onDelete('cascade');
+            });
+        }
     }
 
     /**

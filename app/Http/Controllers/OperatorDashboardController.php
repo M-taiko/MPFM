@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PlanTask;
 use App\Models\MonthlyPlan;
 use App\Models\WellTest;
+use App\Enums\TaskState;
+use App\Services\TaskStateService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -102,10 +104,6 @@ class OperatorDashboardController extends Controller
         $failedTasks = PlanTask::where('assigned_operator_id', $operator->id)
             ->where('completion_status', 'failed')
             ->count();
-        $avgDuration = PlanTask::where('assigned_operator_id', $operator->id)
-            ->completed()
-            ->whereNotNull('duration_minutes')
-            ->avg('duration_minutes');
 
         $performance = [
             'total_tasks' => $totalTasks,
@@ -114,7 +112,6 @@ class OperatorDashboardController extends Controller
             'in_progress_tasks' => $inProgressTasks,
             'failed_tasks' => $failedTasks,
             'completion_rate' => $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0,
-            'average_duration' => $avgDuration,
         ];
 
         return view('operator.dashboard', compact(
@@ -200,15 +197,23 @@ class OperatorDashboardController extends Controller
             abort(403, 'You are not assigned to this task.');
         }
 
-        if ($planTask->completion_status !== 'pending') {
-            return back()->with('error', 'Task has already been started or completed.');
+        // Check state-based eligibility
+        if (!$planTask->canOperatorStart()) {
+            return back()->with('error', 'Task cannot be started in its current state.');
         }
 
         try {
-            $planTask->update(['completion_status' => 'in_progress']);
+            // Use state service for state transition
+            $stateService = app(TaskStateService::class);
+            $stateService->transition(
+                $planTask,
+                TaskState::IN_PROGRESS,
+                auth()->user(),
+                'Task started by operator'
+            );
 
             // Redirect to centralized upload page at /upload with task_id parameter
-            return redirect()->route('upload.form', ['task_id' => $planTask->id])
+            return redirect('/upload?task_id=' . $planTask->id)
                 ->with('success', 'Task started successfully. Please upload the log file.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to start task: ' . $e->getMessage());

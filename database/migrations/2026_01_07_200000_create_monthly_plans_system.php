@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,6 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Drop old plan_tasks table from previous migration if it exists (schema refactoring)
+        if (Schema::hasTable('plan_tasks')) {
+            // Disable foreign key checks to allow dropping the table
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            Schema::dropIfExists('plan_tasks');
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
+
         // Monthly Plans Table (Job Officer creates this)
         Schema::create('monthly_plans', function (Blueprint $table) {
             $table->id();

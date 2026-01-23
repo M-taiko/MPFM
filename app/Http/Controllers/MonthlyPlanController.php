@@ -7,6 +7,8 @@ use App\Models\PlanTask;
 use App\Models\User;
 use App\Models\Tower;
 use App\Models\OilString;
+use App\Enums\TaskState;
+use App\Services\TaskStateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -374,7 +376,7 @@ class MonthlyPlanController extends Controller
     }
 
     /**
-     * Submit plan for review (Job Officer submits to MPFM Supervisor)
+     * Submit plan for review (Job Officer submits to Surveillance Supervisor)
      */
     public function submitForReview(MonthlyPlan $monthlyPlan)
     {
@@ -387,13 +389,32 @@ class MonthlyPlanController extends Controller
         }
 
         try {
-            $monthlyPlan->update(['status' => 'under_review']);
+            DB::transaction(function () use ($monthlyPlan) {
+                // Update plan status
+                $monthlyPlan->update(['status' => 'under_review']);
 
-            // TODO: Send notification to MPFM Supervisors
+                // Transition all draft tasks to SUBMITTED_TO_SURVEILLANCE
+                $stateService = app(TaskStateService::class);
+                $draftTasks = $monthlyPlan->tasks()->where('state', TaskState::DRAFT)->get();
+
+                foreach ($draftTasks as $task) {
+                    try {
+                        $stateService->transition(
+                            $task,
+                            TaskState::SUBMITTED_TO_SURVEILLANCE,
+                            auth()->user(),
+                            'Submitted with monthly plan for surveillance review'
+                        );
+                    } catch (\Exception $e) {
+                        // Log but don't fail the whole transaction
+                        \Log::warning("Failed to transition task {$task->id}: {$e->getMessage()}");
+                    }
+                }
+            });
 
             return redirect()
                 ->route('monthly-plans.show', $monthlyPlan)
-                ->with('success', 'Plan submitted for review successfully.');
+                ->with('success', 'Plan and tasks submitted for surveillance review successfully.');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to submit plan: ' . $e->getMessage());

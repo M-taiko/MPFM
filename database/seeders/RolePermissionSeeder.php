@@ -64,8 +64,10 @@ class RolePermissionSeeder extends Seeder
         $jobOfficerRole = Role::firstOrCreate(['name' => 'job_officer']);
         $reservoirEngineerRole = Role::firstOrCreate(['name' => 'reservoir_engineer']);
         $productionSupervisorRole = Role::firstOrCreate(['name' => 'production_supervisor']);
+        $surveillanceSupervisorRole = Role::firstOrCreate(['name' => 'surveillance_supervisor']);
         $mpfmSupervisorRole = Role::firstOrCreate(['name' => 'mpfm_supervisor']);
         $mpfmOperatorRole = Role::firstOrCreate(['name' => 'mpfm_operator']);
+        $operatorRole = Role::firstOrCreate(['name' => 'operator']); // Backward compatibility fallback
 
         // Admin gets all permissions
         $adminRole->givePermissionTo(Permission::all());
@@ -104,8 +106,20 @@ class RolePermissionSeeder extends Seeder
             'view_well_string_requirements',
         ]);
 
+        // Surveillance Supervisor permissions
+        $surveillanceSupervisorRole->syncPermissions([
+            'view_well_tests',
+            'view_well_string_requirements',
+        ]);
+
         // MPFM Operator permissions
         $mpfmOperatorRole->syncPermissions([
+            'view_well_tests',
+            'view_mpfm_operator_reports',
+        ]);
+
+        // Operator permissions (backward compatibility)
+        $operatorRole->syncPermissions([
             'view_well_tests',
             'view_mpfm_operator_reports',
         ]);

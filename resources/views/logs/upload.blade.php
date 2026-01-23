@@ -390,6 +390,11 @@
             <div class="form-section-title">
                 <i class="fe fe-info mr-2"></i>
                 Well Information
+                @if(isset($task))
+                <span style="font-size: 0.85rem; margin-left: 1rem; opacity: 0.8;">
+                    <i class="fe fe-check-circle" style="color: #10b981;"></i> Auto-filled from task
+                </span>
+                @endif
             </div>
 
             <div class="row">
@@ -439,6 +444,11 @@
             <div class="form-section-title">
                 <i class="fe fe-settings mr-2"></i>
                 Test Configuration
+                @if(isset($task))
+                <span style="font-size: 0.85rem; margin-left: 1rem; opacity: 0.8;">
+                    <i class="fe fe-check-circle" style="color: #10b981;"></i> Auto-filled from task
+                </span>
+                @endif
             </div>
 
             <div class="row">

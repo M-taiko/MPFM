@@ -130,6 +130,32 @@
                 </ul>
             </li>
 
+            <!-- Reports & Analytics -->
+            <li class="side-item side-item-category">Reporting & Analytics</li>
+
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('reports*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-bar-chart"></i>
+                    <span class="side-menu__label">Reports</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->is('reports/job-officer') ? 'active' : '' }}" href="{{ route('reports.job-officer') }}">Job Officer Report</a></li>
+                    <li><a class="slide-item {{ request()->is('reports/mpfm-supervisor') ? 'active' : '' }}" href="{{ route('reports.mpfm-supervisor') }}">MPFM Supervisor Report</a></li>
+                    <li><a class="slide-item {{ request()->is('reports/production') ? 'active' : '' }}" href="{{ route('reports.production') }}">Production Report</a></li>
+                </ul>
+            </li>
+
+            <!-- SLA Monitoring -->
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('job_officer') || auth()->user()->hasRole('mpfm_supervisor'))
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('sla*') ? 'active' : '' }}" href="{{ url('/sla/dashboard') }}">
+                    <i class="side-menu__icon fe fe-alert-circle"></i>
+                    <span class="side-menu__label">SLA Monitoring</span>
+                </a>
+            </li>
+            @endif
+
             <!-- User Management (Admin Only) -->
             @can('manage_users')
             <li class="side-item side-item-category">Administration</li>
