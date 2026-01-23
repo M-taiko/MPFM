@@ -111,10 +111,12 @@ Route::middleware('auth')->group(function () {
 | Vx Log
 |--------------------------------------------------------------------------
 */
-Route::get('/upload', [VxLogController::class, 'showUploadForm'])->name('upload.form');
-Route::post('/process-log', [VxLogController::class, 'processLogFile'])->name('process.log');
-Route::get('/chart-data', [VxLogController::class, 'getChartDataForUnit'])->name('chart.data');
-Route::post('/tests/store', [VxLogController::class, 'storeTest'])->name('tests.store');
+Route::middleware('auth')->group(function () {
+    Route::get('/upload', [VxLogController::class, 'showUploadForm'])->name('upload.form');
+    Route::post('/process-log', [VxLogController::class, 'processLogFile'])->name('process.log');
+    Route::get('/chart-data', [VxLogController::class, 'getChartDataForUnit'])->name('chart.data');
+    Route::post('/tests/store', [VxLogController::class, 'storeTest'])->name('tests.store');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -225,9 +227,6 @@ Route::middleware('auth')->group(function () {
     Route::prefix('operator')->name('operator.')->group(function () {
         Route::get('/dashboard', [OperatorDashboardController::class, 'index'])->name('dashboard');
         Route::get('/tasks', [OperatorDashboardController::class, 'tasks'])->name('tasks');
-        Route::get('/tasks/{task}', [OperatorDashboardController::class, 'showTask'])->name('tasks.show');
-        Route::post('/tasks/{task}/start', [OperatorDashboardController::class, 'startTask'])->name('tasks.start');
-        Route::post('/tasks/{task}/complete', [OperatorDashboardController::class, 'completeTask'])->name('tasks.complete');
         Route::get('/calendar', [OperatorDashboardController::class, 'calendar'])->name('calendar');
         Route::get('/history', [OperatorDashboardController::class, 'history'])->name('history');
     });

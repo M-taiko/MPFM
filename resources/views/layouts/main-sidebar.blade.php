@@ -139,11 +139,11 @@
                     <span class="side-menu__label">Reports</span>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
-                <ul class="slide-menu">
+                {{-- <ul class="slide-menu">
                     <li><a class="slide-item {{ request()->is('reports/job-officer') ? 'active' : '' }}" href="{{ route('reports.job-officer') }}">Job Officer Report</a></li>
                     <li><a class="slide-item {{ request()->is('reports/mpfm-supervisor') ? 'active' : '' }}" href="{{ route('reports.mpfm-supervisor') }}">MPFM Supervisor Report</a></li>
                     <li><a class="slide-item {{ request()->is('reports/production') ? 'active' : '' }}" href="{{ route('reports.production') }}">Production Report</a></li>
-                </ul>
+                </ul> --}}
             </li>
 
             <!-- SLA Monitoring -->

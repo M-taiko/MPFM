@@ -263,7 +263,7 @@
 
                                         <div class="d-flex justify-content-between align-items-center">
                                             @if($task->status === 'pending')
-                                                <button type="button" class="btn btn-sm btn-primary" onclick="event.stopPropagation(); window.location.href='/upload?task_id={{ $task->id }}'">
+                                                <button type="button" class="btn btn-sm btn-primary" onclick="event.stopPropagation(); window.location.href='{{ route('upload.form') }}?task_id={{ $task->id }}'">
                                                     <i class="fe fe-play mr-1"></i>Start Task
                                                 </button>
                                             @elseif($task->status === 'in_progress')
@@ -346,7 +346,7 @@
                                             <i class="fe fe-eye"></i>
                                         </a>
                                         @if($task->status === 'pending')
-                                        <button type="button" class="btn btn-sm btn-primary" onclick="window.location.href='/upload?task_id={{ $task->id }}'">
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="window.location.href='{{ route('upload.form') }}?task_id={{ $task->id }}'">
                                             <i class="fe fe-play"></i>
                                         </button>
                                         @endif

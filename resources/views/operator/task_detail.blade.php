@@ -55,8 +55,8 @@
                     <div class="info-card">
                         <h5>{{ $task->task_identifier }}</h5>
                         <p class="mb-0">
-                            <strong>Plan:</strong> {{ $task->dailyPlan->plan_name }}<br>
-                            <strong>Date:</strong> {{ $task->dailyPlan->plan_date->format('l, d F Y') }}
+                            <strong>Plan:</strong> {{ $task->monthlyPlan->plan_name }}<br>
+                            <strong>Period:</strong> {{ $task->monthlyPlan->plan_month }}
                         </p>
                     </div>
 
@@ -152,8 +152,8 @@
                             </form>
                         @elseif($task->status === 'in_progress')
                             <div>
-                                <p class="mb-2"><strong>Task started at:</strong> {{ $task->started_at->format('d M Y H:i') }}</p>
-                                <a href="{{ url('/upload') }}?task_id={{ $task->id }}" class="btn btn-success btn-lg">
+                                <p class="mb-2"><strong>Scheduled for:</strong> {{ $task->scheduled_date->format('d M Y') }}</p>
+                                <a href="{{ route('upload.form') }}?task_id={{ $task->id }}" class="btn btn-success btn-lg">
                                     <i class="fe fe-upload mr-2"></i>Upload Log & Complete Task
                                 </a>
                             </div>
@@ -161,8 +161,9 @@
                             <div class="alert alert-success w-100">
                                 <i class="fe fe-check-circle mr-2"></i>
                                 <strong>Task Completed</strong><br>
+                                @if($task->completed_at)
                                 Completed at: {{ $task->completed_at->format('d M Y H:i') }}<br>
-                                Duration: {{ $task->duration_minutes }} minutes
+                                @endif
                             </div>
                         @endif
                     </div>
@@ -249,25 +250,13 @@
                         </span>
                     </div>
                     <div class="mb-3">
-                        <strong>Task Order:</strong>
-                        <span class="float-right">#{{ $task->task_order }}</span>
+                        <strong>Scheduled Date:</strong>
+                        <span class="float-right">{{ $task->scheduled_date->format('d M Y') }}</span>
                     </div>
-                    @if($task->started_at)
-                    <div class="mb-3">
-                        <strong>Started:</strong>
-                        <span class="float-right">{{ $task->started_at->format('H:i') }}</span>
-                    </div>
-                    @endif
                     @if($task->completed_at)
                     <div class="mb-3">
                         <strong>Completed:</strong>
                         <span class="float-right">{{ $task->completed_at->format('H:i') }}</span>
-                    </div>
-                    @endif
-                    @if($task->duration_minutes)
-                    <div class="mb-3">
-                        <strong>Duration:</strong>
-                        <span class="float-right">{{ $task->duration_minutes }} min</span>
                     </div>
                     @endif
                 </div>
@@ -278,18 +267,13 @@
                     <h3 class="card-title">Plan Information</h3>
                 </div>
                 <div class="card-body">
-                    <h6>{{ $task->dailyPlan->plan_name }}</h6>
-                    <p class="text-muted mb-2">{{ $task->dailyPlan->plan_date->format('d M Y') }}</p>
-
-                    <div class="progress mb-2" style="height: 20px;">
-                        <div class="progress-bar bg-{{ $task->dailyPlan->completion_percentage == 100 ? 'success' : 'info' }}"
-                             style="width: {{ $task->dailyPlan->completion_percentage }}%">
-                            {{ $task->dailyPlan->completion_percentage }}%
-                        </div>
-                    </div>
+                    <h6>{{ $task->monthlyPlan->plan_name }}</h6>
+                    <p class="text-muted mb-2">{{ $task->monthlyPlan->plan_month }}</p>
 
                     <small class="text-muted">
-                        {{ $task->dailyPlan->completed_tasks }} / {{ $task->dailyPlan->total_tasks }} tasks completed
+                        Total Tests: {{ $task->monthlyPlan->total_tests }}<br>
+                        Completed: {{ $task->monthlyPlan->total_completed }}<br>
+                        Pending: {{ $task->monthlyPlan->total_pending }}
                     </small>
                 </div>
             </div>

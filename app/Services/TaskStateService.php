@@ -145,12 +145,12 @@ class TaskStateService
             TaskState::ASSIGNED_TO_MPFM => function() use ($task, $user) {
                 $task->surveillance_supervisor_id = $user->id;
                 $task->surveillance_assigned_at = now();
-            }(),
+            },
 
             // When operator starts, update completion_status
             TaskState::IN_PROGRESS => function() use ($task) {
                 $task->completion_status = 'in_progress';
-            }(),
+            },
 
             // When completed, mark all statuses as completed
             TaskState::COMPLETED => function() use ($task) {
@@ -159,7 +159,7 @@ class TaskStateService
                     $task->completed_at = now();
                 }
                 $task->final_status = 'approved';
-            }(),
+            },
 
             // For MPFM_REVIEWED going back to IN_PROGRESS (rejection)
             TaskState::IN_PROGRESS => function() use ($task) {
@@ -167,7 +167,7 @@ class TaskStateService
                     // Operator needs to redo
                     $task->completion_status = 'in_progress';
                 }
-            }(),
+            },
 
             default => null
         };

@@ -244,6 +244,16 @@
 .breadcrumb-modern .breadcrumb-item a:hover {
     opacity: 1;
 }
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-modern-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
 </style>
 
 <div class="main-container container-fluid">
@@ -515,13 +525,22 @@
                 <div class="col-md-6">
                     <div class="modern-form-group">
                         <label class="modern-form-label">Test Type</label>
-                        <select name="test_type" class="modern-form-input" {{ isset($task) ? 'disabled' : '' }}>
-                            <option value="flow" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'flow' ? 'selected' : '' }}>Flow Test</option>
-                            <option value="cleanup" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'cleanup' ? 'selected' : '' }}>Clean Up</option>
-                            <option value="build-up" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'build-up' ? 'selected' : '' }}>Build Up</option>
-                        </select>
                         @if(isset($task))
-                        <input type="hidden" name="test_type" value="{{ $autoFillData['test_type'] ?? 'flow' }}">
+                            <!-- When task is set, use readonly select and hidden input for form submission -->
+                            <select class="modern-form-input" disabled>
+                                <option value="flow" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'flow' ? 'selected' : '' }}>Flow Test</option>
+                                <option value="cleanup" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'cleanup' ? 'selected' : '' }}>Clean Up</option>
+                                <option value="build-up" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'build-up' ? 'selected' : '' }}>Build Up</option>
+                            </select>
+                            <input type="hidden" name="test_type" value="{{ $autoFillData['test_type'] ?? 'flow' }}">
+                        @else
+                            <!-- When no task, allow selection -->
+                            <select name="test_type" class="modern-form-input" required>
+                                <option value="">-- Select Test Type --</option>
+                                <option value="flow" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'flow' ? 'selected' : '' }}>Flow Test</option>
+                                <option value="cleanup" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'cleanup' ? 'selected' : '' }}>Clean Up</option>
+                                <option value="build-up" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'build-up' ? 'selected' : '' }}>Build Up</option>
+                            </select>
                         @endif
                     </div>
                 </div>
@@ -582,6 +601,8 @@
 <script>
 // Global validation function called directly from button
 function validateAndSubmit(event) {
+    event.preventDefault();
+
     const fileInput = document.getElementById('logfile');
     const uploadForm = document.getElementById('uploadForm');
 
@@ -590,20 +611,70 @@ function validateAndSubmit(event) {
     console.log('Files selected:', fileInput.files.length);
     console.log('Form method:', uploadForm.method);
     console.log('Form action:', uploadForm.action);
+    console.log('Form enctype:', uploadForm.enctype);
 
     if (!fileInput.files || fileInput.files.length === 0) {
         console.log('VALIDATION FAILED: No file selected');
-        event.preventDefault();
         alert('Please select a log file to upload');
         return false;
     }
 
-    console.log('VALIDATION PASSED: File selected, submitting form');
+    console.log('VALIDATION PASSED: File selected');
     console.log('File name:', fileInput.files[0].name);
     console.log('File size:', fileInput.files[0].size);
 
-    // Explicitly submit the form
-    uploadForm.submit();
+    // Log all form data before submission
+    console.log('=== Form Fields ===');
+    const formData = new FormData(uploadForm);
+    for (let [key, value] of formData.entries()) {
+        if (key !== '_token') { // Don't log CSRF token for security
+            console.log(`${key}:`, typeof value === 'object' ? value.name : value);
+        }
+    }
+
+    console.log('Submitting form to:', uploadForm.action);
+    console.log('With method:', uploadForm.method);
+
+    // Show loading indicator
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fe fe-loader" style="animation: spin 1s linear infinite;"></i> Processing...';
+
+    // Use fetch to have more control and see actual response
+    fetch(uploadForm.action, {
+        method: 'POST',
+        body: new FormData(uploadForm)
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response statusText:', response.statusText);
+        if (response.status === 401) {
+            throw new Error('Session expired. Please log in again.');
+        }
+        if (response.status === 419) {
+            throw new Error('CSRF token expired. Please refresh the page and try again.');
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.text();
+    })
+    .then(html => {
+        console.log('Form submitted successfully!');
+        // Replace entire page with response
+        document.open();
+        document.write(html);
+        document.close();
+    })
+    .catch(error => {
+        console.error('Form submission error:', error);
+        // Restore button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+        alert('Error submitting form: ' + error.message);
+    });
+
     return false;
 }
 

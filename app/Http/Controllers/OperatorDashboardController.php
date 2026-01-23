@@ -184,7 +184,7 @@ class OperatorDashboardController extends Controller
 
         $planTask->load(['monthlyPlan', 'towerModel', 'oilString', 'mpfmTest', 'assigner']);
 
-        return view('operator.task_detail', compact('planTask'));
+        return view('operator.task_detail', ['task' => $planTask]);
     }
 
     /**
@@ -213,7 +213,7 @@ class OperatorDashboardController extends Controller
             );
 
             // Redirect to centralized upload page at /upload with task_id parameter
-            return redirect('/upload?task_id=' . $planTask->id)
+            return redirect(route('upload.form') . '?task_id=' . $planTask->id)
                 ->with('success', 'Task started successfully. Please upload the log file.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to start task: ' . $e->getMessage());
@@ -273,7 +273,7 @@ class OperatorDashboardController extends Controller
             'plan_task_id' => $planTask->id,
         ];
 
-        return view('operator.upload_log', compact('planTask', 'autoFillData'));
+        return view('operator.upload_log', ['task' => $planTask, 'autoFillData' => $autoFillData]);
     }
 
     /**
