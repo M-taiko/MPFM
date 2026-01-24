@@ -12,6 +12,8 @@ use App\Http\Requests\UpdateMPFMTestRequest;
 use App\Services\MPFMTestService;
 use App\Services\MPFMLogProcessingService;
 use App\Services\DataTable\MPFMTestDataTableService;
+use App\Services\MPFMValidationService;
+use App\Services\MPFMHistoricalComparisonService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -504,6 +506,71 @@ class MPFMTestController extends Controller
     {
         $oilStrings = OilString::where('tower_id', $towerId)->active()->get();
         return response()->json($oilStrings);
+    }
+
+    /**
+     * Show test with historical comparison
+     */
+    public function showWithHistory(MPFMTest $mpfmTest)
+    {
+        $mpfmTest->load([
+            'planTask.oilString',
+            'latestValidation',
+            'latestComparison'
+        ]);
+
+        return view('mpfm_tests.show_with_history', compact('mpfmTest'));
+    }
+
+    /**
+     * Show string analysis with all tests and trends
+     */
+    public function stringAnalysis($oilStringId)
+    {
+        $oilString = OilString::with('tower')->findOrFail($oilStringId);
+
+        $tests = MPFMTest::whereHas('planTask', function($q) use ($oilStringId) {
+            $q->where('oil_string_id', $oilStringId);
+        })->with('latestValidation')
+          ->orderBy('test_date', 'desc')
+          ->paginate(20);
+
+        $comparisonService = app(MPFMHistoricalComparisonService::class);
+        $trendingData = $comparisonService->getStringTrendingAnalysis($oilStringId);
+
+        return view('mpfm_tests.string_analysis', compact('oilString', 'tests', 'trendingData'));
+    }
+
+    /**
+     * Show trending dashboard for all strings
+     */
+    public function trendingDashboard(Request $request)
+    {
+        $strings = OilString::with('tower')->get();
+
+        $comparisonService = app(MPFMHistoricalComparisonService::class);
+
+        $stringsWithAlerts = $strings->map(function($string) use ($comparisonService) {
+            $trending = $comparisonService->getStringTrendingAnalysis($string->id);
+            return [
+                'string' => $string,
+                'alerts' => $trending['alerts'] ?? [],
+                'alert_count' => count($trending['alerts'] ?? []),
+            ];
+        })->sortByDesc('alert_count');
+
+        return view('mpfm_tests.trending_dashboard', compact('stringsWithAlerts'));
+    }
+
+    /**
+     * Revalidate a test
+     */
+    public function revalidate(MPFMTest $mpfmTest)
+    {
+        $validationService = app(MPFMValidationService::class);
+        $validationService->validateTest($mpfmTest, true);
+
+        return redirect()->back()->with('success', 'Test revalidated successfully');
     }
 }
 

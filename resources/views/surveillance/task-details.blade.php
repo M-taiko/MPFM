@@ -189,14 +189,22 @@
                         </div>
                     </div>
 
-                    <div class="mt-3">
+                    <div class="mt-3" style="display: flex; gap: 10px; flex-wrap: wrap;">
                         @if($task->mpfmTest->test_data)
-                        <a href="{{ route('mpfm-tests.view', $task->mpfmTest) }}" class="btn btn-success" target="_blank">
-                            <i class="fe fe-bar-chart-2 mr-2"></i>View Complete Charts & Analysis
+                        <a href="{{ route('mpfm-tests.view', $task->mpfmTest) }}" class="btn btn-success" target="_blank" title="View Charts">
+                            <i class="fe fe-bar-chart-2 mr-2"></i>Charts
                         </a>
                         @endif
-                        <a href="{{ route('mpfm_tests.show', $task->mpfmTest) }}" class="btn btn-primary">
-                            <i class="fe fe-external-link mr-2"></i>View Full Test Report
+                        <a href="{{ route('mpfm_tests.show', $task->mpfmTest) }}" class="btn btn-primary" title="View Full Test Report">
+                            <i class="fe fe-eye mr-2"></i>Details
+                        </a>
+                        <!-- Validation & History -->
+                        <a href="{{ route('mpfm_tests.show_history', $task->mpfmTest->id) }}" class="btn btn-warning" title="View Validation & History">
+                            <i class="fe fe-check-circle mr-2"></i>Validation
+                        </a>
+                        <!-- String Analysis -->
+                        <a href="{{ route('mpfm_tests.string_analysis', $task->mpfmTest->oil_string_id) }}" class="btn btn-info" title="View String Analysis">
+                            <i class="fe fe-trending-up mr-2"></i>Analysis
                         </a>
                     </div>
                 </div>

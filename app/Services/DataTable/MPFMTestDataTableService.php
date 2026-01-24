@@ -78,10 +78,15 @@ class MPFMTestDataTableService
                 return '<span class="badge ' . $badgeClass . '">' . ucfirst($test->status) . '</span>';
             })
             ->addColumn('action', function ($test) {
-                $actions = '<a href="' . route('mpfm_tests.show', $test->id) . '" class="btn btn-sm btn-info">View</a> ';
+                $actions = '<a href="' . route('mpfm_tests.show', $test->id) . '" class="btn btn-sm btn-info" title="View Details">View</a> ';
                 if ($test->test_data) {
-                    $actions .= '<a href="' . route('mpfm-tests.view', $test->id) . '" class="btn btn-sm btn-success" target="_blank">Charts</a> ';
+                    $actions .= '<a href="' . route('mpfm-tests.view', $test->id) . '" class="btn btn-sm btn-success" target="_blank" title="View Charts">Charts</a> ';
                 }
+                // Validation & History button
+                $actions .= '<a href="' . route('mpfm_tests.show_history', $test->id) . '" class="btn btn-sm btn-warning" title="View Validation & History"><i class="fe fe-check-circle"></i></a> ';
+                // String Analysis button
+                $actions .= '<a href="' . route('mpfm_tests.string_analysis', $test->oil_string_id) . '" class="btn btn-sm btn-primary" title="View String Analysis"><i class="fe fe-trending-up"></i></a> ';
+
                 if (auth()->user()->can('update', $test)) {
                     $actions .= '<a href="' . route('mpfm_tests.edit', $test->id) . '" class="btn btn-sm btn-primary">Edit</a> ';
                 }

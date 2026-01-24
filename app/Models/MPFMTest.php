@@ -177,5 +177,63 @@ class MPFMTest extends Model
                 ->orWhereIn('mpfm_operational_plan_id', $planIds);
         });
     }
+
+    /**
+     * Get all validation results for this test
+     */
+    public function validations()
+    {
+        return $this->hasMany(MPFMTestValidation::class, 'mpfm_test_id', 'id')->latest('validated_at');
+    }
+
+    /**
+     * Get the latest validation result
+     */
+    public function latestValidation()
+    {
+        return $this->hasOne(MPFMTestValidation::class, 'mpfm_test_id', 'id')->latestOfMany('validated_at');
+    }
+
+    /**
+     * Get all comparisons for this test
+     */
+    public function comparisons()
+    {
+        return $this->hasMany(MPFMTestComparison::class, 'current_test_id')->latest();
+    }
+
+    /**
+     * Get the latest comparison
+     */
+    public function latestComparison()
+    {
+        return $this->hasOne(MPFMTestComparison::class, 'current_test_id')->latestOfMany();
+    }
+
+    /**
+     * Scope to get tests that need validation
+     */
+    public function scopeNeedsValidation($query)
+    {
+        return $query->whereNull('last_validated_at')
+                     ->orWhere('last_validated_at', '<', \DB::raw('updated_at'));
+    }
+
+    /**
+     * Scope to filter approved tests
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    /**
+     * Check if test needs revalidation
+     */
+    public function needsRevalidation()
+    {
+        return $this->last_validated_at === null ||
+               $this->last_validated_at < $this->updated_at;
+    }
 }
 

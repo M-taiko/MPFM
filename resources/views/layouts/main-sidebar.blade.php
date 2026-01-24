@@ -131,6 +131,21 @@
                 </ul>
             </li>
 
+            <!-- MPFM Validation & Analytics -->
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('mpfm_supervisor'))
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('mpfm-tests/trending*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-trending-up"></i>
+                    <span class="side-menu__label">Validation & Analytics</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->is('mpfm-tests/trending-dashboard') ? 'active' : '' }}" href="{{ route('mpfm_tests.trending_dashboard') }}">Trending Dashboard</a></li>
+                    <li><a class="slide-item" href="{{ route('mpfm_tests.index') }}">View All Tests</a></li>
+                </ul>
+            </li>
+            @endif
+
             <!-- Infrastructure Management -->
             <li class="side-item side-item-category">Field Infrastructure</li>
 

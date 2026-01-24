@@ -253,10 +253,21 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Test Results</h3>
-                    <div class="card-options">
-                        <a href="{{ route('mpfm_tests.show', $task->mpfmTest) }}" class="btn btn-sm btn-primary">
-                            View Full Test Report
+                    <div class="card-options" style="display: flex; gap: 5px;">
+                        <a href="{{ route('mpfm_tests.show', $task->mpfmTest) }}" class="btn btn-sm btn-primary" title="View Full Test Report">
+                            <i class="fe fe-eye mr-2"></i>Details
                         </a>
+                        <a href="{{ route('mpfm_tests.show_history', $task->mpfmTest) }}" class="btn btn-sm btn-warning" title="View Validation & History">
+                            <i class="fe fe-check-circle mr-2"></i>Validation
+                        </a>
+                        <a href="{{ route('mpfm_tests.string_analysis', $task->mpfmTest->oil_string_id) }}" class="btn btn-sm btn-info" title="View String Analysis">
+                            <i class="fe fe-trending-up mr-2"></i>Analysis
+                        </a>
+                        @if($task->mpfmTest->test_data)
+                        <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" target="_blank" title="View Charts">
+                            <i class="fe fe-bar-chart-2 mr-2"></i>Charts
+                        </a>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">

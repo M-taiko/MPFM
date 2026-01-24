@@ -14,6 +14,14 @@
                         <i class="fe fe-bar-chart-2 mr-2"></i>Full Report with Charts
                     </a>
                     @endif
+                    <!-- Validation & History Button -->
+                    <a href="{{ route('mpfm_tests.show_history', $mpfmTest->id) }}" class="btn btn-warning btn-sm">
+                        <i class="fe fe-check-circle mr-2"></i>Validation & History
+                    </a>
+                    <!-- String Analysis Button -->
+                    <a href="{{ route('mpfm_tests.string_analysis', $mpfmTest->oil_string_id) }}" class="btn btn-primary btn-sm">
+                        <i class="fe fe-trending-up mr-2"></i>String Analysis
+                    </a>
                     @can('update', $mpfmTest)
                     <a href="{{ route('mpfm_tests.edit', $mpfmTest->id) }}" class="btn btn-primary btn-sm">
                         <i class="fe fe-edit"></i> Edit

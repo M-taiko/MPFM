@@ -273,15 +273,25 @@
                     </div>
 
                     <!-- Task Actions -->
-                    <div class="task-actions">
-                        <button class="btn btn-sm btn-info" onclick="viewTaskDetails({{ $task->id }})">
-                            <i class="fe fe-eye mr-2"></i>View Details
+                    <div class="task-actions" style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button class="btn btn-sm btn-info" onclick="viewTaskDetails({{ $task->id }})" title="View Task Details">
+                            <i class="fe fe-eye mr-2"></i>Details
                         </button>
 
-                        @if ($task->mpfmTest && $task->mpfmTest->test_data)
-                        <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" title="View Test with Charts" target="_blank">
-                            <i class="fe fe-bar-chart-2 mr-2"></i>View Charts
-                        </a>
+                        @if ($task->mpfmTest)
+                            @if ($task->mpfmTest->test_data)
+                            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" title="View Test with Charts" target="_blank">
+                                <i class="fe fe-bar-chart-2 mr-2"></i>Charts
+                            </a>
+                            @endif
+                            <!-- Validation & History -->
+                            <a href="{{ route('mpfm_tests.show_history', $task->mpfmTest->id) }}" class="btn btn-sm btn-warning" title="View Validation & History">
+                                <i class="fe fe-check-circle mr-2"></i>Validation
+                            </a>
+                            <!-- String Analysis -->
+                            <a href="{{ route('mpfm_tests.string_analysis', $task->mpfmTest->oil_string_id) }}" class="btn btn-sm btn-primary" title="View String Analysis">
+                                <i class="fe fe-trending-up mr-2"></i>Analysis
+                            </a>
                         @endif
 
                         @if ($task->state && $task->state->value === 'submitted_to_surveillance')

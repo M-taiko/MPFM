@@ -233,14 +233,24 @@
                     </div>
                 </div>
             </div>
-            <div class="task-actions" style="display: flex; gap: 10px;">
-                <a href="{{ route('task-archive.show', $task) }}" style="background: #667eea;">
-                    <i class="fe fe-eye mr-2"></i>View Details
+            <div class="task-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="{{ route('task-archive.show', $task) }}" style="background: #667eea;" title="View Task Details">
+                    <i class="fe fe-eye mr-2"></i>Details
                 </a>
-                @if($task->mpfmTest && $task->mpfmTest->test_data)
-                <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" target="_blank" style="background: #28a745;">
-                    <i class="fe fe-bar-chart-2 mr-2"></i>View Charts
-                </a>
+                @if($task->mpfmTest)
+                    @if($task->mpfmTest->test_data)
+                    <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" target="_blank" style="background: #28a745;" title="View Charts">
+                        <i class="fe fe-bar-chart-2 mr-2"></i>Charts
+                    </a>
+                    @endif
+                    <!-- Validation & History -->
+                    <a href="{{ route('mpfm_tests.show_history', $task->mpfmTest->id) }}" style="background: #ff9800;" title="View Validation & History">
+                        <i class="fe fe-check-circle mr-2"></i>Validation
+                    </a>
+                    <!-- String Analysis -->
+                    <a href="{{ route('mpfm_tests.string_analysis', $task->mpfmTest->oil_string_id) }}" style="background: #2196F3;" title="View String Analysis">
+                        <i class="fe fe-trending-up mr-2"></i>Analysis
+                    </a>
                 @endif
             </div>
         </div>

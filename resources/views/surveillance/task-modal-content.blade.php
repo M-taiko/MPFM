@@ -308,14 +308,22 @@
             </div>
         </div>
 
-        <div style="text-align: center; padding-top: 10px; display: flex; gap: 10px; justify-content: center;">
+        <div style="text-align: center; padding-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             @if($task->mpfmTest->test_data)
-            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" target="_blank">
-                <i class="fe fe-bar-chart-2 mr-1"></i>View Charts
+            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" target="_blank" title="View Charts">
+                <i class="fe fe-bar-chart-2 mr-1"></i>Charts
             </a>
             @endif
-            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-primary" target="_blank">
-                <i class="fe fe-external-link mr-1"></i>View Full Test Report
+            <a href="{{ route('mpfm_tests.show', $task->mpfmTest->id) }}" class="btn btn-sm btn-primary" title="View Full Test Report">
+                <i class="fe fe-eye mr-1"></i>Details
+            </a>
+            <!-- Validation & History -->
+            <a href="{{ route('mpfm_tests.show_history', $task->mpfmTest->id) }}" class="btn btn-sm btn-warning" title="View Validation & History">
+                <i class="fe fe-check-circle mr-1"></i>Validation
+            </a>
+            <!-- String Analysis -->
+            <a href="{{ route('mpfm_tests.string_analysis', $task->mpfmTest->oil_string_id) }}" class="btn btn-sm btn-info" title="View String Analysis">
+                <i class="fe fe-trending-up mr-1"></i>Analysis
             </a>
         </div>
     </div>

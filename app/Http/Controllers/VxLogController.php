@@ -15,6 +15,7 @@ use App\Services\MPFMParsingService;
 use App\Services\MPFMChartService;
 use App\Services\MPFMPreviewService;
 use App\Services\TaskStateService;
+use App\Services\MPFMValidationService;
 use App\Enums\TaskState;
 use App\Notifications\TaskCompletedNotification;
 
@@ -528,7 +529,26 @@ public function approveTest(Request $request, $mpfmTestId)
         }
     }
 
+    /**
+     * Show test approval page with validation results
+     */
+    public function showTestApproval($mpfmTestId)
+    {
+        $mpfmTest = MPFMTest::with([
+            'planTask.oilString.tower',
+            'latestValidation',
+            'latestComparison'
+        ])->findOrFail($mpfmTestId);
 
+        // Run validation if not done yet
+        if (!$mpfmTest->latestValidation || $mpfmTest->needsRevalidation()) {
+            $validationService = app(MPFMValidationService::class);
+            $validationService->validateTest($mpfmTest, true);
+            $mpfmTest->load('latestValidation');
+        }
+
+        return view('supervisor.test_approval', compact('mpfmTest'));
+    }
 
 
 

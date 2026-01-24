@@ -404,6 +404,29 @@ Route::middleware('auth')->group(function () {
     // Workflow Dashboard
     Route::get('workflow/dashboard', [TaskStateController::class, 'dashboard'])
         ->name('workflow.dashboard');
+
+    // MPFM Validation Rules Management (admin/supervisor only)
+    Route::middleware('permission:manage-validation-rules')->group(function () {
+        Route::resource('validation-rules', \App\Http\Controllers\ValidationRuleController::class);
+    });
+
+    // Test Approval with Validation
+    Route::middleware('permission:review-test')->group(function () {
+        Route::get('/supervisor/test-approval/{mpfmTest}', [VxLogController::class, 'showTestApproval'])
+            ->name('supervisor.test_approval');
+        Route::post('/supervisor/approve-test/{mpfmTest}', [VxLogController::class, 'approveTest'])
+            ->name('vx_log.approve_test');
+    });
+
+    // MPFM Test History and Analysis
+    Route::get('/mpfm-tests/{mpfmTest}/history', [MPFMTestController::class, 'showWithHistory'])
+        ->name('mpfm_tests.show_history');
+    Route::get('/mpfm-tests/string-analysis/{oilString}', [MPFMTestController::class, 'stringAnalysis'])
+        ->name('mpfm_tests.string_analysis');
+    Route::get('/mpfm-tests/trending-dashboard', [MPFMTestController::class, 'trendingDashboard'])
+        ->name('mpfm_tests.trending_dashboard');
+    Route::post('/mpfm-tests/{mpfmTest}/revalidate', [MPFMTestController::class, 'revalidate'])
+        ->name('mpfm_tests.revalidate');
 });
 
 /*
