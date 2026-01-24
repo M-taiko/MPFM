@@ -79,6 +79,9 @@ class MPFMTestDataTableService
             })
             ->addColumn('action', function ($test) {
                 $actions = '<a href="' . route('mpfm_tests.show', $test->id) . '" class="btn btn-sm btn-info">View</a> ';
+                if ($test->test_data) {
+                    $actions .= '<a href="' . route('mpfm-tests.view', $test->id) . '" class="btn btn-sm btn-success" target="_blank">Charts</a> ';
+                }
                 if (auth()->user()->can('update', $test)) {
                     $actions .= '<a href="' . route('mpfm_tests.edit', $test->id) . '" class="btn btn-sm btn-primary">Edit</a> ';
                 }
