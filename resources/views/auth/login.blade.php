@@ -16,13 +16,20 @@
     }
 
     body {
-        background: url('{{ asset("assets/img/brand/Offshore.jpg") }}') center/cover fixed;
+        background: url('{{ asset("assets/img/brand/Offshore.jpg") }}') center/cover;
+        background-attachment: fixed;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         overflow: hidden;
+    }
+
+    @supports not (background-attachment: fixed) {
+        body {
+            background-attachment: scroll;
+        }
     }
 
     /* Dark overlay for background image */
@@ -33,8 +40,9 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.75) 0%, rgba(118, 75, 162, 0.75) 100%);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
         z-index: 1;
+        pointer-events: none;
     }
 
     body::after {
@@ -93,14 +101,12 @@
     }
 
   .brand-logo img {
-    height: 221px;
-    width: 407px;
-    /* max-width: 280px; */
+    height: auto;
+    width: 100%;
+    max-width: 280px;
     filter: brightness(0) invert(1);
     margin-bottom: 30px;
-    position: absolute;
-    top: 157px;
-    left: 269px;
+    position: relative;
   }
 
     .brand-logo-text {
@@ -436,7 +442,8 @@
         }
 
         .brand-logo img {
-            max-width: 220px !important;
+            max-width: 200px !important;
+            width: 90%;
             margin-bottom: 20px;
         }
 
@@ -492,115 +499,154 @@
             font-size: 14px;
         }
 
+        body {
+            background: url('{{ asset("assets/img/brand/Offshore.jpg") }}') center/cover;
+            background-attachment: scroll;
+        }
+
         body::before {
-            width: 300px;
-            height: 300px;
-            top: -20%;
-            right: -15%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.82) 0%, rgba(118, 75, 162, 0.82) 100%);
         }
 
         body::after {
-            width: 250px;
-            height: 250px;
-            bottom: -20%;
-            left: -10%;
+            width: 300px;
+            height: 300px;
+            bottom: -25%;
+            left: -15%;
         }
     }
 
     @media (max-width: 480px) {
         .login-container {
-            padding: 15px;
+            padding: 10px;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 15px;
+            max-width: 100%;
         }
 
         .login-brand {
-            display: flex;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .brand-logo {
-            margin-bottom: 30px;
-        }
-
-        .brand-logo img {
-            max-width: 160px !important;
-            margin-bottom: 15px;
-        }
-
-        .brand-logo-text {
-            font-size: 24px;
-        }
-
-        .brand-title {
-            font-size: 28px;
-            margin-bottom: 15px;
-        }
-
-        .brand-subtitle {
-            font-size: 14px;
-            margin-bottom: 25px;
-        }
-
-        .brand-features {
-            gap: 12px;
-        }
-
-        .feature-row {
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .feature-icon {
-            font-size: 24px;
-        }
-
-        .feature-label {
-            font-size: 13px;
-        }
-
-        .feature-text {
-            font-size: 12px;
+            display: none;
         }
 
         .login-form-wrapper {
             max-width: 100%;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 25px 15px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+        }
+
+        .login-form-content {
+            position: relative;
+            z-index: 2;
         }
 
         .form-title {
-            font-size: 22px;
+            font-size: 26px;
+            margin-bottom: 8px;
         }
 
         .form-subtitle {
-            font-size: 13px;
+            font-size: 14px;
             margin-bottom: 25px;
         }
 
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            padding: 12px 14px;
+            font-size: 14px;
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group-checkbox {
+            margin: 18px 0;
+            gap: 8px;
+        }
+
+        .form-checkbox {
+            width: 18px;
+            height: 18px;
+        }
+
+        .form-checkbox-label {
+            font-size: 13px;
+        }
+
         .btn-signin {
-            padding: 12px;
+            width: 100%;
+            padding: 13px;
+            font-size: 15px;
+            margin-bottom: 12px;
         }
 
         .form-links {
+            font-size: 11px;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password-link {
+            font-weight: 600;
+        }
+
+        .security-info {
+            font-size: 11px;
+            gap: 6px;
+        }
+
+        .divider {
+            margin: 20px 0;
+        }
+
+        .divider-text {
+            font-size: 11px;
+            padding: 0 10px;
+        }
+
+        .signup-section {
             font-size: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
+            line-height: 1.6;
+        }
+
+        .signup-section a {
+            font-weight: 700;
+            margin-left: 3px;
+        }
+
+        body {
+            background: url('{{ asset("assets/img/brand/Offshore.jpg") }}') center/cover;
+            background-attachment: scroll;
         }
 
         body::before {
-            width: 200px;
-            height: 200px;
-            top: -10%;
-            right: -5%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            right: 0;
         }
 
         body::after {
-            width: 200px;
-            height: 200px;
-            bottom: -15%;
-            left: 0;
+            width: 250px;
+            height: 250px;
+            bottom: -40%;
+            left: -50%;
         }
     }
 
