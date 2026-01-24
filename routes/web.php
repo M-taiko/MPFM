@@ -188,6 +188,19 @@ Route::resource('oil-strings', OilStringController::class)->names('oil_strings')
 |--------------------------------------------------------------------------
 */
 Route::resource('mpfm-operational-plans', MPFMOperationalPlanController::class)->names('mpfm_operational_plans');
+
+// MPFM Test History and Analysis - More specific routes BEFORE resource
+Route::middleware('auth')->group(function () {
+    Route::get('/mpfm-tests/trending-dashboard', [MPFMTestController::class, 'trendingDashboard'])
+        ->name('mpfm_tests.trending_dashboard');
+    Route::get('/mpfm-tests/string-analysis/{oilString}', [MPFMTestController::class, 'stringAnalysis'])
+        ->name('mpfm_tests.string_analysis');
+    Route::get('/mpfm-tests/{mpfmTest}/history', [MPFMTestController::class, 'showWithHistory'])
+        ->name('mpfm_tests.show_history');
+    Route::post('/mpfm-tests/{mpfmTest}/revalidate', [MPFMTestController::class, 'revalidate'])
+        ->name('mpfm_tests.revalidate');
+});
+
 Route::resource('mpfm-tests', MPFMTestController::class)->names('mpfm_tests');
 
 // AJAX routes for dynamic dropdowns
@@ -417,16 +430,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/supervisor/approve-test/{mpfmTest}', [VxLogController::class, 'approveTest'])
             ->name('vx_log.approve_test');
     });
-
-    // MPFM Test History and Analysis
-    Route::get('/mpfm-tests/{mpfmTest}/history', [MPFMTestController::class, 'showWithHistory'])
-        ->name('mpfm_tests.show_history');
-    Route::get('/mpfm-tests/string-analysis/{oilString}', [MPFMTestController::class, 'stringAnalysis'])
-        ->name('mpfm_tests.string_analysis');
-    Route::get('/mpfm-tests/trending-dashboard', [MPFMTestController::class, 'trendingDashboard'])
-        ->name('mpfm_tests.trending_dashboard');
-    Route::post('/mpfm-tests/{mpfmTest}/revalidate', [MPFMTestController::class, 'revalidate'])
-        ->name('mpfm_tests.revalidate');
 });
 
 /*
