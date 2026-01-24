@@ -1,70 +1,584 @@
 @extends('layouts.guest')
 
-@section('title', 'Login')
+@section('title', 'Login - VALEX MPFM')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 col-lg-4 mx-auto">
-            <div class="card custom-card">
-                <div class="card-body">
-                    <div class="text-center mb-5">
-                        <a href="{{ route('login') }}">
-                            <img src="https://all-pribors.ru/pics/large/60560-15-0000.jpg" class="header-brand-img desktop-logo" alt="logo">
-                        </a>
-                        <div class="mt-4">
-                            <h4 class="mb-1">Welcome Back!</h4>
-                            <p class="text-muted">Sign in to continue to MPFM System</p>
-                        </div>
-                    </div>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
+    html, body {
+        height: 100%;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
 
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus placeholder="Enter your email">
+    body {
+        background: url('{{ asset("assets/img/brand/Offshore.jpg") }}') center/cover fixed;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-                            @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
+    /* Dark overlay for background image */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.75) 0%, rgba(118, 75, 162, 0.75) 100%);
+        z-index: 1;
+    }
 
-                        <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder="Enter your password">
+    body::after {
+        content: '';
+        position: fixed;
+        top: -50%;
+        right: -10%;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 25s ease-in-out infinite;
+        z-index: 2;
+    }
 
-                            @error('password')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px) translateX(0px);
+        }
+        50% {
+            transform: translateY(40px) translateX(20px);
+        }
+    }
 
-                        <div class="form-group">
-                            <label class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                <span class="custom-control-label">Remember me</span>
-                            </label>
-                        </div>
+    /* Main container */
+    .login-container {
+        width: 100%;
+        max-width: 1200px;
+        height: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+        padding: 40px;
+        position: relative;
+        z-index: 20;
+    }
 
-                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+    /* Left side - Brand section */
+    .login-brand {
+        color: white;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
 
-                        @if (Route::has('password.request'))
-                            <div class="text-center mt-3">
-                                <a href="{{ route('password.request') }}" class="text-primary">Forgot Password?</a>
-                            </div>
-                        @endif
-                    </form>
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+        animation: slideInLeft 0.8s ease-out;
+    }
 
-                    <div class="text-center mt-4">
-                        <p class="text-muted">Don't have an account? <a href="{{ route('register') }}" class="text-primary ml-1">Sign Up</a></p>
-                    </div>
+    .brand-logo img {
+        height: 60px;
+        width: auto;
+        filter: brightness(0) invert(1);
+    }
+
+    .brand-logo-text {
+        font-size: 32px;
+        font-weight: 900;
+        letter-spacing: -1px;
+    }
+
+    .brand-title {
+        font-size: 48px;
+        font-weight: 900;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        animation: slideInLeft 0.8s ease-out 0.1s backwards;
+    }
+
+    .brand-subtitle {
+        font-size: 18px;
+        opacity: 0.9;
+        line-height: 1.6;
+        margin-bottom: 50px;
+        animation: slideInLeft 0.8s ease-out 0.2s backwards;
+    }
+
+    .brand-features {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        animation: slideInLeft 0.8s ease-out 0.3s backwards;
+    }
+
+    .feature-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .feature-icon {
+        font-size: 28px;
+        flex-shrink: 0;
+    }
+
+    .feature-text {
+        font-size: 15px;
+        opacity: 0.95;
+    }
+
+    .feature-label {
+        font-weight: 700;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Right side - Form section */
+    .login-form-wrapper {
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+        padding: 50px;
+        animation: slideInRight 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-form-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .login-form-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .form-title {
+        font-size: 32px;
+        font-weight: 900;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .form-subtitle {
+        font-size: 15px;
+        color: #666;
+        margin-bottom: 40px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        font-size: 13px;
+        color: #333;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e8e8e8;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        color: #333;
+        font-family: inherit;
+    }
+
+    .form-control::placeholder {
+        color: #aaa;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background: #fff5f5;
+    }
+
+    .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 5px rgba(220, 53, 69, 0.1);
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 8px;
+        font-weight: 600;
+    }
+
+    .form-group-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 25px 0;
+    }
+
+    .form-checkbox {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .form-checkbox-label {
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+        user-select: none;
+        font-weight: 500;
+    }
+
+    .btn-signin {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        margin-bottom: 15px;
+    }
+
+    .btn-signin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-signin:active {
+        transform: translateY(0);
+    }
+
+    .form-links {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        margin-bottom: 30px;
+    }
+
+    .forgot-password-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .forgot-password-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .security-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #16a34a;
+    }
+
+    .divider {
+        height: 1px;
+        background: #e8e8e8;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .divider-text {
+        position: absolute;
+        left: 50%;
+        top: -10px;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 15px;
+        font-size: 12px;
+        color: #999;
+        font-weight: 600;
+    }
+
+    .signup-section {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .signup-section a {
+        color: #667eea;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-left: 5px;
+    }
+
+    .signup-section a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .login-container {
+            grid-template-columns: 1fr;
+            gap: 40px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .login-brand {
+            display: none;
+        }
+
+        .login-form-wrapper {
+            padding: 40px;
+        }
+
+        .form-title {
+            font-size: 28px;
+        }
+
+        body::before {
+            width: 500px;
+            height: 500px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 20px;
+        }
+
+        .login-form-wrapper {
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .form-title {
+            font-size: 24px;
+        }
+
+        .form-subtitle {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        body::before {
+            width: 400px;
+            height: 400px;
+            top: -30%;
+            right: -20%;
+        }
+
+        body::after {
+            width: 300px;
+            height: 300px;
+            bottom: -30%;
+        }
+    }
+</style>
+
+<div class="login-container">
+    <!-- Left Brand Section -->
+    <div class="login-brand">
+        <div class="brand-logo">
+            <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt="VALEX MPFM">
+            <div class="brand-logo-text">VALEX</div>
+        </div>
+
+        <h1 class="brand-title">Offshore Operations, Perfected</h1>
+
+        <p class="brand-subtitle">
+            Precision multiphase flow meter testing with complete operational oversight and surveillance management.
+        </p>
+
+        <div class="brand-features">
+            <div class="feature-row">
+                <div class="feature-icon">⚡</div>
+                <div>
+                    <span class="feature-label">Real-Time Monitoring</span>
+                    <span class="feature-text">Live data tracking and instant alerts</span>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon">🔐</div>
+                <div>
+                    <span class="feature-label">Enterprise Security</span>
+                    <span class="feature-text">Role-based access & encrypted communication</span>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon">📊</div>
+                <div>
+                    <span class="feature-label">Advanced Analytics</span>
+                    <span class="feature-text">Comprehensive reports and KPI tracking</span>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-icon">✓</div>
+                <div>
+                    <span class="feature-label">Workflow Management</span>
+                    <span class="feature-text">Automated task routing and approvals</span>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Right Login Form Section -->
+    <div class="login-form-wrapper">
+        <div class="login-form-content">
+            <h2 class="form-title">Welcome Back</h2>
+            <p class="form-subtitle">Sign in to access your dashboard</p>
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input
+                        id="email"
+                        type="email"
+                        class="form-control @error('email') is-invalid @enderror"
+                        name="email"
+                        value="{{ old('email') }}"
+                        required
+                        autocomplete="email"
+                        autofocus
+                        placeholder="you@example.com"
+                    >
+                    @error('email')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input
+                        id="password"
+                        type="password"
+                        class="form-control @error('password') is-invalid @enderror"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="••••••••"
+                    >
+                    @error('password')
+                        <span class="invalid-feedback">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <!-- Remember Me -->
+                <div class="form-group-checkbox">
+                    <input
+                        type="checkbox"
+                        class="form-checkbox"
+                        name="remember"
+                        id="remember"
+                        {{ old('remember') ? 'checked' : '' }}
+                    >
+                    <label class="form-checkbox-label" for="remember">
+                        Remember me for 30 days
+                    </label>
+                </div>
+
+                <!-- Sign In Button -->
+                <button type="submit" class="btn-signin">Sign In Now</button>
+
+                <!-- Links Section -->
+                <div class="form-links">
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="forgot-password-link">
+                            Forgot password?
+                        </a>
+                    @endif
+                    <div class="security-info">
+                        🔒 Encrypted & Secure
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span class="divider-text">or</span>
+                </div>
+
+                <!-- Sign Up Section -->
+                <div class="signup-section">
+                    Don't have an account? or forget your credentials? <br><a href="#">Contact Support</a><br>
+                Call your system administrator to get access.
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 @endsection

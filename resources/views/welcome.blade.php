@@ -3,152 +3,1138 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VALEX MPFM - Advanced Well Testing Solutions</title>
+    <title> MPFM - Offshore Operations Management System</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800,900&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Feather Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
 
     <!-- Styles -->
-    <!-- هنا يبدأ كود Tailwind CSS الكامل -->
     <style>
-        /* ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com */
-        *,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]{display:none}*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: }.sticky{position:sticky}.top-0{top:0px}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-10{margin-top:2.5rem}.mt-12{margin-top:3rem}.flex{display:flex}.grid{display:grid}.h-16{height:4rem}.h-48{height:12rem}.w-16{width:4rem}.w-8{width:2rem}.w-full{width:100%}.max-w-3xl{max-width:48rem}.max-w-7xl{max-width:80rem}.flex-1{flex:1 1 0%}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.space-x-4>:not([hidden])~:not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.gap-8{gap:2rem}.overflow-hidden{overflow:hidden}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity))}.bg-gray-800{--tw-bg-opacity:1;background-color:rgb(31 41 55 / var(--tw-bg-opacity))}.bg-indigo-100{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity))}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity))}.bg-orange-100{--tw-bg-opacity:1;background-color:rgb(255 237 213 / var(--tw-bg-opacity))}.bg-orange-500{--tw-bg-opacity:1;background-color:rgb(249 115 22 / var(--tw-bg-opacity))}.bg-black{--tw-bg-opacity:1;background-color:rgb(0 0 0 / var(--tw-bg-opacity))}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-4{padding-left:1rem;padding-right:1rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-8{padding-top:2rem;padding-bottom:2rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-24{padding-top:6rem;padding-bottom:6rem}.py-32{padding-top:8rem;padding-bottom:8rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.text-6xl{font-size:3.75rem;line-height:1}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.font-semibold{font-weight:600}.font-extrabold{font-weight:800}.font-bold{font-weight:700}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity))}.text-gray-900{--tw-text-opacity:1;color:rgb(17 24 39 / var(--tw-text-opacity))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity))}.text-green-600{--tw-text-opacity:1;color:rgb(22 163 74 / var(--tw-text-opacity))}.text-orange-600{--tw-text-opacity:1;color:rgb(234 88 12 / var(--tw-text-opacity))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity))}.hover\:bg-orange-600:hover{--tw-bg-opacity:1;background-color:rgb(234 88 12 / var(--tw-bg-opacity))}.hover\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:text-indigo-600:hover{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}@media (min-width: 640px){.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}}@media (min-width: 1024px){.lg\:px-8{padding-left:2rem;padding-right:2rem}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:text-5xl{font-size:3rem;line-height:1}.lg\:text-6xl{font-size:3.75rem;line-height:1}}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        /* هنا تضاف الأنماط المخصصة الخاصة بنا */
-        .bg-gradient-dark {
-            background: linear-gradient(to right, #1a202c, #2d3748);
+        body {
+            font-family: 'Inter', 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        .text-shadow {
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+
+        /* Gradient Backgrounds */
+        .gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        .gradient-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        .card-hover:hover {
+
+        .gradient-dark {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        .gradient-ocean {
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+        }
+
+        /* Utility Classes */
+        .container-custom {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            padding: 15px 0;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .logo img {
+                height: 142px;
+                width: 327px;
+                position: absolute;
+                right: 44%;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: #333;
+        }
+
+        .logo-text .logo-accent {
+            color: #667eea;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0 100px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%),
+                        url('{{ asset("assets/img/brand/Offshore.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: 5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(30px);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(40px, 5vw, 56px);
+            font-weight: 900;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            margin-bottom: 35px;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+            padding: 15px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .hero-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        .feature-card svg {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                padding: 0;
+            }
+
+            .hero-text h1 {
+                font-size: 36px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 60px 0;
+            background: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stat-desc {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Roles Section */
+        .roles-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 900;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .role-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            border-top: 5px solid #667eea;
+        }
+
+        .role-card:nth-child(2) {
+            border-top-color: #9333ea;
+        }
+
+        .role-card:nth-child(3) {
+            border-top-color: #0ea5e9;
+        }
+
+        .role-card:nth-child(4) {
+            border-top-color: #16a34a;
+        }
+
+        .role-card:nth-child(5) {
+            border-top-color: #d97706;
+        }
+
+        .role-card:nth-child(6) {
+            border-top-color: #dc2626;
+        }
+
+        .role-card:hover {
+            transform: translateY(-15px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .role-header {
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .role-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .role-card:nth-child(1) .role-icon {
+            background: #eef2ff;
+            color: #667eea;
+        }
+
+        .role-card:nth-child(2) .role-icon {
+            background: #faf5ff;
+            color: #9333ea;
+        }
+
+        .role-card:nth-child(3) .role-icon {
+            background: #f0f9ff;
+            color: #0ea5e9;
+        }
+
+        .role-card:nth-child(4) .role-icon {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .role-card:nth-child(5) .role-icon {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .role-card:nth-child(6) .role-icon {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .role-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .role-body {
+            padding: 30px;
+        }
+
+        .role-description {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .role-features {
+            list-style: none;
+        }
+
+        .role-features li {
+            padding: 10px 0;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-features li::before {
+            content: '✓';
+            color: #16a34a;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Workflow Section */
+        .workflow-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .workflow-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 25px;
+            padding: 50px 30px;
+            color: white;
+            overflow-x: auto;
+        }
+
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            min-width: max-content;
+            position: relative;
+        }
+
+        .workflow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            min-width: 120px;
+        }
+
+        .step-number {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .step-role {
+            font-size: 12px;
+            opacity: 0.85;
+            text-align: center;
+        }
+
+        .workflow-line {
+            flex: 1;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            min-width: 30px;
+            margin-top: 25px;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            text-align: center;
+        }
+
+        .feature-item:hover {
             transform: translateY(-10px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 25px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .feature-item:nth-child(1) .feature-icon {
+            background: #eef2ff;
+            color: #667eea;
+        }
+
+        .feature-item:nth-child(2) .feature-icon {
+            background: #faf5ff;
+            color: #9333ea;
+        }
+
+        .feature-item:nth-child(3) .feature-icon {
+            background: #f0f9ff;
+            color: #0ea5e9;
+        }
+
+        .feature-item:nth-child(4) .feature-icon {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .feature-item:nth-child(5) .feature-icon {
+            background: #fffbeb;
+            color: #d97706;
+        }
+
+        .feature-item:nth-child(6) .feature-icon {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .feature-item h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .feature-item p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-content h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            font-weight: 900;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .cta-content p {
+            font-size: 18px;
+            margin-bottom: 35px;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a2e;
+            color: #eee;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .footer-section p, .footer-section a {
+            font-size: 14px;
+            color: #aaa;
+            text-decoration: none;
+            line-height: 1.8;
+        }
+
+        .footer-section a:hover {
+            color: #667eea;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                gap: 40px;
+            }
+
+            .roles-grid, .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .roles-grid, .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-header h2 {
+                font-size: 32px;
+            }
+
+            .hero {
+                padding: 60px 0 80px;
+            }
+
+            .hero-text h1 {
+                font-size: 32px;
+            }
+
+            .workflow-container {
+                padding: 30px 15px;
+            }
+
+            .workflow-line {
+                display: none;
+            }
+
+            .workflow-steps {
+                flex-wrap: wrap;
+            }
+
+            .workflow-step {
+                flex: 1;
+                min-width: 100px;
+            }
+        }
+
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            margin: 0;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
 
-    <!-- Navigation Bar -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <!-- Logo Placeholder -->
-                    <h1 class="text-2xl font-bold text-indigo-600">MP<span class="text-gray-700">FM</span></h1>
-                </div>
-                <div class="flex items-center space-x-4">
-                   <a href="{{ route('login') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md transition duration-300">
-                        Login
-                    </a>
-                </div>
+    <!-- Navigation -->
+    <nav>
+        <div class="container-custom">
+            <div class="nav-content">
+                <a href="#" class="logo">
+                    <img src="{{ asset('assets/img/brand/logo.png') }}" alt=" MPFM Logo">
+                    <div class="logo-text">
+                   <span class="logo-accent" style="margin-right: 5px;">ADNOC</span>MPFM
+                    </div>
+                </a>
+                <a href="{{ route('login') }}" class="btn-login">Login →</a>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="relative bg-gradient-dark text-white">
-        <!-- Background Image -->
-        <div class="absolute inset-0">
-            <img class="object-cover" style="width: 10%; height: 10%; object-fit: cover;" src="https://all-pribors.ru/pics/large/60560-15-0000.jpg" alt="Industrial Background">
-            <div class="absolute inset-0 bg-black opacity-60"></div> <!-- Overlay -->
-        </div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 text-center">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-shadow">
-                Precision in Every Flow
-            </h1>
-            <p class="mt-6 text-xl sm:text-2xl max-w-3xl mx-auto">
-                Discover the next generation of Multi-Phase Flow Meters.  MPFM delivers unmatched accuracy and real-time data for optimal well performance.
-            </p>
-            <div class="mt-10">
-                <a href="{{ route('login') }}" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300 transform hover:scale-105">
-                    Access Dashboard
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- Features Section -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-gray-900">Why Choose  MPFM?</h2>
-                <p class="mt-4 text-lg text-gray-600">Our technology is built on the pillars of accuracy, reliability, and innovation.</p>
-            </div>
-            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="bg-indigo-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                        <!-- Icon for Accuracy -->
-                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <section class="hero">
+        <div class="container-custom">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Offshore Operations Made <span style="color: #ffd89b;">Intelligent</span></h1>
+                    <p>VALEX MPFM delivers precision multiphase flow meter testing with complete operational oversight, surveillance, and task management for modern offshore production.</p>
+                    <div class="hero-buttons">
+                        <a href="{{ route('login') }}" class="btn-primary">
+                            <span>Get Started</span>
+                            <span style="font-size: 18px;">→</span>
+                        </a>
+                        <a href="#features" class="btn-secondary">
+                            <span style="font-size: 18px;">↓</span>
+                            <span>Learn More</span>
+                        </a>
                     </div>
-                    <h3 class="mt-6 text-xl font-semibold">Unmatched Accuracy</h3>
-                    <p class="mt-2 text-gray-600">Proprietary sensor technology ensures precise measurement of oil, water, and gas rates.</p>
                 </div>
-                <div class="text-center">
-                    <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                        <!-- Icon for Real-Time Data -->
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <div class="hero-features">
+                    <div class="feature-card">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <h4>Real-Time Data</h4>
                     </div>
-                    <h3 class="mt-6 text-xl font-semibold">Real-Time Data</h3>
-                    <p class="mt-2 text-gray-600">Monitor well performance live and make informed decisions instantly from anywhere.</p>
-                </div>
-                <div class="text-center">
-                    <div class="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                        <!-- Icon for Robust Design -->
-                        <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <div class="feature-card">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <h4>Full Analytics</h4>
                     </div>
-                    <h3 class="mt-6 text-xl font-semibold">Robust Design</h3>
-                    <p class="mt-2 text-gray-600">Engineered to withstand the most demanding environments and ensure continuous operation.</p>
+                    <div class="feature-card">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h4>Quality Assurance</h4>
+                    </div>
+                    <div class="feature-card">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h4>Complete History</h4>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Technology Showcase Section -->
-    <section class="py-16 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-gray-900">Our Technology in Action</h2>
-                <p class="mt-4 text-lg text-gray-600">A glimpse into the hardware and software that power our solutions.</p>
-            </div>
-            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Image 1: MPFM Hardware -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
-                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="MPFM Hardware" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold">Advanced Hardware</h3>
-                        <p class="mt-2 text-gray-600">Cutting-edge flow meters designed for precision and durability in the field.</p>
-                    </div>
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container-custom">
+            <h2 style="text-align: center; font-size: 42px; font-weight: 900; margin-bottom: 20px; color: #333;">System Capabilities</h2>
+            <p style="text-align: center; color: #666; font-size: 18px; margin-bottom: 50px;">Enterprise-grade platform built for operational excellence</p>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Role Types</div>
+                    <div class="stat-desc">Granular permission control</div>
                 </div>
-                <!-- Image 2: Control Room / Dashboard -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
-                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Control Room Dashboard" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold">Integrated Dashboard</h3>
-                        <p class="mt-2 text-gray-600">A centralized platform for data analysis, reporting, and remote monitoring.</p>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Scalability</div>
+                    <div class="stat-desc">Unlimited task management</div>
                 </div>
-                <!-- Image 3: Field Installation -->
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden card-hover">
-                    <img src="https://images.unsplash.com/photo-1603792554982-2b7c6e3c8c3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80" alt="Field Installation" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold">Seamless Integration</h3>
-                        <p class="mt-2 text-gray-600">Easy installation and integration with existing field infrastructure.</p>
-                    </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Uptime</div>
+                    <div class="stat-desc">Enterprise reliability</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">360°</div>
+                    <div class="stat-label">Visibility</div>
+                    <div class="stat-desc">Complete transparency</div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Roles Section -->
+    <section class="roles-section">
+        <div class="container-custom">
+            <div class="section-header">
+                <h2>Comprehensive Role-Based System</h2>
+                <p>6 distinct roles with granular permissions designed for seamless offshore operations management</p>
+            </div>
+            <div class="roles-grid">
+                <!-- Admin -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">⚙️</div>
+                        <h3 class="role-title">Admin</h3>
+                    </div>
+                    <div class="role-body">
+                        <p class="role-description">System administrator with complete control and oversight</p>
+                        <ul class="role-features">
+                            <li>Full system access</li>
+                            <li>User management</li>
+                            <li>Configuration control</li>
+                            <li>System monitoring</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Job Officer -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">📋</div>
+                        <h3 class="role-title">Job Officer</h3>
+                    </div>
+                    <div class="role-body">
+                        <p class="role-description">Monthly plan creation and final approval authority</p>
+                        <ul class="role-features">
+                            <li>Create monthly plans</li>
+                            <li>Submit plans for review</li>
+                            <li>Final approval power</li>
+                            <li>Task rejection rights</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Surveillance Supervisor -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">👁️</div>
+                        <h3 class="role-title">Surveillance</h3>
+                    </div>
+                    <div class="role-body">
+                        <p class="role-description">Task classification and MPFM assignment oversight</p>
+                        <ul class="role-features">
+                            <li>Classify tasks</li>
+                            <li>Assign to MPFM</li>
+                            <li>Pre-review tasks</li>
+                            <li>Dashboard access</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- MPFM Supervisor -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">🔬</div>
+                        <h3 class="role-title">MPFM Supervisor</h3>
+                    </div>
+                    <div class="role-body">
+                        <p class="role-description">Test operations and technical review management</p>
+                        <ul class="role-features">
+                            <li>Assign operators</li>
+                            <li>Review test data</li>
+                            <li>Approve/reject tests</li>
+                            <li>Analytics access</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Production Supervisor -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">⚡</div>
+                        <h3 class="role-title">Production</h3>
+                    </div>
+                    <div class="role-body">
+                        <p class="role-description">Production asset oversight and reporting</p>
+                        <ul class="role-features">
+                            <li>View production data</li>
+                            <li>Archive access</li>
+                            <li>Generate reports</li>
+                            <li>Historical analysis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- MPFM Operator -->
+                <div class="role-card">
+                    <div class="role-header">
+                        <div class="role-icon">🛠️</div>
+                        <h3 class="role-title">MPFM Operator</h3>
+                    </div>
+                    <div class="role-body">
+                        <p class="role-description">Field execution and data collection</p>
+                        <ul class="role-features">
+                            <li>Execute tests</li>
+                            <li>Upload data</li>
+                            <li>Submit reports</li>
+                            <li>Task tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Workflow Section -->
+    <section class="workflow-section">
+        <div class="container-custom">
+            <div class="section-header">
+                <h2>Complete Workflow Process</h2>
+                <p>From planning to completion - every step is tracked with role-based controls</p>
+            </div>
+            <div class="workflow-container">
+                <div class="workflow-steps">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Monthly<br>Planning</div>
+                        <div class="step-role">Job Officer</div>
+                    </div>
+                    <div class="workflow-line"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Task<br>Submission</div>
+                        <div class="step-role">Job Officer</div>
+                    </div>
+                    <div class="workflow-line"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Classification &<br>Assignment</div>
+                        <div class="step-role">Surveillance</div>
+                    </div>
+                    <div class="workflow-line"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Operator<br>Execution</div>
+                        <div class="step-role">MPFM Operator</div>
+                    </div>
+                    <div class="workflow-line"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-title">MPFM<br>Review</div>
+                        <div class="step-role">MPFM Supervisor</div>
+                    </div>
+                    <div class="workflow-line"></div>
+                    <div class="workflow-step">
+                        <div class="step-number">6</div>
+                        <div class="step-title">Final<br>Approval</div>
+                        <div class="step-role">Job Officer</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container-custom">
+            <div class="section-header">
+                <h2>Powerful Features</h2>
+                <p>Comprehensive tools designed for modern offshore operations</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📅</div>
+                    <h3>Monthly Planning</h3>
+                    <p>Create and manage comprehensive test plans with full audit trails and version control</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔬</div>
+                    <h3>MPFM Testing</h3>
+                    <p>Execute tests with real-time data capture, automated calculations and reporting</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <h3>Task Management</h3>
+                    <p>Track lifecycle from creation to completion with status updates and deadlines</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👁️</div>
+                    <h3>Surveillance</h3>
+                    <p>Comprehensive oversight dashboards for review, approval and management</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <h3>Analytics</h3>
+                    <p>Interactive charts, real-time metrics and comprehensive reports with KPIs</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🗂️</div>
+                    <h3>Archive</h3>
+                    <p>Complete historical records with full traceability and compliance documentation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Transform Your Offshore Operations?</h2>
+            <p>VALEX MPFM provides the complete solution for multiphase flow meter management with operational excellence and surveillance oversight.</p>
+            <a href="{{ route('login') }}" class="btn-primary">
+                <span>Access the System</span>
+                <span style="font-size: 18px;">→</span>
+            </a>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p>&copy; {{ date('Y') }} VALEX MPFM. All Rights Reserved.</p>
-            <p class="mt-2 text-gray-400">A leader in well testing technology.</p>
+    <footer>
+        <div class="container-custom">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt="VALEX MPFM">
+                        <span style="font-weight: 800; font-size: 16px;">VALEX MPFM</span>
+                    </div>
+                    <p>Advanced offshore operations management system built for precision and reliability</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <a href="{{ route('login') }}">Login</a><br>
+                    <a href="#features">Features</a><br>
+                    <a href="#roles-section">Roles</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <a href="#">Documentation</a><br>
+                    <a href="#">Support Center</a><br>
+                    <a href="#">Contact Us</a>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a><br>
+                    <a href="#">Technology</a><br>
+                    <a href="#">Privacy Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ date('Y') }} VALEX MPFM. All Rights Reserved. | Engineering Precision • Operational Excellence</p>
+            </div>
         </div>
     </footer>
 
