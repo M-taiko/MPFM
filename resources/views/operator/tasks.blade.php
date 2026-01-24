@@ -154,12 +154,20 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="btn-group">
+                                        <div class="btn-group" role="group">
                                             <a href="{{ route('operator.tasks.show', $task) }}"
                                                class="btn btn-sm btn-info"
                                                title="View Details">
                                                 <i class="fe fe-eye"></i>
                                             </a>
+                                            @if($task->mpfmTest && $task->mpfmTest->test_data)
+                                            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}"
+                                               class="btn btn-sm btn-success"
+                                               title="View Test with Charts"
+                                               target="_blank">
+                                                <i class="fe fe-bar-chart-2"></i>
+                                            </a>
+                                            @endif
                                             @if($task->status === 'pending')
                                             <form action="{{ route('operator.tasks.start', $task) }}" method="POST" style="display: inline;">
                                                 @csrf
