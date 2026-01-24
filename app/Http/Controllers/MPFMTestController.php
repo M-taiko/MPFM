@@ -29,7 +29,8 @@ class MPFMTestController extends Controller
         $this->testService = $testService;
         $this->logProcessingService = $logProcessingService;
         $this->dataTableService = $dataTableService;
-        $this->authorizeResource(MPFMTest::class, 'mpfm_test');
+        // Allow supervisors and operators to view MPFM tests
+        $this->middleware('auth');
     }
 
     /**
