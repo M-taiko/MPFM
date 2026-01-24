@@ -312,8 +312,8 @@ class MPFMValidationService
                     'severity' => abs($zScore) > 3 ? 'critical' : 'warning',
                     'current_value' => $deviation['current_value'],
                     'expected_range' => [
-                        round($deviation['average'] - $deviation['std_dev'], 2),
-                        round($deviation['average'] + $deviation['std_dev'], 2),
+                        round($deviation['average'] * 0.9, 2),
+                        round($deviation['average'] * 1.1, 2),
                     ],
                     'deviation' => round(abs($zScore), 1) . ' standard deviations',
                     'message' => ucfirst(str_replace('_', ' ', $param)) . ' ' .
