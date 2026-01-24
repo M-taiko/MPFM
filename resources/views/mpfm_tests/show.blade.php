@@ -9,6 +9,11 @@
             <div class="card-header">
                 <h3 class="card-title">MPFM Test #{{ $mpfmTest->id }}</h3>
                 <div class="card-options">
+                    @if($mpfmTest && $mpfmTest->test_data)
+                    <a href="{{ route('mpfm-tests.view', $mpfmTest->id) }}" class="btn btn-info btn-sm" target="_blank">
+                        <i class="fe fe-bar-chart-2 mr-2"></i>Full Report with Charts
+                    </a>
+                    @endif
                     @can('update', $mpfmTest)
                     <a href="{{ route('mpfm_tests.edit', $mpfmTest->id) }}" class="btn btn-primary btn-sm">
                         <i class="fe fe-edit"></i> Edit

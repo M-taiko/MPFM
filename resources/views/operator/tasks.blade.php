@@ -85,7 +85,9 @@
                                     <th>Scheduled Date</th>
                                     <th>Plan Name</th>
                                     <th>Tower / Field</th>
-                                    <th>Device</th>
+                                    <th>Well (البير)</th>
+                                    <th>String (رقم الاسترينج)</th>
+                                    <th>Device (نوع الجهاز)</th>
                                     <th>Priority</th>
                                     <th>Status</th>
                                     <th>SLA Status</th>
@@ -108,6 +110,24 @@
                                     <td>
                                         @if($task->towerModel && $task->towerModel->oilField)
                                             {{ $task->towerModel->oilField->name }} / {{ $task->towerModel->name }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($task->well_full_name)
+                                            {{ $task->well_full_name }}
+                                        @elseif($task->oilString && $task->oilString->name)
+                                            {{ $task->oilString->name }}
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($task->string_number)
+                                            <strong>{{ $task->string_number }}</strong>
+                                        @elseif($task->oilString && $task->oilString->string_number)
+                                            <strong>{{ $task->oilString->string_number }}</strong>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
@@ -155,7 +175,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="9" class="text-center py-4">
+                                    <td colspan="12" class="text-center py-4">
                                         <i class="fe fe-inbox" style="font-size: 3rem; opacity: 0.2;"></i>
                                         <p class="text-muted mt-2">No tasks found</p>
                                     </td>
