@@ -275,6 +275,12 @@ class VxLogController extends Controller
         if (isset($parsedData['test_data']['rows'])) {
             $rows = $parsedData['test_data']['rows'];
             $fullMetrics = $this->calculationService->calculateStandardizedMetrics($rows);
+
+            // Map calculated metrics to standard field names
+            $fullMetrics['water_cut'] = $fullMetrics['bsw'] ?? null; // BSW = Bottom Side Water = Water Cut
+            $fullMetrics['pressure'] = $fullMetrics['avg_pressure'] ?? null;
+            $fullMetrics['temperature'] = $fullMetrics['avg_temperature'] ?? null;
+
             $averages = $fullMetrics;
         }
 
