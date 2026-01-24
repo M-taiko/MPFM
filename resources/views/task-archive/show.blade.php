@@ -182,7 +182,7 @@
                             <i class="fe fe-bar-chart-2 mr-2"></i>View Charts
                         </a>
                         @endif
-                        <a href="{{ route('mpfm-tests.show', $task->mpfmTest) }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('mpfm_tests.show', $task->mpfmTest) }}" class="btn btn-sm btn-primary">
                             <i class="fe fe-external-link mr-2"></i>View Full Test Report
                         </a>
                     </div>
