@@ -77,7 +77,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 70px;
+            height: 100px;
+            padding: 10px 0;
         }
 
         .logo {
@@ -89,20 +90,21 @@
         }
 
         .logo img {
-                height: 142px;
-                width: 327px;
-                position: absolute;
-                right: 44%;
+            height: 80px;
+            width: auto;
+            display: block;
         }
 
         .logo-text {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 900;
             color: #333;
+            letter-spacing: -1px;
         }
 
         .logo-text .logo-accent {
             color: #667eea;
+            font-weight: 900;
         }
 
         .btn-login {
@@ -744,6 +746,30 @@
         }
 
         @media (max-width: 768px) {
+            .nav-content {
+                height: auto;
+                gap: 20px;
+                padding: 15px 0;
+            }
+
+            .logo {
+                gap: 12px;
+            }
+
+            .logo img {
+                height: 60px !important;
+                width: auto;
+            }
+
+            .logo-text {
+                font-size: 22px;
+            }
+
+            .btn-login {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
             .roles-grid, .features-grid {
                 grid-template-columns: 1fr;
             }
@@ -764,6 +790,10 @@
                 font-size: 32px;
             }
 
+            .hero-text p {
+                font-size: 16px;
+            }
+
             .workflow-container {
                 padding: 30px 15px;
             }
@@ -779,6 +809,191 @@
             .workflow-step {
                 flex: 1;
                 min-width: 100px;
+            }
+
+            .step-number {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+
+            .step-title {
+                font-size: 12px;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+
+            .feature-card h4 {
+                font-size: 14px;
+            }
+
+            .role-card {
+                margin-bottom: 20px;
+            }
+
+            .cta-content h2 {
+                font-size: 32px;
+            }
+
+            .cta-content p {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav {
+                padding: 10px 0;
+            }
+
+            .nav-content {
+                height: auto;
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 0;
+            }
+
+            .logo {
+                gap: 10px;
+                justify-content: center;
+            }
+
+            .logo img {
+                height: 50px !important;
+                width: auto;
+            }
+
+            .logo-text {
+                font-size: 18px;
+            }
+
+            .btn-login {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .hero {
+                padding: 40px 0 60px;
+            }
+
+            .hero-text h1 {
+                font-size: 26px;
+                margin-bottom: 15px;
+            }
+
+            .hero-text p {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-primary, .btn-secondary {
+                padding: 12px 20px;
+                font-size: 13px;
+            }
+
+            .hero-features {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .feature-card {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-item {
+                padding: 20px;
+            }
+
+            .stat-number {
+                font-size: 36px;
+            }
+
+            .section-header h2 {
+                font-size: 26px;
+            }
+
+            .section-header p {
+                font-size: 14px;
+            }
+
+            .role-header {
+                padding: 20px;
+            }
+
+            .role-body {
+                padding: 20px;
+            }
+
+            .role-title {
+                font-size: 18px;
+            }
+
+            .workflow-step {
+                min-width: 80px;
+            }
+
+            .step-number {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .step-title {
+                font-size: 11px;
+            }
+
+            .step-role {
+                font-size: 10px;
+            }
+
+            .feature-item {
+                padding: 25px 15px;
+            }
+
+            .feature-item h3 {
+                font-size: 18px;
+            }
+
+            .feature-item p {
+                font-size: 13px;
+            }
+
+            .cta-section {
+                padding: 60px 0;
+            }
+
+            .cta-content h2 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .cta-content p {
+                font-size: 14px;
+                margin-bottom: 25px;
+            }
+
+            .footer-content {
+                gap: 25px;
+                grid-template-columns: 1fr;
+            }
+
+            .footer-section h4 {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            .footer-section p, .footer-section a {
+                font-size: 13px;
             }
         }
 

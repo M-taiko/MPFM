@@ -84,40 +84,45 @@
 
     .brand-logo {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 15px;
-        margin-bottom: 40px;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 50px;
         animation: slideInLeft 0.8s ease-out;
     }
 
-   .brand-logo img {
-    height: 276px;
-    width: auto;
+  .brand-logo img {
+    height: 221px;
+    width: 407px;
+    /* max-width: 280px; */
     filter: brightness(0) invert(1);
+    margin-bottom: 30px;
     position: absolute;
-    left: 256px;
-    top: 76px;
-}
+    top: 157px;
+    left: 269px;
+  }
 
     .brand-logo-text {
-        font-size: 32px;
+        font-size: 36px;
         font-weight: 900;
         letter-spacing: -1px;
+        text-align: center;
     }
 
     .brand-title {
-        font-size: 48px;
+        font-size: 52px;
         font-weight: 900;
         line-height: 1.2;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         animation: slideInLeft 0.8s ease-out 0.1s backwards;
     }
 
     .brand-subtitle {
-        font-size: 18px;
+        font-size: 20px;
         opacity: 0.9;
-        line-height: 1.6;
-        margin-bottom: 50px;
+        line-height: 1.7;
+        margin-bottom: 60px;
         animation: slideInLeft 0.8s ease-out 0.2s backwards;
     }
 
@@ -415,10 +420,49 @@
     @media (max-width: 768px) {
         .login-container {
             padding: 20px;
+            max-width: 100%;
+            gap: 30px;
+        }
+
+        .login-brand {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .brand-logo img {
+            max-width: 220px !important;
+            margin-bottom: 20px;
+        }
+
+        .brand-logo-text {
+            font-size: 28px;
+        }
+
+        .brand-title {
+            font-size: 40px;
+        }
+
+        .brand-subtitle {
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .brand-features {
+            gap: 15px;
+        }
+
+        .feature-row {
+            justify-content: flex-start;
         }
 
         .login-form-wrapper {
-            padding: 30px;
+            padding: 30px 20px;
             border-radius: 20px;
         }
 
@@ -434,17 +478,129 @@
             margin-bottom: 20px;
         }
 
+        .form-label {
+            font-size: 12px;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .btn-signin {
+            padding: 14px;
+            font-size: 14px;
+        }
+
         body::before {
-            width: 400px;
-            height: 400px;
-            top: -30%;
-            right: -20%;
+            width: 300px;
+            height: 300px;
+            top: -20%;
+            right: -15%;
         }
 
         body::after {
-            width: 300px;
-            height: 300px;
-            bottom: -30%;
+            width: 250px;
+            height: 250px;
+            bottom: -20%;
+            left: -10%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 15px;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .login-brand {
+            display: flex;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .brand-logo {
+            margin-bottom: 30px;
+        }
+
+        .brand-logo img {
+            max-width: 160px !important;
+            margin-bottom: 15px;
+        }
+
+        .brand-logo-text {
+            font-size: 24px;
+        }
+
+        .brand-title {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .brand-subtitle {
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .brand-features {
+            gap: 12px;
+        }
+
+        .feature-row {
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+        }
+
+        .feature-label {
+            font-size: 13px;
+        }
+
+        .feature-text {
+            font-size: 12px;
+        }
+
+        .login-form-wrapper {
+            max-width: 100%;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .form-title {
+            font-size: 22px;
+        }
+
+        .form-subtitle {
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .btn-signin {
+            padding: 12px;
+        }
+
+        .form-links {
+            font-size: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        body::before {
+            width: 200px;
+            height: 200px;
+            top: -10%;
+            right: -5%;
+        }
+
+        body::after {
+            width: 200px;
+            height: 200px;
+            bottom: -15%;
+            left: 0;
         }
     }
 
