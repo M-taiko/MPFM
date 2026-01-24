@@ -76,6 +76,7 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item {{ request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.dashboard') }}">Dashboard</a></li>
                     <li><a class="slide-item {{ request()->is('surveillance') && !request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
+                    <li><a class="slide-item {{ request()->is('mpfm-tests') && !request()->is('mpfm-tests/*') ? 'active' : '' }}" href="{{ route('mpfm_tests.index') }}">All MPFM Tests</a></li>
                 </ul>
             </li>
             @endif
@@ -92,6 +93,7 @@
                     <li><a class="slide-item {{ request()->is('mpfm-supervisor/dashboard') ? 'active' : '' }}" href="{{ route('mpfm-supervisor.dashboard') }}">Dashboard</a></li>
                     <li><a class="slide-item" href="{{ route('mpfm-supervisor.dashboard') }}#reviews">Plans for Review</a></li>
                     <li><a class="slide-item" href="{{ route('mpfm-supervisor.dashboard') }}#unassigned">Unassigned Tasks</a></li>
+                     <li><a class="slide-item {{ request()->is('mpfm-tests') && !request()->is('mpfm-tests/*') ? 'active' : '' }}" href="{{ route('mpfm_tests.index') }}">All MPFM Tests</a></li>
                 </ul>
             </li>
             @endif
