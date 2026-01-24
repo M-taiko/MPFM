@@ -6,7 +6,9 @@
       "Bash(php:*)",
       "Bash(cat:*)",
       "Bash(wc:*)",
-      "Bash(del test_migration.php)"
+      "Bash(del test_migration.php)",
+      "Bash(mysql:*)",
+      "Bash(git add:*)"
     ]
   }
 }

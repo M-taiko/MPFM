@@ -278,6 +278,12 @@
                             <i class="fe fe-eye mr-2"></i>View Details
                         </button>
 
+                        @if ($task->mpfmTest && $task->mpfmTest->test_data)
+                        <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" title="View Test with Charts" target="_blank">
+                            <i class="fe fe-bar-chart-2 mr-2"></i>View Charts
+                        </a>
+                        @endif
+
                         @if ($task->state && $task->state->value === 'submitted_to_surveillance')
                         <form action="{{ route('surveillance.approve-task', ['monthlyPlan' => $plan->id, 'planTask' => $task->id]) }}" method="POST" style="display: inline;">
                             @csrf

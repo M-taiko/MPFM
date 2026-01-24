@@ -13,8 +13,8 @@ class TaskArchiveController extends Controller
      */
     public function index(Request $request)
     {
-        // Check authorization - only surveillance supervisor and admin can access
-        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'surveillance_supervisor'])) {
+        // Check authorization - supervisors and admin can access
+        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'surveillance_supervisor', 'mpfm_supervisor'])) {
             abort(403, 'Unauthorized to access task archive');
         }
 
@@ -62,8 +62,8 @@ class TaskArchiveController extends Controller
      */
     public function show(PlanTask $task)
     {
-        // Check authorization
-        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'surveillance_supervisor'])) {
+        // Check authorization - supervisors and admin can access
+        if (!auth()->check() || !auth()->user()->hasAnyRole(['admin', 'surveillance_supervisor', 'mpfm_supervisor'])) {
             abort(403, 'Unauthorized');
         }
 

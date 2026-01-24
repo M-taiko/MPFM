@@ -233,10 +233,15 @@
                     </div>
                 </div>
             </div>
-            <div class="task-actions">
-                <a href="{{ route('task-archive.show', $task) }}">
+            <div class="task-actions" style="display: flex; gap: 10px;">
+                <a href="{{ route('task-archive.show', $task) }}" style="background: #667eea;">
                     <i class="fe fe-eye mr-2"></i>View Details
                 </a>
+                @if($task->mpfmTest && $task->mpfmTest->test_data)
+                <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" target="_blank" style="background: #28a745;">
+                    <i class="fe fe-bar-chart-2 mr-2"></i>View Charts
+                </a>
+                @endif
             </div>
         </div>
         @empty

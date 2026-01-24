@@ -304,6 +304,8 @@ Route::middleware('auth')->group(function () {
 
     // Surveillance Supervisor Routes - Review and Approve
     Route::prefix('surveillance')->name('surveillance.')->group(function () {
+        Route::get('/dashboard', [SurveillanceSupervisorController::class, 'dashboard'])->name('dashboard');
+        Route::get('/tasks/{task}/view', [SurveillanceSupervisorController::class, 'viewTask'])->name('view-task');
         Route::get('/', [SurveillanceSupervisorController::class, 'index'])->name('index');
         Route::get('/plans/{monthlyPlan}/review', [SurveillanceSupervisorController::class, 'reviewPlan'])->name('review');
         Route::get('/plans/{monthlyPlan}/tasks/{planTask}/details', [SurveillanceSupervisorController::class, 'getTaskDetails'])->name('task-details');

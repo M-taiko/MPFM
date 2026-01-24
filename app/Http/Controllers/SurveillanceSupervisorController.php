@@ -22,6 +22,152 @@ class SurveillanceSupervisorController extends Controller
     }
 
     /**
+     * Show comprehensive surveillance supervisor dashboard
+     */
+    public function dashboard(Request $request)
+    {
+        // Active monthly plans
+        $activePlans = MonthlyPlan::where('status', 'active')
+            ->with(['tasks'])
+            ->get()
+            ->map(function ($plan) {
+                $tasks = $plan->tasks;
+                return [
+                    'id' => $plan->id,
+                    'plan_name' => $plan->plan_name,
+                    'plan_month' => $plan->plan_month,
+                    'total_tasks' => $tasks->count(),
+                    'completed_tasks' => $tasks->where('completion_status', 'completed')->count(),
+                    'pending_tasks' => $tasks->where('completion_status', 'pending')->count(),
+                    'progress' => $tasks->count() > 0 ? round(($tasks->where('completion_status', 'completed')->count() / $tasks->count()) * 100, 1) : 0
+                ];
+            });
+
+        // KPI Counters - All tasks from all plans
+        $totalTasks = PlanTask::count();
+        $completedTasks = PlanTask::where('completion_status', 'completed')->orWhere('state', 'completed')->count();
+        $pendingTasks = PlanTask::where('completion_status', 'pending')->count();
+        $overdueTasks = PlanTask::where('completion_status', 'pending')
+            ->where('scheduled_date', '<', now()->startOfDay())
+            ->count();
+
+        // DataTable data will be loaded via AJAX
+        if ($request->ajax()) {
+            return $this->getDashboardTasksData($request);
+        }
+
+        return view('surveillance.dashboard', compact(
+            'activePlans',
+            'totalTasks',
+            'completedTasks',
+            'pendingTasks',
+            'overdueTasks'
+        ));
+    }
+
+    /**
+     * Get tasks data for DataTable (AJAX)
+     */
+    private function getDashboardTasksData(Request $request)
+    {
+        $query = PlanTask::with([
+            'monthlyPlan',
+            'towerModel',
+            'oilString',
+            'operator',
+            'mpfmTest'
+        ]);
+
+        // Search functionality
+        if ($request->has('search') && $request->search['value']) {
+            $searchValue = $request->search['value'];
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('sno', 'like', "%{$searchValue}%")
+                    ->orWhere('well_full_name', 'like', "%{$searchValue}%")
+                    ->orWhereHas('operator', function ($q) use ($searchValue) {
+                        $q->where('name', 'like', "%{$searchValue}%");
+                    });
+            });
+        }
+
+        // Sorting
+        $columns = ['id', 'sno', 'well_full_name', 'category', 'sub_category', 'assigned_operator_id', 'completion_status', 'updated_at'];
+        if ($request->has('order') && isset($request->order[0])) {
+            $orderColumn = $columns[$request->order[0]['column']] ?? 'id';
+            $orderDir = $request->order[0]['dir'] === 'desc' ? 'desc' : 'asc';
+            $query->orderBy($orderColumn, $orderDir);
+        } else {
+            $query->latest('updated_at');
+        }
+
+        // Pagination
+        $start = $request->start ?? 0;
+        $length = $request->length ?? 10;
+        $total = $query->count();
+
+        $tasks = $query->offset($start)
+            ->limit($length)
+            ->get();
+
+        $data = $tasks->map(function ($task) {
+            return [
+                'id' => $task->id,
+                'sno' => $task->sno ?? '-',
+                'plan' => $task->monthlyPlan?->plan_month ?? '-',
+                'well_name' => $task->well_full_name ?? '-',
+                'department' => ucfirst($task->category ?? '-'),
+                'operation_type' => ucfirst($task->sub_category ?? '-'),
+                'operator' => $task->operator?->name ?? 'Unassigned',
+                'status' => $this->getStatusBadge($task->completion_status),
+                'updated_at' => $task->updated_at?->format('d M Y H:i') ?? '-',
+                'action' => view('surveillance.task-detail-button', compact('task'))->render()
+            ];
+        });
+
+        return response()->json([
+            'draw' => intval($request->draw),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $total,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * Get status badge HTML
+     */
+    private function getStatusBadge($status)
+    {
+        $badges = [
+            'pending' => '<span class="badge badge-warning">Pending</span>',
+            'in_progress' => '<span class="badge badge-info">In Progress</span>',
+            'completed' => '<span class="badge badge-success">Completed</span>',
+            'failed' => '<span class="badge badge-danger">Failed</span>',
+            'reviewed' => '<span class="badge badge-primary">Reviewed</span>',
+        ];
+        return $badges[$status] ?? '<span class="badge badge-secondary">Unknown</span>';
+    }
+
+    /**
+     * Show task details for surveillance supervisor
+     */
+    public function viewTask(PlanTask $task)
+    {
+        // Load task with all relationships
+        $task->load([
+            'monthlyPlan',
+            'towerModel',
+            'oilString',
+            'operator',
+            'mpfmTest',
+            'mpfmTest.wellTest',
+            'stateHistories',
+            'stateHistories.changedBy'
+        ]);
+
+        return view('surveillance.task-details', compact('task'));
+    }
+
+    /**
      * Show list of monthly plans awaiting surveillance review
      */
     public function index()

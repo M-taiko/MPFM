@@ -39,15 +39,11 @@ class MPFMSupervisorController extends Controller
             ->orderBy('scheduled_date', 'asc')
             ->get();
 
-        // Recent completed tests
-        $recentCompletedTests = PlanTask::whereHas('monthlyPlan', function($q) {
-                $q->where('status', 'active');
-            })
-            ->where('completion_status', 'completed')
-            ->with('monthlyPlan', 'operator', 'mpfmTest')
+        // All completed tests for the supervisor's team
+        $recentCompletedTests = PlanTask::where('completion_status', 'completed')
+            ->with('monthlyPlan', 'operator', 'mpfmTest', 'towerModel')
             ->orderBy('completed_at', 'desc')
-            ->limit(10)
-            ->get();
+            ->paginate(25);
 
         // Recent stats (last 30 days)
         $recentStats = [

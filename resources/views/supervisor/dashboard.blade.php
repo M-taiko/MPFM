@@ -117,6 +117,9 @@
                 <div class="card-header">
                     <h3 class="card-title">Today's Plans ({{ now()->format('d M Y') }})</h3>
                     <div class="card-options">
+                        <a href="{{ route('task-archive.index') }}" class="btn btn-sm btn-outline-success">
+                            <i class="fe fe-archive mr-1"></i>View Archive
+                        </a>
                         <a href="{{ route('supervisor.calendar') }}" class="btn btn-sm btn-outline-primary">
                             <i class="fe fe-calendar mr-1"></i>Calendar View
                         </a>
@@ -173,9 +176,16 @@
 
                                         <hr>
 
-                                        <a href="{{ route('monthly-plans.show', $task->monthlyPlan) }}" class="btn btn-sm btn-info btn-block">
-                                            <i class="fe fe-eye mr-1"></i>View Plan
-                                        </a>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ route('monthly-plans.show', $task->monthlyPlan) }}" class="btn btn-sm btn-info flex-grow-1">
+                                                <i class="fe fe-eye mr-1"></i>View Plan
+                                            </a>
+                                            @if($task->mpfmTest && $task->mpfmTest->test_data)
+                                            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" title="View Test with Charts" target="_blank">
+                                                <i class="fe fe-bar-chart-2"></i>
+                                            </a>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -284,9 +294,16 @@
                                             </form>
                                         </td>
                                         <td>
-                                            <a href="{{ route('monthly-plans.show', $task->monthlyPlan) }}" class="btn btn-sm btn-info">
-                                                <i class="fe fe-eye"></i> View
-                                            </a>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('monthly-plans.show', $task->monthlyPlan) }}" class="btn btn-sm btn-info">
+                                                    <i class="fe fe-eye"></i> View
+                                                </a>
+                                                @if($task->mpfmTest && $task->mpfmTest->test_data)
+                                                <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" title="View Test with Charts" target="_blank">
+                                                    <i class="fe fe-bar-chart-2"></i>
+                                                </a>
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -366,6 +383,106 @@
                         </div>
                     @endif
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completed Tasks -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
+                    <h3 class="card-title mb-0">
+                        <i class="fe fe-check-circle mr-2"></i>
+                        Recently Completed Tasks
+                    </h3>
+                    <div class="ml-auto">
+                        <span class="badge badge-light">{{ $recentCompletedTests->count() }} tasks</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @if($recentCompletedTests->isEmpty())
+                        <div class="text-center py-5">
+                            <i class="fe fe-check-circle" style="font-size: 48px; color: #28a745; opacity: 0.3;"></i>
+                            <h4 class="mt-3 mb-2">No Completed Tasks Yet</h4>
+                            <p class="text-muted mb-0">Completed tasks will appear here.</p>
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead style="background: #f9fafb;">
+                                    <tr>
+                                        <th>Task #</th>
+                                        <th>Well / String</th>
+                                        <th>Plan</th>
+                                        <th>Operator</th>
+                                        <th>Completed Date</th>
+                                        <th>Status</th>
+                                        <th width="200">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentCompletedTests as $task)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $task->sno ?? '-' }}</strong>
+                                        </td>
+                                        <td>
+                                            @if($task->well_full_name)
+                                                {{ $task->well_full_name }}
+                                            @else
+                                                {{ $task->well_number ?? '-' }} / {{ $task->string_number ?? '-' }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ $task->monthlyPlan->plan_name ?? '-' }}</small>
+                                        </td>
+                                        <td>
+                                            {{ $task->operator?->name ?? 'Unassigned' }}
+                                        </td>
+                                        <td>
+                                            @if($task->completed_at)
+                                                {{ $task->completed_at->format('d M Y H:i') }}
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-success">{{ ucfirst($task->completion_status) }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-sm btn-info" title="View Details">
+                                                    <i class="fe fe-eye"></i>
+                                                </a>
+                                                @if($task->mpfmTest && $task->mpfmTest->test_data)
+                                                <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" title="View Test with Charts" target="_blank">
+                                                    <i class="fe fe-bar-chart-2"></i>
+                                                </a>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+
+                <!-- Pagination -->
+                @if($recentCompletedTests->count() > 0)
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Showing {{ $recentCompletedTests->firstItem() }} to {{ $recentCompletedTests->lastItem() }} of {{ $recentCompletedTests->total() }} completed tasks
+                        </small>
+                        <div>
+                            {{ $recentCompletedTests->links('pagination::bootstrap-4') }}
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>

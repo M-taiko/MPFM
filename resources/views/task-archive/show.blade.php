@@ -176,7 +176,12 @@
                         </div>
                     </div>
 
-                    <div class="mt-3">
+                    <div class="mt-3" style="display: flex; gap: 10px;">
+                        @if($task->mpfmTest->test_data)
+                        <a href="{{ route('mpfm-tests.view', $task->mpfmTest) }}" class="btn btn-sm btn-success" target="_blank">
+                            <i class="fe fe-bar-chart-2 mr-2"></i>View Charts
+                        </a>
+                        @endif
                         <a href="{{ route('mpfm-tests.show', $task->mpfmTest) }}" class="btn btn-sm btn-primary">
                             <i class="fe fe-external-link mr-2"></i>View Full Test Report
                         </a>

@@ -308,7 +308,12 @@
             </div>
         </div>
 
-        <div style="text-align: center; padding-top: 10px;">
+        <div style="text-align: center; padding-top: 10px; display: flex; gap: 10px; justify-content: center;">
+            @if($task->mpfmTest->test_data)
+            <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-success" target="_blank">
+                <i class="fe fe-bar-chart-2 mr-1"></i>View Charts
+            </a>
+            @endif
             <a href="{{ route('mpfm-tests.view', $task->mpfmTest->id) }}" class="btn btn-sm btn-primary" target="_blank">
                 <i class="fe fe-external-link mr-1"></i>View Full Test Report
             </a>

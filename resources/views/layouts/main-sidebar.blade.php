@@ -70,11 +70,12 @@
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('surveillance*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-eye"></i>
-                    <span class="side-menu__label">Surveillance Review</span>
+                    <span class="side-menu__label">Surveillance</span>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('surveillance') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
+                    <li><a class="slide-item {{ request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.dashboard') }}">Dashboard</a></li>
+                    <li><a class="slide-item {{ request()->is('surveillance') && !request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
                 </ul>
             </li>
             @endif
@@ -170,8 +171,8 @@
             </li>
             @endif
 
-            <!-- Task Archive (Surveillance Supervisor) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor'))
+            <!-- Task Archive (Surveillance & MPFM Supervisor) -->
+            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('mpfm_supervisor'))
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('task-archive*') ? 'active' : '' }}" href="{{ route('task-archive.index') }}">
                     <i class="side-menu__icon fe fe-archive"></i>

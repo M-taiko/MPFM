@@ -108,12 +108,25 @@
                         <div class="col-md-6">
                             <h6>Location</h6>
                             <p>
-                                <i class="fe fe-map-pin text-primary mr-2"></i>
-                                <strong>Field:</strong> {{ $task->oilString->tower->oilField->name }}<br>
-                                <i class="fe fe-map-pin text-primary mr-2"></i>
-                                <strong>Tower:</strong> {{ $task->oilString->tower->name }}<br>
-                                <i class="fe fe-map-pin text-primary mr-2"></i>
-                                <strong>String:</strong> {{ $task->oilString->name }}
+                                @if($task->oilString && $task->oilString->tower && $task->oilString->tower->oilField)
+                                    <i class="fe fe-map-pin text-primary mr-2"></i>
+                                    <strong>Field:</strong> {{ $task->oilString->tower->oilField->name }}<br>
+                                    <i class="fe fe-map-pin text-primary mr-2"></i>
+                                    <strong>Tower:</strong> {{ $task->oilString->tower->name }}<br>
+                                    <i class="fe fe-map-pin text-primary mr-2"></i>
+                                    <strong>String:</strong> {{ $task->oilString->name }}
+                                @elseif($task->towerModel && $task->towerModel->oilField)
+                                    <i class="fe fe-map-pin text-primary mr-2"></i>
+                                    <strong>Field:</strong> {{ $task->towerModel->oilField->name }}<br>
+                                    <i class="fe fe-map-pin text-primary mr-2"></i>
+                                    <strong>Tower:</strong> {{ $task->towerModel->name }}<br>
+                                    @if($task->oilString)
+                                    <i class="fe fe-map-pin text-primary mr-2"></i>
+                                    <strong>String:</strong> {{ $task->oilString->name }}
+                                    @endif
+                                @else
+                                    <span class="text-muted">Location information not available</span>
+                                @endif
                             </p>
                         </div>
                         <div class="col-md-6">
