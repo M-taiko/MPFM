@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Login - VALEX MPFM')
+@section('title', 'Login - ADNOC MPFM')
 
 @section('content')
 <style>
@@ -90,11 +90,14 @@
         animation: slideInLeft 0.8s ease-out;
     }
 
-    .brand-logo img {
-        height: 60px;
-        width: auto;
-        filter: brightness(0) invert(1);
-    }
+   .brand-logo img {
+    height: 276px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    position: absolute;
+    left: 256px;
+    top: 76px;
+}
 
     .brand-logo-text {
         font-size: 32px;
@@ -444,14 +447,23 @@
             bottom: -30%;
         }
     }
+
+
+       .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 14px;
+        }
 </style>
 
 <div class="login-container">
     <!-- Left Brand Section -->
     <div class="login-brand">
         <div class="brand-logo">
-            <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt="VALEX MPFM">
-            <div class="brand-logo-text">VALEX</div>
+            <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt=" MPFM">
+            <div class="brand-logo-text">ADNOC MPFM</div>
         </div>
 
         <h1 class="brand-title">Offshore Operations, Perfected</h1>
@@ -581,4 +593,11 @@
     </div>
 </div>
 
+ <div class="footer-bottom">
+                <p>&copy; {{ date('Y') }}  MPFM. All Rights Reserved. | Engineering Precision • Operational Excellence || this software is proprietary and confidential </p>
+                <br>
+                <p>Developed by <a href="https://www.facebook.com/m.tarek2014" target="_blank">Mohamed Tarek</a> with <a href="https://masarsoft.io">Masarsoft</a></p>
+            </div>
+
 @endsection
+

@@ -812,7 +812,7 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <h1>Offshore Operations Made <span style="color: #ffd89b;">Intelligent</span></h1>
-                    <p>VALEX MPFM delivers precision multiphase flow meter testing with complete operational oversight, surveillance, and task management for modern offshore production.</p>
+                    <p> MPFM delivers precision multiphase flow meter testing with complete operational oversight, surveillance, and task management for modern offshore production.</p>
                     <div class="hero-buttons">
                         <a href="{{ route('login') }}" class="btn-primary">
                             <span>Get Started</span>
@@ -1094,7 +1094,7 @@
     <section class="cta-section">
         <div class="cta-content">
             <h2>Ready to Transform Your Offshore Operations?</h2>
-            <p>VALEX MPFM provides the complete solution for multiphase flow meter management with operational excellence and surveillance oversight.</p>
+            <p> MPFM provides the complete solution for multiphase flow meter management with operational excellence and surveillance oversight.</p>
             <a href="{{ route('login') }}" class="btn-primary">
                 <span>Access the System</span>
                 <span style="font-size: 18px;">→</span>
@@ -1108,8 +1108,8 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="footer-logo">
-                        <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt="VALEX MPFM">
-                        <span style="font-weight: 800; font-size: 16px;">VALEX MPFM</span>
+                        <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt=" MPFM">
+                        <span style="font-weight: 800; font-size: 16px;"> MPFM</span>
                     </div>
                     <p>Advanced offshore operations management system built for precision and reliability</p>
                 </div>
@@ -1133,7 +1133,9 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; {{ date('Y') }} VALEX MPFM. All Rights Reserved. | Engineering Precision • Operational Excellence</p>
+                <p>&copy; {{ date('Y') }}  MPFM. All Rights Reserved. | Engineering Precision • Operational Excellence || this software is proprietary and confidential </p>
+                <br>
+                <p>Developed by <a href="https://www.facebook.com/m.tarek2014" target="_blank">Mohamed Tarek</a> with <a href="https://masarsoft.io">Masarsoft</a></p>
             </div>
         </div>
     </footer>
