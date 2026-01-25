@@ -40,6 +40,31 @@ class MPFMTest extends Model
         'log_file_path',
         'raw_log_data',
         'test_duration_minutes',
+        // Timing fields
+        'test_started_at',
+        'test_completed_at',
+        // Detailed metrics fields
+        'qo_lc', 'qw_lc', 'qg_lc', 'ql_lc',
+        'qo_sc', 'qw_sc', 'qg_sc',
+        'fo_lc', 'fw_lc', 'fg_lc',
+        'bsw', 'wlr', 'glr', 'gvf',
+        'po_lc', 'pw_lc', 'pg_lc', 'mo_lc', 'mw_lc', 'mg_lc',
+        'cvo_lc', 'cvw_lc', 'cvg_lc', 'cvo_sc', 'cvw_sc', 'cvg_sc',
+        'bo', 'bw', 'bg', 'z_factor', 'rst',
+        'dp', 'pl', 'tl',
+        'pressure_avg', 'pressure_max', 'pressure_min',
+        'temperature_avg', 'temperature_max', 'temperature_min',
+        'qo_flow_weighted', 'qw_flow_weighted', 'qg_flow_weighted',
+        'bsw_sc', 'wlr_sc', 'gor_sc',
+        'h2s_mfr', 'co2_mfr', 'n2_mfr',
+        'choke_size', 'choke_dp',
+        'test_duration_hours', 'test_stable_duration_hours', 'test_total_data_points',
+        'gamma_reading', 'detector_temp',
+        'data_quality_score', 'missing_data_percentage',
+        // JSON fields
+        'detailed_metrics', 'flow_rate_metrics', 'pvt_metrics',
+        'pressure_temperature_metrics', 'ratio_metrics', 'cumulative_metrics',
+        'data_quality_metrics',
     ];
 
     protected $casts = [
@@ -53,6 +78,17 @@ class MPFMTest extends Model
         'calculated_kpis' => 'array',
         'status' => 'string',
         'raw_log_data' => 'array',
+        // Timing fields
+        'test_started_at' => 'datetime',
+        'test_completed_at' => 'datetime',
+        // Detailed metrics JSON fields
+        'detailed_metrics' => 'array',
+        'flow_rate_metrics' => 'array',
+        'pvt_metrics' => 'array',
+        'pressure_temperature_metrics' => 'array',
+        'ratio_metrics' => 'array',
+        'cumulative_metrics' => 'array',
+        'data_quality_metrics' => 'array',
     ];
 
     /**

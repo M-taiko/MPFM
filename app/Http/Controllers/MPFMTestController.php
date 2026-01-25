@@ -519,7 +519,102 @@ class MPFMTestController extends Controller
             'latestComparison'
         ]);
 
-        return view('mpfm_tests.show_with_history', compact('mpfmTest'));
+        // Auto-validate if no validation exists
+        if (!$mpfmTest->latestValidation && $mpfmTest->raw_log_data) {
+            try {
+                $validationService = app(MPFMValidationService::class);
+                $validationService->validateTest($mpfmTest);
+                $mpfmTest->load('latestValidation');
+            } catch (\Exception $e) {
+                // Silently fail if validation service not available
+            }
+        }
+
+        // Get all related tests for the same oil string for trending
+        $trendingCharts = $this->prepareTrendingCharts($mpfmTest);
+
+        return view('mpfm_tests.show_with_history', compact('mpfmTest', 'trendingCharts'));
+    }
+
+    /**
+     * Prepare trending chart data for a test's oil string
+     */
+    private function prepareTrendingCharts(MPFMTest $mpfmTest): array
+    {
+        if (!$mpfmTest->oil_string_id) {
+            return [];
+        }
+
+        // Get all approved tests for this oil string, ordered by test date
+        $relatedTests = MPFMTest::where('oil_string_id', $mpfmTest->oil_string_id)
+            ->where('status', 'approved')
+            ->orderBy('test_date', 'asc')
+            ->get();
+
+        if ($relatedTests->isEmpty()) {
+            return [];
+        }
+
+        // Prepare chart data
+        $testDates = $relatedTests->map(fn($test) => $test->test_date->format('M d, Y'))->toArray();
+
+        return [
+            'production_rates' => [
+                'labels' => $testDates,
+                'datasets' => [
+                    [
+                        'label' => 'Oil Rate SC (STB/d)',
+                        'data' => $relatedTests->pluck('qo_sc')->toArray(),
+                        'borderColor' => '#667eea',
+                        'backgroundColor' => 'rgba(102, 126, 234, 0.1)',
+                        'tension' => 0.4,
+                    ],
+                    [
+                        'label' => 'Water Rate SC (STB/d)',
+                        'data' => $relatedTests->pluck('qw_sc')->toArray(),
+                        'borderColor' => '#e74c3c',
+                        'backgroundColor' => 'rgba(231, 76, 60, 0.1)',
+                        'tension' => 0.4,
+                    ],
+                ]
+            ],
+            'gor_trend' => [
+                'labels' => $testDates,
+                'datasets' => [
+                    [
+                        'label' => 'GOR (Scf/STB)',
+                        'data' => $relatedTests->pluck('gor')->toArray(),
+                        'borderColor' => '#f39c12',
+                        'backgroundColor' => 'rgba(243, 156, 18, 0.1)',
+                        'tension' => 0.4,
+                    ]
+                ]
+            ],
+            'bsw_trend' => [
+                'labels' => $testDates,
+                'datasets' => [
+                    [
+                        'label' => 'BSW (%)',
+                        'data' => $relatedTests->pluck('bsw')->toArray(),
+                        'borderColor' => '#e67e22',
+                        'backgroundColor' => 'rgba(230, 126, 34, 0.1)',
+                        'tension' => 0.4,
+                    ]
+                ]
+            ],
+            'wlr_trend' => [
+                'labels' => $testDates,
+                'datasets' => [
+                    [
+                        'label' => 'WLR',
+                        'data' => $relatedTests->pluck('wlr')->toArray(),
+                        'borderColor' => '#3498db',
+                        'backgroundColor' => 'rgba(52, 152, 219, 0.1)',
+                        'tension' => 0.4,
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -571,6 +666,24 @@ class MPFMTestController extends Controller
         $validationService->validateTest($mpfmTest, true);
 
         return redirect()->back()->with('success', 'Test revalidated successfully');
+    }
+
+    /**
+     * Download log file for a test
+     */
+    public function downloadLog(MPFMTest $mpfmTest)
+    {
+        if (!$mpfmTest->log_file_path) {
+            return redirect()->back()->with('error', 'No log file associated with this test');
+        }
+
+        $filePath = storage_path('app/public/' . $mpfmTest->log_file_path);
+
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', 'Log file not found');
+        }
+
+        return response()->download($filePath, basename($filePath));
     }
 }
 

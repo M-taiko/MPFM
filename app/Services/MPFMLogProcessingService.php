@@ -11,6 +11,7 @@ use App\Models\OilString;
 use App\Services\MPFMParsingService;
 use App\Services\MPFMCalculationService;
 use App\Services\MPFMChartService;
+use App\Services\MPFMDetailedMetricsExtractorService;
 use Carbon\Carbon;
 
 /**
@@ -22,15 +23,18 @@ class MPFMLogProcessingService
     protected $parsingService;
     protected $calculationService;
     protected $chartService;
+    protected $metricsExtractor;
 
     public function __construct(
         MPFMParsingService $parsingService,
         MPFMCalculationService $calculationService,
-        MPFMChartService $chartService
+        MPFMChartService $chartService,
+        MPFMDetailedMetricsExtractorService $metricsExtractor
     ) {
         $this->parsingService = $parsingService;
         $this->calculationService = $calculationService;
         $this->chartService = $chartService;
+        $this->metricsExtractor = $metricsExtractor;
     }
 
     /**
@@ -169,12 +173,16 @@ class MPFMLogProcessingService
         // Calculate test metadata
         $metadata = $this->calculateTestMetadata($rows, $rawContent);
 
+        // Extract detailed metrics from log file
+        $detailedMetrics = $this->safeExtractDetailedMetrics($parsedData, $rawContent);
+
         return [
             'averages' => $averages,
             'mpfm_data' => $mpfmData,
             'chart_data' => $chartData,
             'metadata' => $metadata,
             'data_quality' => $this->assessDataQuality($rows, $columns),
+            'detailed_metrics' => $detailedMetrics,
         ];
     }
 
@@ -923,6 +931,20 @@ class MPFMLogProcessingService
         }
 
         return null;
+    }
+
+    /**
+     * Safely extract detailed metrics with error handling
+     */
+    private function safeExtractDetailedMetrics(array $parsedData, string $rawContent): array
+    {
+        try {
+            return $this->metricsExtractor->extractDetailedMetrics($parsedData, $rawContent);
+        } catch (\Exception $e) {
+            return [
+                'error' => 'Failed to extract detailed metrics: ' . $e->getMessage(),
+            ];
+        }
     }
 }
 

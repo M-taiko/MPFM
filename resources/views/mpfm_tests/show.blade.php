@@ -599,9 +599,11 @@
                                         <button type="submit" class="btn btn-success" id="submitBtn">
                                             <i class="fe fe-check mr-2"></i> Submit Decision
                                         </button>
-                                        <a href="{{ route('monthly-plans.show', $task->monthly_plan_id) }}" class="btn btn-secondary">
+                                        @if($mpfmTest->planTask?->monthlyPlan)
+                                        <a href="{{ route('monthly-plans.show', $mpfmTest->planTask->monthlyPlan) }}" class="btn btn-secondary">
                                             <i class="fe fe-arrow-left mr-2"></i> Back to Plan
                                         </a>
+                                        @endif
                                     </div>
                                 </form>
                             </div>
@@ -615,6 +617,65 @@
                             <i class="fe fe-check-circle mr-2"></i>
                             <strong>Test Approved!</strong> This test has been approved by the supervisor.
                         </div>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Test Timing & Detailed Metrics Section -->
+                @if($mpfmTest->test_started_at || $mpfmTest->detailed_metrics)
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <!-- Test Timing Information -->
+                        @if($mpfmTest->test_started_at)
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary">
+                                <h5 class="card-title mb-0" style="color: white;">
+                                    <i class="fe fe-clock mr-2"></i>Test Timing & Duration
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div style="padding: 1rem; background: rgba(78, 115, 223, 0.05); border-radius: 8px;">
+                                            <h6 class="text-muted mb-2">Test Started At</h6>
+                                            <p style="font-weight: 600; font-size: 1rem;">
+                                                {{ $mpfmTest->test_started_at?->format('M d, Y H:i:s') ?? 'N/A' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div style="padding: 1rem; background: rgba(78, 115, 223, 0.05); border-radius: 8px;">
+                                            <h6 class="text-muted mb-2">Test Completed At</h6>
+                                            <p style="font-weight: 600; font-size: 1rem;">
+                                                {{ $mpfmTest->test_completed_at?->format('M d, Y H:i:s') ?? 'N/A' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div style="padding: 1rem; background: rgba(52, 211, 153, 0.05); border-radius: 8px;">
+                                            <h6 class="text-muted mb-2">Total Duration</h6>
+                                            <p style="font-weight: 600; font-size: 1rem;">
+                                                {{ round($mpfmTest->test_duration_hours ?? 0, 2) }} hours
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div style="padding: 1rem; background: rgba(59, 130, 246, 0.05); border-radius: 8px;">
+                                            <h6 class="text-muted mb-2">Stable Duration</h6>
+                                            <p style="font-weight: 600; font-size: 1rem;">
+                                                {{ round($mpfmTest->test_stable_duration_hours ?? 0, 2) }} hours
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
+                        <!-- Detailed Metrics Display -->
+                        @if($mpfmTest->detailed_metrics)
+                        <x-detailed-metrics-display :metrics="$mpfmTest->detailed_metrics" />
+                        @endif
                     </div>
                 </div>
                 @endif

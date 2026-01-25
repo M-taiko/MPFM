@@ -125,33 +125,66 @@
         </p>
     </div>
 
-    <!-- Test Data -->
+    <!-- Test Timing -->
+    @if($mpfmTest->test_started_at)
     <div class="detail-card">
-        <h5>Test Results</h5>
+        <h5>Test Timing Information</h5>
         <div class="detail-grid">
             <div class="detail-item">
-                <div class="detail-label">Oil Rate (bbl/day)</div>
-                <div class="detail-value">{{ $mpfmTest->oil_rate ?? 'N/A' }}</div>
+                <div class="detail-label">Test Started At</div>
+                <div class="detail-value" style="font-size: 1rem;">{{ $mpfmTest->test_started_at?->format('M d, Y H:i:s') ?? 'N/A' }}</div>
             </div>
             <div class="detail-item">
-                <div class="detail-label">Water Cut (%)</div>
-                <div class="detail-value">{{ $mpfmTest->water_cut ?? 'N/A' }}</div>
+                <div class="detail-label">Test Completed At</div>
+                <div class="detail-value" style="font-size: 1rem;">{{ $mpfmTest->test_completed_at?->format('M d, Y H:i:s') ?? 'N/A' }}</div>
             </div>
             <div class="detail-item">
-                <div class="detail-label">GOR (scf/bbl)</div>
-                <div class="detail-value">{{ $mpfmTest->gor ?? 'N/A' }}</div>
+                <div class="detail-label">Total Duration</div>
+                <div class="detail-value">{{ round($mpfmTest->test_duration_hours ?? 0, 2) }} hrs</div>
             </div>
             <div class="detail-item">
-                <div class="detail-label">Gas Rate (MMSCF/day)</div>
-                <div class="detail-value">{{ $mpfmTest->gas_rate ?? 'N/A' }}</div>
+                <div class="detail-label">Stable Duration</div>
+                <div class="detail-value">{{ round($mpfmTest->test_stable_duration_hours ?? 0, 2) }} hrs</div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Test Data -->
+    <div class="detail-card">
+        <h5>Test Results (Extracted from Log File)</h5>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Oil Rate SC (STB/d)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->qo_sc ?? 0, 2) }}</div>
             </div>
             <div class="detail-item">
-                <div class="detail-label">Pressure (psi)</div>
-                <div class="detail-value">{{ $mpfmTest->pressure ?? 'N/A' }}</div>
+                <div class="detail-label">Water Cut / BSW (%)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->bsw ?? 0, 2) }}</div>
             </div>
             <div class="detail-item">
-                <div class="detail-label">Temperature (°F)</div>
-                <div class="detail-value">{{ $mpfmTest->temperature ?? 'N/A' }}</div>
+                <div class="detail-label">GOR (Scf/STB)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->gor ?? 0, 2) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Gas Rate SC (MMScf/d)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->qg_sc ?? 0, 2) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Pressure Avg (psia)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->pressure_avg ?? $mpfmTest->pressure ?? 0, 2) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Temperature Avg (°C)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->temperature_avg ?? $mpfmTest->temperature ?? 0, 2) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">GVF (%)</div>
+                <div class="detail-value">{{ number_format($mpfmTest->gvf ?? 0, 2) }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">WLR</div>
+                <div class="detail-value">{{ number_format($mpfmTest->wlr ?? 0, 2) }}</div>
             </div>
         </div>
 
@@ -242,8 +275,44 @@
 
             <!-- Trends Tab -->
             <div id="trends" class="tab-pane fade">
+                <h6 style="margin-bottom: 20px;">Well String Performance Trends</h6>
+
+                <!-- Production Rates Chart -->
+                @if(isset($trendingCharts['production_rates']))
+                <div style="margin-bottom: 30px;">
+                    <h6>Production Rates Over Time</h6>
+                    <canvas id="productionRatesChart" height="80"></canvas>
+                </div>
+                @endif
+
+                <!-- GOR Trend Chart -->
+                @if(isset($trendingCharts['gor_trend']))
+                <div style="margin-bottom: 30px;">
+                    <h6>Gas-Oil Ratio (GOR) Trend</h6>
+                    <canvas id="gorTrendChart" height="80"></canvas>
+                </div>
+                @endif
+
+                <!-- BSW Trend Chart -->
+                @if(isset($trendingCharts['bsw_trend']))
+                <div style="margin-bottom: 30px;">
+                    <h6>Basic Sediment & Water (BSW) Trend</h6>
+                    <canvas id="bswTrendChart" height="80"></canvas>
+                </div>
+                @endif
+
+                <!-- WLR Trend Chart -->
+                @if(isset($trendingCharts['wlr_trend']))
+                <div style="margin-bottom: 30px;">
+                    <h6>Water-Liquid Ratio (WLR) Trend</h6>
+                    <canvas id="wlrTrendChart" height="80"></canvas>
+                </div>
+                @endif
+
+                <!-- Trend Analysis Summary -->
                 @if($mpfmTest->latestValidation && $mpfmTest->latestValidation->historical_comparison && isset($mpfmTest->latestValidation->historical_comparison['trends']))
-                    <h6>Trend Analysis</h6>
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+                    <h6>Trend Analysis Summary</h6>
                     @foreach($mpfmTest->latestValidation->historical_comparison['trends'] as $param => $trend)
                     <div style="padding: 15px; margin-bottom: 15px; background: #f8f9fa; border-radius: 6px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -260,12 +329,21 @@
                         </div>
                     </div>
                     @endforeach
+                </div>
                 @else
-                    <p class="text-muted">No trend data available</p>
+                    <p class="text-muted">No detailed trend analysis available</p>
                 @endif
             </div>
         </div>
     </div>
+
+    <!-- Detailed Metrics Display -->
+    @if($mpfmTest->detailed_metrics)
+    <div class="detail-card">
+        <h5>Detailed Metrics Analysis</h5>
+        <x-detailed-metrics-display :metrics="$mpfmTest->detailed_metrics" />
+    </div>
+    @endif
 
     <!-- Action Buttons -->
     <div class="action-buttons">
@@ -282,4 +360,127 @@
         </a>
     </div>
 </div>
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+// Production Rates Chart
+@if(isset($trendingCharts['production_rates']))
+const productionCtx = document.getElementById('productionRatesChart')?.getContext('2d');
+if (productionCtx) {
+    new Chart(productionCtx, {
+        type: 'line',
+        data: {!! json_encode($trendingCharts['production_rates']) !!},
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Rate (STB/d)'
+                    }
+                }
+            }
+        }
+    });
+}
+@endif
+
+// GOR Trend Chart
+@if(isset($trendingCharts['gor_trend']))
+const gorCtx = document.getElementById('gorTrendChart')?.getContext('2d');
+if (gorCtx) {
+    new Chart(gorCtx, {
+        type: 'line',
+        data: {!! json_encode($trendingCharts['gor_trend']) !!},
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'GOR (Scf/STB)'
+                    }
+                }
+            }
+        }
+    });
+}
+@endif
+
+// BSW Trend Chart
+@if(isset($trendingCharts['bsw_trend']))
+const bswCtx = document.getElementById('bswTrendChart')?.getContext('2d');
+if (bswCtx) {
+    new Chart(bswCtx, {
+        type: 'line',
+        data: {!! json_encode($trendingCharts['bsw_trend']) !!},
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'BSW (%)'
+                    }
+                }
+            }
+        }
+    });
+}
+@endif
+
+// WLR Trend Chart
+@if(isset($trendingCharts['wlr_trend']))
+const wlrCtx = document.getElementById('wlrTrendChart')?.getContext('2d');
+if (wlrCtx) {
+    new Chart(wlrCtx, {
+        type: 'line',
+        data: {!! json_encode($trendingCharts['wlr_trend']) !!},
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'WLR'
+                    }
+                }
+            }
+        }
+    });
+}
+@endif
+</script>
+@endsection
+
 @endsection

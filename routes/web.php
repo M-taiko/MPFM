@@ -199,6 +199,8 @@ Route::middleware('auth')->group(function () {
         ->name('mpfm_tests.show_history');
     Route::post('/mpfm-tests/{mpfmTest}/revalidate', [MPFMTestController::class, 'revalidate'])
         ->name('mpfm_tests.revalidate');
+    Route::get('/mpfm-tests/{mpfmTest}/download-log', [MPFMTestController::class, 'downloadLog'])
+        ->name('mpfm_tests.download_log');
 });
 
 Route::resource('mpfm-tests', MPFMTestController::class)->names('mpfm_tests');
