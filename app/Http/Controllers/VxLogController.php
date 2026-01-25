@@ -16,6 +16,7 @@ use App\Services\MPFMChartService;
 use App\Services\MPFMPreviewService;
 use App\Services\TaskStateService;
 use App\Services\MPFMValidationService;
+use App\Services\MPFMDetailedMetricsExtractorService;
 use App\Enums\TaskState;
 use App\Notifications\TaskCompletedNotification;
 
@@ -314,8 +315,18 @@ class VxLogController extends Controller
             $tower = $task->towerModel;
             $oilFieldId = $tower ? $tower->oil_field_id : null;
 
+            // Extract detailed metrics from parsed data
+            $detailedMetricsExtractor = app(MPFMDetailedMetricsExtractorService::class);
+            $detailedMetrics = $detailedMetricsExtractor->extractDetailedMetrics($parsedData, '');
+
+            // Extract timing information
+            $testStartedAt = $detailedMetrics['timing']['test_started_at'] ?? $summary['start_time'];
+            $testCompletedAt = $detailedMetrics['timing']['test_completed_at'] ?? $summary['end_time'];
+            $testDurationHours = $detailedMetrics['timing']['test_duration_hours'] ?? null;
+            $testStableDurationHours = $detailedMetrics['timing']['test_stable_duration_hours'] ?? null;
+
             // Create MPFMTest linked to task
-            $mpfmTest = MPFMTest::create([
+            $mpfmTestData = [
                 'user_id' => auth()->id(),
                 'oil_field_id' => $oilFieldId,
                 'tower_id' => $task->tower_id,
@@ -333,7 +344,27 @@ class VxLogController extends Controller
                 'log_file_path' => $permanentPath,
                 'raw_log_data' => $parsedData,
                 'test_duration_minutes' => $this->calculateTestDuration($summary['start_time'], $summary['end_time']),
-            ]);
+                'test_started_at' => $testStartedAt,
+                'test_completed_at' => $testCompletedAt,
+                'test_duration_hours' => $testDurationHours,
+                'test_stable_duration_hours' => $testStableDurationHours,
+                'detailed_metrics' => $detailedMetrics,
+                // Extract individual metrics from detailed metrics
+                'qo_sc' => $detailedMetrics['flow_rates']['standard_conditions']['qo_sc']['value'] ?? null,
+                'qw_sc' => $detailedMetrics['flow_rates']['standard_conditions']['qw_sc']['value'] ?? null,
+                'qg_sc' => $detailedMetrics['flow_rates']['standard_conditions']['qg_sc']['value'] ?? null,
+                'qo_lc' => $detailedMetrics['flow_rates']['line_conditions']['qo_lc']['value'] ?? null,
+                'qw_lc' => $detailedMetrics['flow_rates']['line_conditions']['qw_lc']['value'] ?? null,
+                'qg_lc' => $detailedMetrics['flow_rates']['line_conditions']['qg_lc']['value'] ?? null,
+                'bsw' => $detailedMetrics['water_cut_metrics']['bsw']['value'] ?? null,
+                'wlr' => $detailedMetrics['water_cut_metrics']['wlr']['value'] ?? null,
+                'gvf' => $detailedMetrics['gas_oil_relations']['gvf']['value'] ?? null,
+                'pressure_avg' => $averages['avg_pressure'] ?? null,
+                'temperature_avg' => $averages['avg_temperature'] ?? null,
+                'test_total_data_points' => $detailedMetrics['timing']['test_total_data_points'] ?? count($parsedData['test_data']['rows'] ?? []),
+            ];
+
+            $mpfmTest = MPFMTest::create($mpfmTestData);
 
             // Mark task as completed
             $task->update([
