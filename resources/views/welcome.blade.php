@@ -1305,6 +1305,232 @@
         </div>
     </section>
 
+    <div class="section-divider"></div>
+
+    <!-- Departments Section -->
+    <section style="padding: 80px 0; background: white;">
+        <div class="container-custom">
+            <div class="section-header">
+                <h2>Multi-Department Management System</h2>
+                <p>Enterprise-grade platform supporting multiple autonomous departments with independent operations</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🏢</div>
+                    <h3>MPFM Department</h3>
+                    <p>Multiphase Flow Meter testing and operations with specialized task management and validation</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📡</div>
+                    <h3>Wire Line Operations</h3>
+                    <p>Cable-based well intervention with diagnostic capabilities and real-time monitoring</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Production Operations</h3>
+                    <p>Production asset management with comprehensive oversight and performance tracking</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🛢️</div>
+                    <h3>Drilling Operations</h3>
+                    <p>Drilling program management with well engineering and execution planning</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Completion Services</h3>
+                    <p>Well completion planning and execution with technical specifications tracking</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <h3>Workover Operations</h3>
+                    <p>Well maintenance and repair operations with integrated scheduling and tracking</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Architecture Section -->
+    <section style="padding: 80px 0; background: #f8f9fa;">
+        <div class="container-custom">
+            <div class="section-header">
+                <h2>System Architecture & Scalability</h2>
+                <p>Enterprise-ready architecture designed for unlimited growth and operational expansion</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 50px;">
+                <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">🏗️</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 15px; color: #333;">Modular Architecture</h3>
+                    <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Each department operates as an independent module with its own:</p>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 8px 0;">✓ Dedicated task management workflows</li>
+                        <li style="padding: 8px 0;">✓ Department-specific user roles</li>
+                        <li style="padding: 8px 0;">✓ Custom permission sets</li>
+                        <li style="padding: 8px 0;">✓ Independent dashboards and reports</li>
+                        <li style="padding: 8px 0;">✓ Isolated data and analytics</li>
+                    </ul>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">⚡</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 15px; color: #333;">Scalability Features</h3>
+                    <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Platform supports seamless expansion:</p>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 8px 0;">✓ Add new departments instantly</li>
+                        <li style="padding: 8px 0;">✓ Unlimited users per department</li>
+                        <li style="padding: 8px 0;">✓ Unlimited task creation</li>
+                        <li style="padding: 8px 0;">✓ Multi-user concurrent access</li>
+                        <li style="padding: 8px 0;">✓ Automatic data distribution</li>
+                    </ul>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">🔐</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 15px; color: #333;">Security & Isolation</h3>
+                    <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Enterprise-grade data protection:</p>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 8px 0;">✓ Department data isolation</li>
+                        <li style="padding: 8px 0;">✓ Role-based access control</li>
+                        <li style="padding: 8px 0;">✓ Permission enforcement</li>
+                        <li style="padding: 8px 0;">✓ Audit trail logging</li>
+                        <li style="padding: 8px 0;">✓ Cross-department visibility control</li>
+                    </ul>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">📈</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 15px; color: #333;">Performance Metrics</h3>
+                    <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Track operations across departments:</p>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 8px 0;">✓ Department-level KPIs</li>
+                        <li style="padding: 8px 0;">✓ Progress tracking & analytics</li>
+                        <li style="padding: 8px 0;">✓ Custom dashboards per role</li>
+                        <li style="padding: 8px 0;">✓ Real-time status updates</li>
+                        <li style="padding: 8px 0;">✓ Historical trend analysis</li>
+                    </ul>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">🔄</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 15px; color: #333;">Workflow Flexibility</h3>
+                    <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Customizable workflows for each department:</p>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 8px 0;">✓ State machine-based transitions</li>
+                        <li style="padding: 8px 0;">✓ Approval hierarchy management</li>
+                        <li style="padding: 8px 0;">✓ Multi-stage task reviews</li>
+                        <li style="padding: 8px 0;">✓ SLA tracking & monitoring</li>
+                        <li style="padding: 8px 0;">✓ Custom validation rules</li>
+                    </ul>
+                </div>
+
+                <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);">
+                    <div style="font-size: 40px; margin-bottom: 20px;">🛠️</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 15px; color: #333;">Future Enhancements</h3>
+                    <p style="color: #666; font-size: 15px; line-height: 1.6; margin-bottom: 15px;">Platform ready for advanced features:</p>
+                    <ul style="color: #555; font-size: 14px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 8px 0;">✓ API integrations & webhooks</li>
+                        <li style="padding: 8px 0;">✓ Mobile app support</li>
+                        <li style="padding: 8px 0;">✓ Advanced machine learning</li>
+                        <li style="padding: 8px 0;">✓ Real-time notifications</li>
+                        <li style="padding: 8px 0;">✓ Multi-language support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Department Roles Section -->
+    <section style="padding: 80px 0; background: white;">
+        <div class="container-custom">
+            <div class="section-header">
+                <h2>Department-Level Roles & Permissions</h2>
+                <p>Granular access control ensures proper oversight and operational independence</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 50px;">
+                <div style="background: linear-gradient(135deg, #eef2ff 0%, #f5f8ff 100%); padding: 30px; border-radius: 20px; border-left: 5px solid #667eea;">
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #333;">Department Supervisor</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;"><strong>User Management Authority</strong></p>
+                    <ul style="color: #555; font-size: 13px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 6px 0;">• Create users in their department</li>
+                        <li style="padding: 6px 0;">• Edit user information</li>
+                        <li style="padding: 6px 0;">• Change user passwords</li>
+                        <li style="padding: 6px 0;">• Remove users from department</li>
+                        <li style="padding: 6px 0;">• Assign operator roles</li>
+                        <li style="padding: 6px 0;">• View department users</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f0fdf4 0%, #f5fef8 100%); padding: 30px; border-radius: 20px; border-left: 5px solid #16a34a;">
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #333;">Department Manager</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;"><strong>Task Assignment Authority</strong></p>
+                    <ul style="color: #555; font-size: 13px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 6px 0;">• Assign operators to tasks</li>
+                        <li style="padding: 6px 0;">• Review department work</li>
+                        <li style="padding: 6px 0;">• Monitor task progress</li>
+                        <li style="padding: 6px 0;">• View department dashboard</li>
+                        <li style="padding: 6px 0;">• Access department reports</li>
+                        <li style="padding: 6px 0;">• View team assignments</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fffbeb 0%, #fef9f2 100%); padding: 30px; border-radius: 20px; border-left: 5px solid #d97706;">
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #333;">Department Operator</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;"><strong>Task Execution Authority</strong></p>
+                    <ul style="color: #555; font-size: 13px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 6px 0;">• Execute assigned tasks</li>
+                        <li style="padding: 6px 0;">• Update task status</li>
+                        <li style="padding: 6px 0;">• Upload task data</li>
+                        <li style="padding: 6px 0;">• Submit task reports</li>
+                        <li style="padding: 6px 0;">• View assigned tasks</li>
+                        <li style="padding: 6px 0;">• Track task history</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #f5faff 100%); padding: 30px; border-radius: 20px; border-left: 5px solid #0ea5e9;">
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #333;">Surveillance Supervisor</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;"><strong>Global Oversight (Read-Only)</strong></p>
+                    <ul style="color: #555; font-size: 13px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 6px 0;">• View all departments</li>
+                        <li style="padding: 6px 0;">• Monitor all tasks</li>
+                        <li style="padding: 6px 0;">• Access global dashboard</li>
+                        <li style="padding: 6px 0;">• Review analytics</li>
+                        <li style="padding: 6px 0;">• Generate reports</li>
+                        <li style="padding: 6px 0;">• NO assignment authority</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #faf5ff 0%, #fdf8ff 100%); padding: 30px; border-radius: 20px; border-left: 5px solid #9333ea;">
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #333;">Job Officer</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;"><strong>Plan Creation Authority</strong></p>
+                    <ul style="color: #555; font-size: 13px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 6px 0;">• Create monthly plans</li>
+                        <li style="padding: 6px 0;">• Add tasks to plans</li>
+                        <li style="padding: 6px 0;">• Assign to departments</li>
+                        <li style="padding: 6px 0;">• Final approval power</li>
+                        <li style="padding: 6px 0;">• Review task completion</li>
+                        <li style="padding: 6px 0;">• View all plans</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #fef2f2 0%, #fdf9f9 100%); padding: 30px; border-radius: 20px; border-left: 5px solid #dc2626;">
+                    <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 15px; color: #333;">System Admin</h3>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;"><strong>Complete System Control</strong></p>
+                    <ul style="color: #555; font-size: 13px; line-height: 1.8; list-style: none; padding-left: 0;">
+                        <li style="padding: 6px 0;">• Manage all users</li>
+                        <li style="padding: 6px 0;">• Create/edit departments</li>
+                        <li style="padding: 6px 0;">• Configure roles & permissions</li>
+                        <li style="padding: 6px 0;">• System configuration</li>
+                        <li style="padding: 6px 0;">• Access all data</li>
+                        <li style="padding: 6px 0;">• System monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="cta-content">
