@@ -17,6 +17,7 @@ use App\Http\Controllers\MPFMOperationalPlanController;
 use App\Http\Controllers\MPFMTestController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskStateController;
+use App\Http\Controllers\DepartmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -433,6 +434,19 @@ Route::middleware('auth')->group(function () {
             ->name('supervisor.test_approval');
         Route::post('/supervisor/approve-test/{mpfmTest}', [VxLogController::class, 'approveTest'])
             ->name('vx_log.approve_test');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Department Management
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('departments')->name('departments.')->group(function () {
+        Route::get('/{department}/dashboard', [DepartmentController::class, 'dashboard'])->name('dashboard');
+        Route::get('/{department}/tasks', [DepartmentController::class, 'tasks'])->name('tasks');
+        Route::get('/{department}/operators', [DepartmentController::class, 'operators'])->name('operators');
+        Route::get('/{department}/reports', [DepartmentController::class, 'reports'])->name('reports');
+        Route::post('/{department}/assign-operator', [DepartmentController::class, 'assignOperator'])->name('assign-operator');
     });
 });
 

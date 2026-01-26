@@ -47,11 +47,10 @@
                 </a>
             </li>
 
-            <!-- Monthly Planning Section -->
-            <li class="side-item side-item-category">Monthly Planning</li>
-
-            <!-- Job Officer - Monthly Plans (Admin or Production Supervisor can see) -->
+            <!-- Monthly Planning (Job Officer & Admin) -->
             @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_production_supervisor_reports'))
+            <li class="side-item side-item-category">Planning & Oversight</li>
+
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('monthly-plans*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-clipboard"></i>
@@ -65,8 +64,12 @@
             </li>
             @endif
 
-            <!-- Surveillance Supervisor - Review Plans (Admin or Surveillance Supervisor can see) -->
+            <!-- Surveillance & Monitoring (Surveillance Supervisor & Admin) -->
             @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('production_supervisor'))
+            @if(!auth()->user()->hasRole('admin') && !auth()->user()->can('view_production_supervisor_reports'))
+            <li class="side-item side-item-category">Monitoring & Review</li>
+            @endif
+
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('surveillance*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-eye"></i>
@@ -76,61 +79,50 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item {{ request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.dashboard') }}">Dashboard</a></li>
                     <li><a class="slide-item {{ request()->is('surveillance') && !request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
-                    <li><a class="slide-item {{ request()->is('mpfm-tests') && !request()->is('mpfm-tests/*') ? 'active' : '' }}" href="{{ route('mpfm_tests.index') }}">All MPFM Tests</a></li>
                 </ul>
             </li>
             @endif
 
-            <!-- Department Manager - Operator Assignment & Review (Department Manager can see) -->
-            @if(auth()->user()->hasRole('department_manager') && auth()->user()->department)
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('department-manager*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-users"></i>
-                    <span class="side-menu__label">{{ auth()->user()->department->name }} Dept</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('department-manager/dashboard') ? 'active' : '' }}" href="{{ route('department-manager.dashboard') }}">Dashboard</a></li>
-                    <li><a class="slide-item {{ request()->is('department-manager/reports') ? 'active' : '' }}" href="{{ route('department-manager.reports') }}">Reports</a></li>
-                </ul>
-            </li>
+            <!-- Department Operations Section -->
+            @php
+                $departments = App\Models\Department::where('is_active', true)->orderBy('display_order')->get();
+                $userDepartmentId = auth()->user()->department_id;
+            @endphp
+
+            @if($departments->count() > 0 && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('department_manager') || auth()->user()->hasRole('operator')))
+            <li class="side-item side-item-category">Department Operations</li>
+
+            @foreach($departments as $dept)
+                @php
+                    $canViewDept = auth()->user()->hasRole('admin') ||
+                                   (auth()->user()->hasRole('department_manager') && $userDepartmentId == $dept->id) ||
+                                   (auth()->user()->hasRole('operator') && $userDepartmentId == $dept->id);
+                @endphp
+
+                @if($canViewDept)
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('departments/' . $dept->id . '*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                        <i class="side-menu__icon fe fe-layers"></i>
+                        <span class="side-menu__label">{{ $dept->name }}</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
+                    <ul class="slide-menu">
+                        @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('department_manager'))
+                        <li><a class="slide-item" href="{{ route('departments.dashboard', $dept->id) }}">Dashboard</a></li>
+                        <li><a class="slide-item" href="{{ route('departments.tasks', $dept->id) }}">Tasks</a></li>
+                        <li><a class="slide-item" href="{{ route('departments.operators', $dept->id) }}">Team Members</a></li>
+                        <li><a class="slide-item" href="{{ route('departments.reports', $dept->id) }}">Reports</a></li>
+                        @elseif(auth()->user()->hasRole('operator'))
+                        <li><a class="slide-item" href="{{ route('operator.dashboard') }}">My Tasks</a></li>
+                        <li><a class="slide-item" href="{{ route('operator.tasks') }}">All Tasks</a></li>
+                        @endif
+                    </ul>
+                </li>
+                @endif
+            @endforeach
             @endif
 
-            <!-- MPFM Supervisor - Review & Assign (Admin or MPFM Supervisor can see) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_mpfm_supervisor_reports'))
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('mpfm-supervisor*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-user-check"></i>
-                    <span class="side-menu__label">MPFM Supervisor</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('mpfm-supervisor/dashboard') ? 'active' : '' }}" href="{{ route('mpfm-supervisor.dashboard') }}">Dashboard</a></li>
-                    <li><a class="slide-item" href="{{ route('mpfm-supervisor.dashboard') }}#reviews">Plans for Review</a></li>
-                    <li><a class="slide-item" href="{{ route('mpfm-supervisor.dashboard') }}#unassigned">Unassigned Tasks</a></li>
-                     <li><a class="slide-item {{ request()->is('mpfm-tests') && !request()->is('mpfm-tests/*') ? 'active' : '' }}" href="{{ route('mpfm_tests.index') }}">All MPFM Tests</a></li>
-                </ul>
-            </li>
-            @endif
-
-            <!-- Operator - Tasks & Execution (Admin or MPFM Operator can see) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_mpfm_operator_reports'))
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('operator*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-check-square"></i>
-                    <span class="side-menu__label">My Tasks</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('operator/dashboard') ? 'active' : '' }}" href="{{ route('operator.dashboard') }}">Dashboard</a></li>
-                    <li><a class="slide-item {{ request()->is('operator/tasks') && !request()->is('operator/tasks/*') ? 'active' : '' }}" href="{{ route('operator.tasks') }}">All Tasks</a></li>
-                    <li><a class="slide-item {{ request()->is('operator/calendar') ? 'active' : '' }}" href="{{ route('operator.calendar') }}">Calendar</a></li>
-                    <li><a class="slide-item {{ request()->is('operator/history') ? 'active' : '' }}" href="{{ route('operator.history') }}">History</a></li>
-                </ul>
-            </li>
-            @endif
-
-            <!-- MPFM Testing -->
+            <!-- MPFM Testing & Analysis -->
             <li class="side-item side-item-category">MPFM Operations</li>
 
             <li class="slide">
@@ -146,28 +138,29 @@
                 </ul>
             </li>
 
-            <!-- MPFM Validation & Analytics -->
+            <!-- MPFM Validation & Analytics (Admin & Supervisors only) -->
             @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('mpfm_supervisor'))
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('mpfm-tests/trending*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-trending-up"></i>
-                    <span class="side-menu__label">Validation & Analytics</span>
+                    <span class="side-menu__label">Analytics & Trending</span>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
                     <li><a class="slide-item {{ request()->is('mpfm-tests/trending-dashboard') ? 'active' : '' }}" href="{{ route('mpfm_tests.trending_dashboard') }}">Trending Dashboard</a></li>
-                    <li><a class="slide-item" href="{{ route('mpfm_tests.index') }}">View All Tests</a></li>
+                    <li><a class="slide-item" href="{{ route('mpfm_tests.index') }}">All Tests</a></li>
                 </ul>
             </li>
             @endif
 
-            <!-- Infrastructure Management -->
-            <li class="side-item side-item-category">Field Infrastructure</li>
+            <!-- Field Infrastructure (Admin only) -->
+            @if(auth()->user()->hasRole('admin'))
+            <li class="side-item side-item-category">Infrastructure</li>
 
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('oil-fields*') || request()->is('towers*') || request()->is('oil-strings*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-map"></i>
-                    <span class="side-menu__label">Infrastructure</span>
+                    <span class="side-menu__label">Field Setup</span>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
@@ -176,44 +169,9 @@
                     <li><a class="slide-item {{ request()->is('oil-strings*') ? 'active' : '' }}" href="{{ route('oil_strings.index') }}">Oil Strings</a></li>
                 </ul>
             </li>
-
-            <!-- Reports & Analytics -->
-            <li class="side-item side-item-category">Reporting & Analytics</li>
-
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('reports*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-bar-chart"></i>
-                    <span class="side-menu__label">Reports</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                {{-- <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('reports/job-officer') ? 'active' : '' }}" href="{{ route('reports.job-officer') }}">Job Officer Report</a></li>
-                    <li><a class="slide-item {{ request()->is('reports/mpfm-supervisor') ? 'active' : '' }}" href="{{ route('reports.mpfm-supervisor') }}">MPFM Supervisor Report</a></li>
-                    <li><a class="slide-item {{ request()->is('reports/production') ? 'active' : '' }}" href="{{ route('reports.production') }}">Production Report</a></li>
-                </ul> --}}
-            </li>
-
-            <!-- SLA Monitoring -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('job_officer') || auth()->user()->hasRole('mpfm_supervisor'))
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('sla*') ? 'active' : '' }}" href="{{ url('/sla/dashboard') }}">
-                    <i class="side-menu__icon fe fe-alert-circle"></i>
-                    <span class="side-menu__label">SLA Monitoring</span>
-                </a>
-            </li>
             @endif
 
-            <!-- Task Archive (Surveillance & MPFM Supervisor) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('mpfm_supervisor'))
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('task-archive*') ? 'active' : '' }}" href="{{ route('task-archive.index') }}">
-                    <i class="side-menu__icon fe fe-archive"></i>
-                    <span class="side-menu__label">Tasks Archive</span>
-                </a>
-            </li>
-            @endif
-
-            <!-- User Management (Admin Only) -->
+            <!-- Administration (Admin only) -->
             @can('manage_users')
             <li class="side-item side-item-category">Administration</li>
 
