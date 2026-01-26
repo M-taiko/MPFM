@@ -1,17 +1,17 @@
 @extends('layouts.master')
 
-@section('title', 'إضافة تاسك - ' . $monthlyPlan->plan_name)
+@section('title', 'Create Task - ' . $monthlyPlan->plan_name)
 
 @section('content')
 <!-- Page Header -->
 <div class="page-header mb-4">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h1 class="page-title mb-2">إضافة تاسك جديد</h1>
+            <h1 class="page-title mb-2">Create New Task</h1>
             <p class="text-muted mb-0">Plan: <strong>{{ $monthlyPlan->plan_name }}</strong></p>
         </div>
         <a href="{{ route('monthly-plans.show', $monthlyPlan) }}" class="btn btn-secondary">
-            <i class="fe fe-arrow-left"></i> عودة للخطة
+            <i class="fe fe-arrow-left"></i> Back to Plan
         </a>
     </div>
 </div>
@@ -24,15 +24,15 @@
                 <div class="d-flex align-items-center">
                     <i class="fe fe-plus-circle" style="font-size: 24px; margin-right: 10px;"></i>
                     <div>
-                        <h5 class="card-title mb-0">تفاصيل التاسك الجديد</h5>
-                        <small style="opacity: 0.9;">اختر القسم ثم املأ البيانات المطلوبة</small>
+                        <h5 class="card-title mb-0">New Task Details</h5>
+                        <small style="opacity: 0.9;">Select Department and fill in the required fields</small>
                     </div>
                 </div>
             </div>
             <div class="card-body" style="padding: 30px;">
                 @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <h5><i class="fe fe-alert-triangle"></i> تنبيه - خطأ في البيانات</h5>
+                    <h5><i class="fe fe-alert-triangle"></i> Error - Invalid Data</h5>
                     <ul class="mb-0" style="margin-top: 10px;">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -48,20 +48,20 @@
                     <!-- Step 1: Department Selection -->
                     <div class="mb-4 pb-4" style="border-bottom: 2px solid #f0f0f0;">
                         <h6 class="text-uppercase mb-3" style="font-weight: 700; color: #667eea; font-size: 13px;">
-                            <i class="fe fe-filter"></i> 1. اختر القسم
+                            <i class="fe fe-filter"></i> 1. Select Department
                         </h6>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-0">
                                     <label for="department_id" class="form-label" style="font-weight: 600;">
-                                        القسم <span class="badge badge-danger">مطلوب</span>
+                                        Department <span class="badge badge-danger">Required</span>
                                     </label>
                                     <select class="form-control form-control-lg @error('department_id') is-invalid @enderror"
                                             id="department_id"
                                             name="department_id"
                                             style="border-radius: 8px; border: 2px solid #e5e7eb;"
                                             required>
-                                        <option value="">-- اختر القسم --</option>
+                                        <option value="">-- Select Department --</option>
                                         @foreach($departments as $dept)
                                             <option value="{{ $dept->id }}"
                                                     {{ old('department_id') == $dept->id ? 'selected' : '' }}>
@@ -78,7 +78,7 @@
                             <div class="col-md-3">
                                 <div class="form-group mb-0">
                                     <label for="sno" class="form-label" style="font-weight: 600;">
-                                        التسلسل <span class="badge badge-danger">مطلوب</span>
+                                        Sequence <span class="badge badge-danger">Required</span>
                                     </label>
                                     <input type="number"
                                            class="form-control form-control-lg @error('sno') is-invalid @enderror"
@@ -99,17 +99,17 @@
                     <!-- Step 2: Basic Information -->
                     <div class="mb-4 pb-4" style="border-bottom: 2px solid #f0f0f0;">
                         <h6 class="text-uppercase mb-3" style="font-weight: 700; color: #667eea; font-size: 13px;">
-                            <i class="fe fe-map-pin"></i> 2. معلومات المئبر والبئر
+                            <i class="fe fe-map-pin"></i> 2. Tower, Well & Layer Information
                         </h6>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="tower" class="form-label" style="font-weight: 600;">المئبر</label>
+                                    <label for="tower" class="form-label" style="font-weight: 600;">Tower</label>
                                     <select class="form-control @error('tower') is-invalid @enderror"
                                             id="tower"
                                             name="tower"
                                             style="border-radius: 8px;">
-                                        <option value="">-- اختر المئبر --</option>
+                                        <option value="">-- Select Tower --</option>
                                         @foreach($towers as $tower)
                                             <option value="{{ $tower->name }}"
                                                     data-tower-id="{{ $tower->id }}"
@@ -117,13 +117,13 @@
                                                 {{ $tower->name }}
                                             </option>
                                         @endforeach
-                                        <option value="__new__">+ إضافة مئبر جديد</option>
+                                        <option value="__new__">+ Add New Tower</option>
                                     </select>
                                     <input type="text"
                                            class="form-control mt-2 d-none"
                                            id="tower_new"
                                            style="border-radius: 8px;"
-                                           placeholder="أدخل اسم المئبر الجديد">
+                                           placeholder="Enter new tower name">
                                     @error('tower')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -133,7 +133,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="well_number" class="form-label" style="font-weight: 600;">
-                                        البئر <span class="badge badge-danger">مطلوب</span>
+                                        Well <span class="badge badge-danger">Required</span>
                                     </label>
                                     <select class="form-control @error('well_number') is-invalid @enderror"
                                             id="well_number"
@@ -141,13 +141,13 @@
                                             style="border-radius: 8px;"
                                             required
                                             disabled>
-                                        <option value="">-- اختر المئبر أولاً --</option>
+                                        <option value="">-- Select Tower First --</option>
                                     </select>
                                     <input type="text"
                                            class="form-control mt-2 d-none"
                                            id="well_number_new"
                                            style="border-radius: 8px;"
-                                           placeholder="أدخل رقم البئر الجديد">
+                                           placeholder="Enter new well number">
                                     @error('well_number')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -159,7 +159,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="string_number" class="form-label" style="font-weight: 600;">
-                                        الخيط <span class="badge badge-danger">مطلوب</span>
+                                        String <span class="badge badge-danger">Required</span>
                                     </label>
                                     <select class="form-control @error('string_number') is-invalid @enderror"
                                             id="string_number"
@@ -167,13 +167,13 @@
                                             style="border-radius: 8px;"
                                             required
                                             disabled>
-                                        <option value="">-- اختر البئر أولاً --</option>
+                                        <option value="">-- Select Well First --</option>
                                     </select>
                                     <input type="text"
                                            class="form-control mt-2 d-none"
                                            id="string_number_new"
                                            style="border-radius: 8px;"
-                                           placeholder="أدخل رقم الخيط الجديد">
+                                           placeholder="Enter new string number">
                                     @error('string_number')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -182,14 +182,14 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="reservoir_layer" class="form-label" style="font-weight: 600;">طبقة الخزان</label>
+                                    <label for="reservoir_layer" class="form-label" style="font-weight: 600;">Reservoir Layer</label>
                                     <input type="text"
                                            class="form-control @error('reservoir_layer') is-invalid @enderror"
                                            id="reservoir_layer"
                                            name="reservoir_layer"
                                            value="{{ old('reservoir_layer') }}"
                                            style="border-radius: 8px;"
-                                           placeholder="مثلاً: الطبقة العليا">
+                                           placeholder="E.g., Upper Layer">
                                     @error('reservoir_layer')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -201,19 +201,19 @@
                     <!-- Step 3: Configuration Details -->
                     <div class="mb-4 pb-4" style="border-bottom: 2px solid #f0f0f0;">
                         <h6 class="text-uppercase mb-3" style="font-weight: 700; color: #667eea; font-size: 13px;">
-                            <i class="fe fe-settings"></i> 3. تفاصيل التكوين
+                            <i class="fe fe-settings"></i> 3. Configuration Details
                         </h6>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="mpfm_type" class="form-label" style="font-weight: 600;">نوع MPFM</label>
+                                    <label for="mpfm_type" class="form-label" style="font-weight: 600;">MPFM Type</label>
                                     <input type="text"
                                            class="form-control @error('mpfm_type') is-invalid @enderror"
                                            id="mpfm_type"
                                            name="mpfm_type"
                                            value="{{ old('mpfm_type') }}"
                                            style="border-radius: 8px;"
-                                           placeholder="مثلاً: Type A">
+                                           placeholder="E.g., Type A">
                                     @error('mpfm_type')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -222,14 +222,14 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="electrification_status" class="form-label" style="font-weight: 600;">حالة الكهربائية</label>
+                                    <label for="electrification_status" class="form-label" style="font-weight: 600;">Electrification Status</label>
                                     <select class="form-control @error('electrification_status') is-invalid @enderror"
                                             id="electrification_status"
                                             name="electrification_status"
                                             style="border-radius: 8px;">
-                                        <option value="">-- اختر --</option>
-                                        <option value="Y" {{ old('electrification_status') === 'Y' ? 'selected' : '' }}>نعم</option>
-                                        <option value="N" {{ old('electrification_status') === 'N' ? 'selected' : '' }}>لا</option>
+                                        <option value="">-- Select --</option>
+                                        <option value="Y" {{ old('electrification_status') === 'Y' ? 'selected' : '' }}>Yes</option>
+                                        <option value="N" {{ old('electrification_status') === 'N' ? 'selected' : '' }}>No</option>
                                     </select>
                                     @error('electrification_status')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -239,13 +239,13 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="test_location" class="form-label" style="font-weight: 600;">موقع الاختبار</label>
+                                    <label for="test_location" class="form-label" style="font-weight: 600;">Test Location</label>
                                     <select class="form-control @error('test_location') is-invalid @enderror"
                                             id="test_location"
                                             name="test_location"
                                             style="border-radius: 8px;">
-                                        <option value="">-- اختر --</option>
-                                        <option value="Locally" {{ old('test_location') === 'Locally' ? 'selected' : '' }}>محلياً</option>
+                                        <option value="">-- Select --</option>
+                                        <option value="Locally" {{ old('test_location') === 'Locally' ? 'selected' : '' }}>Locally</option>
                                         <option value="Scada" {{ old('test_location') === 'Scada' ? 'selected' : '' }}>Scada</option>
                                     </select>
                                     @error('test_location')
@@ -259,19 +259,19 @@
                     <!-- Step 4: Additional Information -->
                     <div class="mb-4 pb-4" style="border-bottom: 2px solid #f0f0f0;">
                         <h6 class="text-uppercase mb-3" style="font-weight: 700; color: #667eea; font-size: 13px;">
-                            <i class="fe fe-info"></i> 4. معلومات إضافية
+                            <i class="fe fe-info"></i> 4. Additional Information
                         </h6>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="priority" class="form-label" style="font-weight: 600;">الأولوية</label>
+                                    <label for="priority" class="form-label" style="font-weight: 600;">Priority</label>
                                     <select class="form-control @error('priority') is-invalid @enderror"
                                             id="priority"
                                             name="priority"
                                             style="border-radius: 8px;">
-                                        <option value="normal" {{ old('priority', 'normal') === 'normal' ? 'selected' : '' }}>عادية</option>
-                                        <option value="high" {{ old('priority') === 'high' ? 'selected' : '' }}>مرتفعة</option>
-                                        <option value="top" {{ old('priority') === 'top' ? 'selected' : '' }}>أعلى</option>
+                                        <option value="normal" {{ old('priority', 'normal') === 'normal' ? 'selected' : '' }}>Normal</option>
+                                        <option value="high" {{ old('priority') === 'high' ? 'selected' : '' }}>High</option>
+                                        <option value="top" {{ old('priority') === 'top' ? 'selected' : '' }}>Top</option>
                                     </select>
                                     @error('priority')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -281,14 +281,14 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="production_rate" class="form-label" style="font-weight: 600;">معدل الإنتاج</label>
+                                    <label for="production_rate" class="form-label" style="font-weight: 600;">Production Rate</label>
                                     <input type="text"
                                            class="form-control @error('production_rate') is-invalid @enderror"
                                            id="production_rate"
                                            name="production_rate"
                                            value="{{ old('production_rate') }}"
                                            style="border-radius: 8px;"
-                                           placeholder="مثلاً: 500 BPD">
+                                           placeholder="E.g., 500 BPD">
                                     @error('production_rate')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -297,7 +297,7 @@
 
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="scheduled_date" class="form-label" style="font-weight: 600;">التاريخ المجدول</label>
+                                    <label for="scheduled_date" class="form-label" style="font-weight: 600;">Scheduled Date</label>
                                     <input type="date"
                                            class="form-control @error('scheduled_date') is-invalid @enderror"
                                            id="scheduled_date"
@@ -314,13 +314,13 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="supervisor_remarks" class="form-label" style="font-weight: 600;">ملاحظات الإشراف</label>
+                                    <label for="supervisor_remarks" class="form-label" style="font-weight: 600;">Supervisor Remarks</label>
                                     <textarea class="form-control @error('supervisor_remarks') is-invalid @enderror"
                                               id="supervisor_remarks"
                                               name="supervisor_remarks"
                                               rows="2"
                                               style="border-radius: 8px;"
-                                              placeholder="أضف أي ملاحظات أو تعليمات خاصة...">{{ old('supervisor_remarks') }}</textarea>
+                                              placeholder="Add any remarks or special instructions...">{{ old('supervisor_remarks') }}</textarea>
                                     @error('supervisor_remarks')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -329,13 +329,13 @@
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="hq_notes" class="form-label" style="font-weight: 600;">ملاحظات المقر</label>
+                                    <label for="hq_notes" class="form-label" style="font-weight: 600;">HQ Notes</label>
                                     <textarea class="form-control @error('hq_notes') is-invalid @enderror"
                                               id="hq_notes"
                                               name="hq_notes"
                                               rows="2"
                                               style="border-radius: 8px;"
-                                              placeholder="أضف ملاحظات من المقر الرئيسي...">{{ old('hq_notes') }}</textarea>
+                                              placeholder="Add notes from headquarters...">{{ old('hq_notes') }}</textarea>
                                     @error('hq_notes')
                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
@@ -347,10 +347,10 @@
                     <!-- Action Buttons -->
                     <div class="d-flex justify-content-end gap-2">
                         <button type="submit" name="action" value="save" class="btn btn-success btn-lg" style="border-radius: 8px; padding: 10px 30px;">
-                            <i class="fe fe-save"></i> حفظ التاسك
+                            <i class="fe fe-save"></i> Save Task
                         </button>
                         <button type="submit" name="action" value="save_and_new" class="btn btn-primary btn-lg" style="border-radius: 8px; padding: 10px 30px;">
-                            <i class="fe fe-plus"></i> حفظ وإضافة آخر
+                            <i class="fe fe-plus"></i> Save and Add Another
                         </button>
                     </div>
                 </form>
@@ -447,7 +447,7 @@ $(document).ready(function() {
 
                 if (requiredFields.includes(fieldId)) {
                     if (!label.find('.badge').length) {
-                        label.append('<span class="badge badge-danger">مطلوب</span>');
+                        label.append('<span class="badge badge-danger">Required</span>');
                     }
                     field.find('input, select, textarea').prop('required', true);
                 } else {
@@ -488,16 +488,16 @@ $(document).ready(function() {
 
         if (towerName === '__new__') {
             $('#tower_new').removeClass('d-none').focus();
-            $('#well_number').prop('disabled', true).html('<option value="">-- اختر المئبر أولاً --</option>');
-            $('#string_number').prop('disabled', true).html('<option value="">-- اختر البئر أولاً --</option>');
+            $('#well_number').prop('disabled', true).html('<option value="">-- Select Tower First --</option>');
+            $('#string_number').prop('disabled', true).html('<option value="">-- Select Well First --</option>');
             return;
         } else {
             $('#tower_new').addClass('d-none').val('');
         }
 
         if (!towerName) {
-            $('#well_number').prop('disabled', true).html('<option value="">-- اختر المئبر أولاً --</option>');
-            $('#string_number').prop('disabled', true).html('<option value="">-- اختر البئر أولاً --</option>');
+            $('#well_number').prop('disabled', true).html('<option value="">-- Select Tower First --</option>');
+            $('#string_number').prop('disabled', true).html('<option value="">-- Select Well First --</option>');
             selectedTowerId = null;
             return;
         }
@@ -509,11 +509,11 @@ $(document).ready(function() {
             type: 'GET',
             success: function(wells) {
                 if (wells.error) {
-                    alert('خطأ: ' + wells.error);
+                    alert('Error: ' + wells.error);
                     return;
                 }
 
-                $('#well_number').prop('disabled', false).html('<option value="">-- اختر البئر --</option>');
+                $('#well_number').prop('disabled', false).html('<option value="">-- Select Well --</option>');
 
                 if (wells && wells.length > 0) {
                     wells.forEach(function(well) {
@@ -521,8 +521,8 @@ $(document).ready(function() {
                     });
                 }
 
-                $('#well_number').append('<option value="__new__">+ بئر جديد</option>');
-                $('#string_number').prop('disabled', true).html('<option value="">-- اختر البئر أولاً --</option>');
+                $('#well_number').append('<option value="__new__">+ Add New Well</option>');
+                $('#string_number').prop('disabled', true).html('<option value="">-- Select Well First --</option>');
                 selectedWellNumber = null;
             }
         });
@@ -535,7 +535,7 @@ $(document).ready(function() {
         if (wellNumber === '__new__') {
             $('#well_number_new').removeClass('d-none').focus();
             $(this).prop('required', false);
-            $('#string_number').prop('disabled', true).html('<option value="">-- اختر البئر أولاً --</option>');
+            $('#string_number').prop('disabled', true).html('<option value="">-- Select Well First --</option>');
             return;
         } else {
             $('#well_number_new').addClass('d-none').val('');
@@ -543,7 +543,7 @@ $(document).ready(function() {
         }
 
         if (!wellNumber || !selectedTowerId) {
-            $('#string_number').prop('disabled', true).html('<option value="">-- اختر البئر أولاً --</option>');
+            $('#string_number').prop('disabled', true).html('<option value="">-- Select Well First --</option>');
             return;
         }
 
@@ -558,11 +558,11 @@ $(document).ready(function() {
             },
             success: function(strings) {
                 if (strings.error) {
-                    alert('خطأ: ' + strings.error);
+                    alert('Error: ' + strings.error);
                     return;
                 }
 
-                $('#string_number').prop('disabled', false).html('<option value="">-- اختر الخيط --</option>');
+                $('#string_number').prop('disabled', false).html('<option value="">-- Select String --</option>');
 
                 if (strings && strings.length > 0) {
                     strings.forEach(function(string) {
@@ -570,7 +570,7 @@ $(document).ready(function() {
                     });
                 }
 
-                $('#string_number').append('<option value="__new__">+ خيط جديد</option>');
+                $('#string_number').append('<option value="__new__">+ Add New String</option>');
             }
         });
     });
@@ -592,14 +592,14 @@ $(document).ready(function() {
 
         if ($('#well_number').prop('disabled')) {
             e.preventDefault();
-            alert('الرجاء اختيار المئبر أولاً.');
+            alert('Please select a Tower first.');
             $('#tower').focus();
             return false;
         }
 
         if ($('#string_number').prop('disabled')) {
             e.preventDefault();
-            alert('الرجاء اختيار البئر أولاً.');
+            alert('Please select a Well first.');
             $('#well_number').focus();
             return false;
         }
@@ -624,7 +624,7 @@ $(document).ready(function() {
             var newWellNumber = $('#well_number_new').val().trim();
             if (newWellNumber === '') {
                 e.preventDefault();
-                alert('الرجاء إدخال رقم البئر الجديد.');
+                alert('Please enter a new Well Number.');
                 $('#well_number_new').focus();
                 return false;
             }
@@ -641,7 +641,7 @@ $(document).ready(function() {
             var newStringNumber = $('#string_number_new').val().trim();
             if (newStringNumber === '') {
                 e.preventDefault();
-                alert('الرجاء إدخال رقم الخيط الجديد.');
+                alert('Please enter a new String Number.');
                 $('#string_number_new').focus();
                 return false;
             }
