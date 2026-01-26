@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\VxLogController;
@@ -78,10 +79,24 @@ Route::middleware('auth')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Users
+    | Users CRUD Operations
     |--------------------------------------------------------------------------
     */
-    Route::get('/users', [RolePermissionController::class, 'indexUsers'])->name('users.index');
+    Route::resource('users', UserController::class)->names([
+        'index' => 'users.index',
+        'create' => 'users.create',
+        'store' => 'users.store',
+        'show' => 'users.show',
+        'edit' => 'users.edit',
+        'update' => 'users.update',
+        'destroy' => 'users.destroy',
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Users Role/Permission Management
+    |--------------------------------------------------------------------------
+    */
     Route::post('/users/{user}/assign-role', [RolePermissionController::class, 'assignRole'])->name('users.assign-role');
     Route::post('/users/{user}/assign-permission', [RolePermissionController::class, 'assignPermission'])->name('users.assign-permission');
     Route::delete('/users/{user}/remove-role/{roleName}', [RolePermissionController::class, 'removeRole'])->name('users.remove-role');

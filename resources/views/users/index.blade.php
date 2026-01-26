@@ -182,8 +182,52 @@
 <div class="container-fluid">
     <!-- Page Header -->
     <div class="page-header">
-        <h1><i class="fe fe-users mr-2"></i>Users Management</h1>
-        <p>Manage user accounts, roles, and permissions</p>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1><i class="fe fe-users mr-2"></i>Users Management</h1>
+                <p>Manage user accounts, roles, and permissions</p>
+            </div>
+            <a href="{{ route('users.create') }}" class="btn btn-primary">
+                <i class="fe fe-plus"></i> Create New User
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="card mb-4" style="border-left: 5px solid #667eea;">
+        <div class="card-body">
+            <form method="GET" action="{{ route('users.index') }}" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Search by name or email" value="{{ request('search') }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="department" class="form-control">
+                        <option value="">All Departments</option>
+                        @foreach($departments as $dept)
+                            <option value="{{ $dept->id }}" {{ request('department') == $dept->id ? 'selected' : '' }}>
+                                {{ $dept->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="role" class="form-control">
+                        <option value="">All Roles</option>
+                        @foreach($roles as $role)
+                            <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>
+                                {{ str_replace('_', ' ', ucfirst($role->name)) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fe fe-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Users Grid -->
@@ -217,8 +261,11 @@
 
                 <!-- Actions -->
                 <div class="actions-section">
+                    <a href="{{ route('users.edit', $user->id) }}" class="action-btn" title="Edit user information">
+                        <i class="fe fe-edit"></i> Edit
+                    </a>
                     <button class="action-btn" onclick="showRoleAssignModal({{ $user->id }})" title="Assign or change user role">
-                        <i class="fe fe-plus"></i> Assign Role
+                        <i class="fe fe-plus"></i> Role
                     </button>
                     <button class="action-btn" onclick="showPermissionAssignModal({{ $user->id }})" title="Give specific permissions">
                         <i class="fe fe-lock"></i> Permission
@@ -239,6 +286,13 @@
         </div>
         @endforelse
     </div>
+
+    <!-- Pagination -->
+    @if($users->hasPages())
+    <div class="mt-4">
+        {{ $users->links() }}
+    </div>
+    @endif
 </div>
 
 <!-- Role Assignment Modal -->
@@ -320,7 +374,7 @@
     }
 
     function confirmDelete(userId) {
-        if (confirm('Are you sure you want to delete this user?')) {
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
             document.getElementById('deleteForm').action = `/users/${userId}`;
             document.getElementById('deleteForm').submit();
         }
