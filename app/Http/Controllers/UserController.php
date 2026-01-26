@@ -7,6 +7,7 @@ use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
@@ -57,8 +58,9 @@ class UserController extends Controller
         $users = $query->with(['roles', 'department'])->paginate(10);
         $departments = Department::where('is_active', true)->orderBy('display_order')->get();
         $roles = Role::all();
+        $permissions = Permission::all();
 
-        return view('users.index', compact('users', 'departments', 'roles'));
+        return view('users.index', compact('users', 'departments', 'roles', 'permissions'));
     }
 
     /**
