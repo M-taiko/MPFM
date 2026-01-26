@@ -7,6 +7,7 @@ use App\Models\PlanTask;
 use App\Models\User;
 use App\Models\Tower;
 use App\Models\OilString;
+use App\Models\Department;
 use App\Enums\TaskState;
 use App\Services\TaskStateService;
 use Illuminate\Http\Request;
@@ -185,11 +186,14 @@ class MonthlyPlanController extends Controller
 
         $towers = Tower::all();
         $operators = User::role('operator')->get();
+        $departments = Department::where('is_active', true)
+            ->orderBy('display_order')
+            ->get();
 
         // Get oil strings with tower relationship for cascading dropdowns
         $oilStrings = OilString::with('tower')->get();
 
-        return view('monthly_plans.create_task', compact('monthlyPlan', 'towers', 'operators', 'oilStrings'));
+        return view('monthly_plans.create_task', compact('monthlyPlan', 'towers', 'operators', 'departments', 'oilStrings'));
     }
 
     /**
@@ -249,6 +253,92 @@ class MonthlyPlanController extends Controller
     }
 
     /**
+     * Get department-specific task fields configuration (AJAX endpoint)
+     */
+    public function getDepartmentFields($departmentId)
+    {
+        try {
+            // Handle both direct ID and potential model binding
+            $department = $departmentId instanceof Department
+                ? $departmentId
+                : Department::findOrFail($departmentId);
+
+            // Define department-specific field configurations
+            $departmentFields = [
+                'MPFM' => [
+                    'required_fields' => ['tower', 'test_location', 'mpfm_type', 'electrification_status'],
+                    'optional_fields' => ['flow_route', 'reservoir_layer', 'dhsv_type', 'priority', 'required_whfp', 'production_rate', 'scheduled_date'],
+                    'hidden_fields' => [],
+                    'title' => 'MPFM Task Details',
+                    'description' => 'Multi-Phase Flow Meter task configuration',
+                    'help_text' => 'Configure the MPFM testing parameters for this task'
+                ],
+                'WIRELINE' => [
+                    'required_fields' => ['tower', 'reservoir_layer', 'priority'],
+                    'optional_fields' => ['flow_route', 'test_location', 'scheduled_date'],
+                    'hidden_fields' => ['mpfm_type', 'dhsv_type', 'electrification_status', 'required_whfp', 'production_rate'],
+                    'title' => 'Wireline Task Details',
+                    'description' => 'Wireline operations task configuration',
+                    'help_text' => 'Configure the wireline operations parameters'
+                ],
+                'PRODUCTION' => [
+                    'required_fields' => ['production_rate', 'scheduled_date'],
+                    'optional_fields' => ['tower', 'test_location', 'priority'],
+                    'hidden_fields' => ['mpfm_type', 'dhsv_type', 'electrification_status', 'flow_route', 'reservoir_layer', 'required_whfp'],
+                    'title' => 'Production Task Details',
+                    'description' => 'Production operations task configuration',
+                    'help_text' => 'Configure the production operations parameters'
+                ],
+                'DRILLING' => [
+                    'required_fields' => ['tower', 'priority', 'scheduled_date'],
+                    'optional_fields' => ['test_location', 'production_rate'],
+                    'hidden_fields' => ['mpfm_type', 'dhsv_type', 'electrification_status', 'flow_route', 'reservoir_layer', 'required_whfp'],
+                    'title' => 'Drilling Task Details',
+                    'description' => 'Drilling operations task configuration',
+                    'help_text' => 'Configure the drilling operations parameters'
+                ],
+                'COMPLETION' => [
+                    'required_fields' => ['tower', 'scheduled_date'],
+                    'optional_fields' => ['test_location', 'priority', 'flow_route'],
+                    'hidden_fields' => ['mpfm_type', 'dhsv_type', 'electrification_status', 'reservoir_layer', 'required_whfp', 'production_rate'],
+                    'title' => 'Completion Task Details',
+                    'description' => 'Completion operations task configuration',
+                    'help_text' => 'Configure the completion operations parameters'
+                ],
+                'WORKOVER' => [
+                    'required_fields' => ['tower', 'priority', 'scheduled_date'],
+                    'optional_fields' => ['test_location', 'flow_route'],
+                    'hidden_fields' => ['mpfm_type', 'dhsv_type', 'electrification_status', 'reservoir_layer', 'required_whfp', 'production_rate'],
+                    'title' => 'Workover Task Details',
+                    'description' => 'Workover operations task configuration',
+                    'help_text' => 'Configure the workover operations parameters'
+                ],
+                'MAINTENANCE' => [
+                    'required_fields' => ['tower', 'priority'],
+                    'optional_fields' => ['scheduled_date', 'test_location'],
+                    'hidden_fields' => ['mpfm_type', 'dhsv_type', 'electrification_status', 'flow_route', 'reservoir_layer', 'required_whfp', 'production_rate'],
+                    'title' => 'Maintenance Task Details',
+                    'description' => 'Maintenance operations task configuration',
+                    'help_text' => 'Configure the maintenance operations parameters'
+                ]
+            ];
+
+            // Get department-specific configuration
+            $deptCode = $department->code;
+            $config = $departmentFields[$deptCode] ?? $departmentFields['MPFM'];
+
+            return response()->json([
+                'success' => true,
+                'department_name' => $department->name,
+                'department_code' => $deptCode,
+                'config' => $config
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to load department fields'], 500);
+        }
+    }
+
+    /**
      * Store new task in plan
      */
     public function storeTask(Request $request, MonthlyPlan $monthlyPlan)
@@ -259,6 +349,7 @@ class MonthlyPlanController extends Controller
 
         try {
             $request->validate([
+            'department_id' => 'required|exists:departments,id',
             'sno' => 'required|integer',
             'well_number' => 'required|string',
             'string_number' => 'required|string',
@@ -302,6 +393,7 @@ class MonthlyPlanController extends Controller
             // Create task
             $task = PlanTask::create([
                 'monthly_plan_id' => $monthlyPlan->id,
+                'department_id' => $request->department_id,
                 'sno' => $request->sno,
                 'well_number' => $request->well_number,
                 'string_number' => $request->string_number,

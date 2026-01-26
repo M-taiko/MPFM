@@ -186,15 +186,36 @@ class TaskSLAService
     public function getResponsibleActorForState(PlanTask $task): ?User
     {
         return match($task->state) {
-            TaskState::DRAFT => $task->monthlyPlan->createdBy,
+            TaskState::DRAFT => $task->monthlyPlan->creator,
             TaskState::SUBMITTED_TO_SURVEILLANCE => $this->getSurveillanceSupervisor(),
-            TaskState::ASSIGNED_TO_MPFM => $this->getMPFMSupervisor($task),
+            // Support both new ASSIGNED_TO_DEPARTMENT and legacy ASSIGNED_TO_MPFM
+            TaskState::ASSIGNED_TO_DEPARTMENT, TaskState::ASSIGNED_TO_MPFM =>
+                $this->getDepartmentManager($task) ?? $this->getMPFMSupervisor($task),
             TaskState::IN_PROGRESS => $task->primaryOperator()->first(),
-            TaskState::MPFM_REVIEWED => $this->getSurveillanceSupervisor(),
-            TaskState::SURVEILLANCE_REVIEWED => $task->monthlyPlan->createdBy,
-            TaskState::JOB_OFFICER_APPROVED => $task->monthlyPlan->createdBy,
+            // Support both new DEPARTMENT_REVIEWED and legacy MPFM_REVIEWED
+            TaskState::DEPARTMENT_REVIEWED, TaskState::MPFM_REVIEWED =>
+                $this->getSurveillanceSupervisor(),
+            TaskState::SURVEILLANCE_REVIEWED => $task->monthlyPlan->creator,
+            TaskState::JOB_OFFICER_APPROVED => $task->monthlyPlan->creator,
             default => null,
         };
+    }
+
+    /**
+     * Get the department manager for a task's department
+     *
+     * @param PlanTask $task
+     * @return User|null
+     */
+    protected function getDepartmentManager(PlanTask $task): ?User
+    {
+        if ($task->department_id === null) {
+            return null;
+        }
+
+        return User::where('department_id', $task->department_id)
+            ->whereHas('roles', fn($q) => $q->where('name', 'department_manager'))
+            ->first();
     }
 
     /**

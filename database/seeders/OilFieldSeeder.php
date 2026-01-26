@@ -9,86 +9,63 @@ use App\Models\OilString;
 
 class OilFieldSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     * Creates ADNOC-grade oil fields, towers, and oil strings
-     */
     public function run(): void
     {
-        // Onshore Fields
-        $onshoreFields = [
+        $fields = [
             [
-                'name' => 'ADNOC Onshore Field Alpha',
-                'code' => 'ADNOC-ONS-ALPHA',
-                'location' => 'Onshore, Abu Dhabi',
-                'description' => 'Primary onshore production field',
-                'towers' => [
-                    ['name' => 'Tower A-1', 'code' => 'TWR-A1', 'description' => 'Main production tower'],
-                    ['name' => 'Tower A-2', 'code' => 'TWR-A2', 'description' => 'Secondary production tower'],
-                    ['name' => 'Tower A-3', 'code' => 'TWR-A3', 'description' => 'Tertiary production tower'],
-                ],
+                'name' => 'Lower Zakum West Field',
+                'code' => 'ZK',
+                'location' => 'Offshore, Abu Dhabi',
+                'tower_prefix' => 'zk',
+                'tower_start' => 100,
+                'tower_count' => 10,
             ],
             [
-                'name' => 'ADNOC Onshore Field Beta',
-                'code' => 'ADNOC-ONS-BETA',
-                'location' => 'Onshore, Abu Dhabi',
-                'description' => 'Secondary onshore production field',
-                'towers' => [
-                    ['name' => 'Tower B-1', 'code' => 'TWR-B1', 'description' => 'Beta field main tower'],
-                    ['name' => 'Tower B-2', 'code' => 'TWR-B2', 'description' => 'Beta field secondary tower'],
-                ],
+                'name' => 'Umm Shaif Field',
+                'code' => 'UM',
+                'location' => 'Offshore, Abu Dhabi',
+                'tower_prefix' => 'um',
+                'tower_start' => 100,
+                'tower_count' => 10,
             ],
         ];
 
-        // Offshore Fields
-        $offshoreFields = [
-            [
-                'name' => 'ADNOC Offshore Field Gamma',
-                'code' => 'ADNOC-OFF-GAMMA',
-                'location' => 'Offshore, Arabian Gulf',
-                'description' => 'Primary offshore production field',
-                'towers' => [
-                    ['name' => 'Platform G-1', 'code' => 'PLT-G1', 'description' => 'Gamma platform main'],
-                    ['name' => 'Platform G-2', 'code' => 'PLT-G2', 'description' => 'Gamma platform secondary'],
-                ],
-            ],
-        ];
-
-        $allFields = array_merge($onshoreFields, $offshoreFields);
-
-        foreach ($allFields as $fieldData) {
+        foreach ($fields as $fieldData) {
             $oilField = OilField::firstOrCreate(
                 ['code' => $fieldData['code']],
                 [
                     'name' => $fieldData['name'],
                     'location' => $fieldData['location'],
-                    'description' => $fieldData['description'],
+                    'description' => '',
                     'status' => 'active',
                 ]
             );
 
-            foreach ($fieldData['towers'] as $towerData) {
+            // إنشاء التاورات
+            for ($i = 0; $i < $fieldData['tower_count']; $i++) {
+                $towerNumber = $fieldData['tower_start'] + $i;
+                $towerCode = $fieldData['tower_prefix'] . '-' . $towerNumber;
+
                 $tower = Tower::firstOrCreate(
-                    ['code' => $towerData['code']],
+                    ['code' => $towerCode],
                     [
                         'oil_field_id' => $oilField->id,
-                        'name' => $towerData['name'],
-                        'description' => $towerData['description'],
+                        'name' => strtoupper($towerCode),
+                        'description' => '',
                         'status' => 'active',
                     ]
                 );
 
-                // Create 2-4 oil strings per tower
-                $stringCount = rand(2, 4);
-                for ($i = 1; $i <= $stringCount; $i++) {
+                // إنشاء 2 Strings لكل تاور (333/1 , 333/2)
+                for ($s = 1; $s <= 2; $s++) {
                     OilString::firstOrCreate(
                         [
                             'tower_id' => $tower->id,
-                            'code' => $tower->code . '-STR-' . $i,
+                            'code' => $tower->name.'/' . $s ,
                         ],
                         [
-                            'name' => 'String ' . $i,
-                            'description' => 'Production string ' . $i . ' for ' . $tower->name,
+                            'name' => $tower->name.'/' . $s,
+                            'description' => 'Production string ' . $s,
                             'status' => 'active',
                         ]
                     );
@@ -96,7 +73,6 @@ class OilFieldSeeder extends Seeder
             }
         }
 
-        $this->command->info('Oil fields, towers, and oil strings seeded successfully!');
+        $this->command->info('Towers and oil strings seeded successfully!');
     }
 }
-

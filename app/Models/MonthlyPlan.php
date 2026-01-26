@@ -209,4 +209,65 @@ class MonthlyPlan extends Model
     {
         return $this->tasks()->where('state', $state);
     }
+
+    //================================================================================
+    // Department-Related Methods
+    //================================================================================
+
+    /**
+     * Scope: Filter plans that have tasks in a specific department
+     */
+    public function scopeForDepartment($query, $departmentId)
+    {
+        return $query->whereHas('tasks', fn($q) =>
+            $q->where('department_id', $departmentId)
+        );
+    }
+
+    /**
+     * Get department breakdown showing task count per department
+     */
+    public function getDepartmentBreakdown(): array
+    {
+        return $this->tasks()
+            ->selectRaw('department_id, COUNT(*) as count')
+            ->groupBy('department_id')
+            ->with('department:id,name,code')
+            ->get()
+            ->mapWithKeys(fn($item) => [
+                $item->department?->code ?? 'UNASSIGNED' => $item->count
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Get completion percentage for a specific department
+     */
+    public function getDepartmentCompletionPercentage($departmentId): float
+    {
+        $total = $this->tasks()
+            ->where('department_id', $departmentId)
+            ->count();
+
+        if ($total === 0) {
+            return 0.0;
+        }
+
+        $completed = $this->tasks()
+            ->where('department_id', $departmentId)
+            ->where('state', TaskState::COMPLETED)
+            ->count();
+
+        return round(($completed / $total) * 100, 2);
+    }
+
+    /**
+     * Get all departments involved in this plan
+     */
+    public function getDepartments()
+    {
+        return Department::whereHas('tasks', fn($q) =>
+            $q->where('monthly_plan_id', $this->id)
+        )->get();
+    }
 }

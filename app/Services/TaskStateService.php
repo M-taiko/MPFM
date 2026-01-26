@@ -96,8 +96,9 @@ class TaskStateService
             TaskState::SUBMITTED_TO_SURVEILLANCE =>
                 $user->hasRole('job_officer'),
 
-            // Surveillance Supervisor assigns to MPFM department
-            TaskState::ASSIGNED_TO_MPFM =>
+            // Surveillance Supervisor assigns to department (generic)
+            // Also supports legacy ASSIGNED_TO_MPFM for backward compatibility
+            TaskState::ASSIGNED_TO_DEPARTMENT, TaskState::ASSIGNED_TO_MPFM =>
                 $user->hasRole('surveillance_supervisor'),
 
             // Surveillance can send back to draft for corrections
@@ -105,14 +106,17 @@ class TaskStateService
                 $user->hasRole('surveillance_supervisor') &&
                 $task->isInState(TaskState::SUBMITTED_TO_SURVEILLANCE),
 
-            // MPFM Operator starts assigned tasks
+            // Operator starts assigned tasks (check department match)
             TaskState::IN_PROGRESS =>
                 ($user->hasRole('mpfm_operator') || $user->hasRole('operator')) &&
-                $task->isAssignedTo($user->id),
+                $task->isAssignedTo($user->id) &&
+                ($task->department_id === null || $task->department_id === $user->department_id),
 
-            // MPFM Supervisor reviews operator submissions
-            TaskState::MPFM_REVIEWED =>
-                $user->hasRole('mpfm_supervisor'),
+            // Department Manager reviews operator submissions
+            // Also supports legacy MPFM_REVIEWED for backward compatibility
+            TaskState::DEPARTMENT_REVIEWED, TaskState::MPFM_REVIEWED =>
+                ($user->hasRole('department_manager') || $user->hasRole('mpfm_supervisor')) &&
+                ($task->department_id === null || $task->department_id === $user->department_id),
 
             // Surveillance Supervisor pre-final review
             TaskState::SURVEILLANCE_REVIEWED =>
@@ -141,8 +145,8 @@ class TaskStateService
     protected function updateRelatedFields(PlanTask $task, TaskState $newState, User $user): void
     {
         match($newState) {
-            // When assigned to MPFM, record surveillance supervisor
-            TaskState::ASSIGNED_TO_MPFM => function() use ($task, $user) {
+            // When assigned to department (or legacy ASSIGNED_TO_MPFM), record surveillance supervisor
+            TaskState::ASSIGNED_TO_DEPARTMENT, TaskState::ASSIGNED_TO_MPFM => function() use ($task, $user) {
                 $task->surveillance_supervisor_id = $user->id;
                 $task->surveillance_assigned_at = now();
             },
@@ -161,9 +165,10 @@ class TaskStateService
                 $task->final_status = 'approved';
             },
 
-            // For MPFM_REVIEWED going back to IN_PROGRESS (rejection)
+            // For DEPARTMENT_REVIEWED or legacy MPFM_REVIEWED going back to IN_PROGRESS (rejection)
             TaskState::IN_PROGRESS => function() use ($task) {
-                if ($task->getCurrentState() === TaskState::MPFM_REVIEWED) {
+                $oldState = $task->getCurrentState();
+                if ($oldState === TaskState::DEPARTMENT_REVIEWED || $oldState === TaskState::MPFM_REVIEWED) {
                     // Operator needs to redo
                     $task->completion_status = 'in_progress';
                 }

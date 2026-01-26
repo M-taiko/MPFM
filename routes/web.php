@@ -309,6 +309,7 @@ Route::middleware('auth')->group(function () {
         // AJAX endpoints for cascading dropdowns
         Route::get('/api/wells-by-tower/{tower}', [MonthlyPlanController::class, 'getWellsByTower'])->name('api.wells-by-tower');
         Route::get('/api/strings-by-well', [MonthlyPlanController::class, 'getStringsByWell'])->name('api.strings-by-well');
+        Route::get('/api/department-fields/{departmentId}', [MonthlyPlanController::class, 'getDepartmentFields'])->name('api.department-fields');
     });
 
     // Task Archive Routes - View completed tasks

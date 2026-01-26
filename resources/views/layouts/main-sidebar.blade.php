@@ -81,6 +81,21 @@
             </li>
             @endif
 
+            <!-- Department Manager - Operator Assignment & Review (Department Manager can see) -->
+            @if(auth()->user()->hasRole('department_manager') && auth()->user()->department)
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('department-manager*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-users"></i>
+                    <span class="side-menu__label">{{ auth()->user()->department->name }} Dept</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->is('department-manager/dashboard') ? 'active' : '' }}" href="{{ route('department-manager.dashboard') }}">Dashboard</a></li>
+                    <li><a class="slide-item {{ request()->is('department-manager/reports') ? 'active' : '' }}" href="{{ route('department-manager.reports') }}">Reports</a></li>
+                </ul>
+            </li>
+            @endif
+
             <!-- MPFM Supervisor - Review & Assign (Admin or MPFM Supervisor can see) -->
             @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_mpfm_supervisor_reports'))
             <li class="slide">

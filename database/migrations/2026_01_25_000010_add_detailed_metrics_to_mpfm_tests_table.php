@@ -123,8 +123,12 @@ return new class extends Migration
                 if (!Schema::hasColumn('mpfm_tests', $column)) {
                     if ($type === 'integer') {
                         $table->integer($column)->nullable();
+                    } elseif (strpos($type, 'decimal:') === 0) {
+                        // Parse decimal:2 -> decimal(10, 2) or decimal:3 -> decimal(10, 3)
+                        $precision = explode(':', $type)[1] ?? 2;
+                        $table->decimal($column, 10, intval($precision))->nullable();
                     } else {
-                        $table->$type($column)->nullable();
+                        $table->string($column)->nullable(); // Fallback for unknown types
                     }
                 }
             }

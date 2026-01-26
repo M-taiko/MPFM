@@ -170,6 +170,80 @@
         </div>
     </div>
 
+    <!-- Department Breakdown (Multi-Department Support) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Task Distribution by Department</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @php
+                            // Group tasks by department
+                            $deptBreakdown = collect([]);
+                            if(isset($allTasks)) {
+                                $deptBreakdown = $allTasks->groupBy(function($task) {
+                                    return $task->department->name ?? 'Unassigned';
+                                });
+                            }
+                        @endphp
+
+                        @forelse($deptBreakdown as $deptName => $tasks)
+                        <div class="col-xl-3 col-lg-6 col-md-6">
+                            <div class="plan-card" style="margin-bottom: 15px;">
+                                <div class="plan-header">
+                                    <div>
+                                        <div class="plan-title">{{ $deptName }}</div>
+                                        <div class="plan-month">{{ $tasks->count() }} Task{{ $tasks->count() !== 1 ? 's' : '' }}</div>
+                                    </div>
+                                    <div class="progress-label" style="text-align: right; margin: 0;">
+                                        @php
+                                            $completed = $tasks->where('state', 'completed')->count();
+                                            $total = $tasks->count();
+                                            $progress = $total > 0 ? round(($completed / $total) * 100) : 0;
+                                        @endphp
+                                        <span style="font-size: 1.3rem; font-weight: 600; color: #667eea;">
+                                            {{ $progress }}%
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 12px;">
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ $progress }}%"></div>
+                                    </div>
+                                </div>
+
+                                <div class="plan-stats" style="grid-template-columns: repeat(3, 1fr); margin-top: 10px;">
+                                    <div class="stat-item">
+                                        <div class="stat-number" style="color: #28a745; font-size: 1.5rem;">{{ $completed }}</div>
+                                        <div class="stat-label" style="font-size: 0.8rem;">Complete</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number" style="color: #17a2b8; font-size: 1.5rem;">{{ $tasks->where('state', 'in_progress')->count() }}</div>
+                                        <div class="stat-label" style="font-size: 0.8rem;">In Progress</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-number" style="color: #ffc107; font-size: 1.5rem;">{{ $tasks->where('state', '!=', 'completed')->where('state', '!=', 'in_progress')->count() }}</div>
+                                        <div class="stat-label" style="font-size: 0.8rem;">Pending</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fe fe-info"></i> No department breakdown available.
+                            </div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Plans Overview -->
     @if($activePlans->count() > 0)
     <div class="row">

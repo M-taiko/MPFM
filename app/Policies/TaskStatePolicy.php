@@ -24,16 +24,26 @@ class TaskStatePolicy
     }
 
     /**
-     * Surveillance Supervisor can classify and assign to MPFM.
+     * Surveillance Supervisor can classify and assign to Department.
+     *
+     * Supports both new ASSIGNED_TO_DEPARTMENT and legacy ASSIGNED_TO_MPFM states
      *
      * @param User $user
      * @param PlanTask $task
      * @return bool
      */
-    public function assignToMPFM(User $user, PlanTask $task): bool
+    public function assignToDepartment(User $user, PlanTask $task): bool
     {
         return $user->hasRole('surveillance_supervisor')
             && $task->isInState(TaskState::SUBMITTED_TO_SURVEILLANCE);
+    }
+
+    /**
+     * Legacy method name for backward compatibility
+     */
+    public function assignToMPFM(User $user, PlanTask $task): bool
+    {
+        return $this->assignToDepartment($user, $task);
     }
 
     /**
@@ -50,7 +60,10 @@ class TaskStatePolicy
     }
 
     /**
-     * MPFM Operator can start assigned tasks.
+     * Operator can start assigned tasks.
+     *
+     * Supports both new ASSIGNED_TO_DEPARTMENT and legacy ASSIGNED_TO_MPFM states
+     * Also checks department matching if applicable
      *
      * @param User $user
      * @param PlanTask $task
@@ -58,27 +71,77 @@ class TaskStatePolicy
      */
     public function startTask(User $user, PlanTask $task): bool
     {
-        return ($user->hasRole('mpfm_operator') || $user->hasRole('operator'))
-            && $task->isInState(TaskState::ASSIGNED_TO_MPFM)
-            && $task->isAssignedTo($user->id);
+        if (!($user->hasRole('mpfm_operator') || $user->hasRole('operator'))) {
+            return false;
+        }
+
+        if (!$task->isAssignedTo($user->id)) {
+            return false;
+        }
+
+        // Check if task is in a state that allows starting (both new and legacy names)
+        $canStart = $task->isInState(TaskState::ASSIGNED_TO_DEPARTMENT)
+            || $task->isInState(TaskState::ASSIGNED_TO_MPFM);
+
+        if (!$canStart) {
+            return false;
+        }
+
+        // Verify department match if department is assigned
+        if ($task->department_id && $user->department_id) {
+            return $task->department_id === $user->department_id;
+        }
+
+        return true;
     }
 
     /**
-     * MPFM Supervisor can review completed work.
+     * Department Manager or MPFM Supervisor can review completed work.
+     *
+     * Supports both department_manager (new) and mpfm_supervisor (legacy) roles
      *
      * @param User $user
      * @param PlanTask $task
      * @return bool
      */
-    public function reviewAsMPFM(User $user, PlanTask $task): bool
+    public function reviewAsDepartment(User $user, PlanTask $task): bool
     {
-        return $user->hasRole('mpfm_supervisor')
-            && $task->isInState(TaskState::IN_PROGRESS)
-            && $task->completion_status === 'completed'; // Technical completion check
+        // Check if user is department manager or legacy MPFM supervisor
+        $isDeptMgr = $user->hasRole('department_manager')
+            || $user->hasRole('mpfm_supervisor');
+
+        if (!$isDeptMgr) {
+            return false;
+        }
+
+        if (!$task->isInState(TaskState::IN_PROGRESS)) {
+            return false;
+        }
+
+        if ($task->completion_status !== 'completed') {
+            return false;
+        }
+
+        // Department Manager must be in same department
+        if ($user->hasRole('department_manager')) {
+            if ($task->department_id && $task->department_id !== $user->department_id) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * MPFM Supervisor can reject task back to operator.
+     * Legacy method name for backward compatibility
+     */
+    public function reviewAsMPFM(User $user, PlanTask $task): bool
+    {
+        return $this->reviewAsDepartment($user, $task);
+    }
+
+    /**
+     * Department Manager or MPFM Supervisor can reject task back to operator.
      *
      * @param User $user
      * @param PlanTask $task
@@ -86,12 +149,34 @@ class TaskStatePolicy
      */
     public function rejectToOperator(User $user, PlanTask $task): bool
     {
-        return $user->hasRole('mpfm_supervisor')
-            && $task->isInState(TaskState::MPFM_REVIEWED);
+        $isDeptMgr = $user->hasRole('department_manager')
+            || $user->hasRole('mpfm_supervisor');
+
+        if (!$isDeptMgr) {
+            return false;
+        }
+
+        $canReject = $task->isInState(TaskState::DEPARTMENT_REVIEWED)
+            || $task->isInState(TaskState::MPFM_REVIEWED);
+
+        if (!$canReject) {
+            return false;
+        }
+
+        // Department Manager must be in same department
+        if ($user->hasRole('department_manager')) {
+            if ($task->department_id && $task->department_id !== $user->department_id) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * Surveillance Supervisor can review after MPFM.
+     * Surveillance Supervisor can review after Department Review.
+     *
+     * Supports both new DEPARTMENT_REVIEWED and legacy MPFM_REVIEWED states
      *
      * @param User $user
      * @param PlanTask $task
@@ -99,21 +184,33 @@ class TaskStatePolicy
      */
     public function reviewAsSurveillance(User $user, PlanTask $task): bool
     {
-        return $user->hasRole('surveillance_supervisor')
-            && $task->isInState(TaskState::MPFM_REVIEWED);
+        if (!$user->hasRole('surveillance_supervisor')) {
+            return false;
+        }
+
+        return $task->isInState(TaskState::DEPARTMENT_REVIEWED)
+            || $task->isInState(TaskState::MPFM_REVIEWED);
     }
 
     /**
-     * Surveillance Supervisor can reject back to MPFM.
+     * Surveillance Supervisor can reject back to Department Review.
      *
      * @param User $user
      * @param PlanTask $task
      * @return bool
      */
-    public function rejectToMPFM(User $user, PlanTask $task): bool
+    public function rejectToDepartment(User $user, PlanTask $task): bool
     {
         return $user->hasRole('surveillance_supervisor')
             && $task->isInState(TaskState::SURVEILLANCE_REVIEWED);
+    }
+
+    /**
+     * Legacy method name for backward compatibility
+     */
+    public function rejectToMPFM(User $user, PlanTask $task): bool
+    {
+        return $this->rejectToDepartment($user, $task);
     }
 
     /**
@@ -151,9 +248,15 @@ class TaskStatePolicy
      */
     public function viewStateHistory(User $user, PlanTask $task): bool
     {
-        // Admins, supervisors, and job officers can view history
+        // Admins, supervisors, job officers, and department managers can view history
         // Operators can view history for their own tasks
-        if ($user->hasAnyRole(['admin', 'job_officer', 'surveillance_supervisor', 'mpfm_supervisor'])) {
+        if ($user->hasAnyRole(['admin', 'job_officer', 'surveillance_supervisor', 'mpfm_supervisor', 'department_manager'])) {
+            // Department managers can only view tasks in their department
+            if ($user->hasRole('department_manager')) {
+                if ($task->department_id && $task->department_id !== $user->department_id) {
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -202,6 +305,14 @@ class TaskStatePolicy
     {
         // Supervisors and job officers can view all tasks
         if ($user->hasAnyRole(['admin', 'job_officer', 'surveillance_supervisor', 'mpfm_supervisor'])) {
+            return true;
+        }
+
+        // Department managers can view tasks in their department
+        if ($user->hasRole('department_manager')) {
+            if ($task->department_id && $task->department_id !== $user->department_id) {
+                return false;
+            }
             return true;
         }
 

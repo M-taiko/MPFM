@@ -8,6 +8,7 @@ use App\Models\WellStringRequirement;
 use App\Models\PlanTask;
 use App\Policies\WellStringRequirementPolicy;
 use App\Policies\TaskStatePolicy;
+use App\Policies\AdminPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -28,9 +29,21 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        // Admin access gate - grants full system access
+        Gate::define('admin-access', function ($user) {
+            return $user && $user->isAdmin();
+        });
+
         // Gate for reviewing tests
         Gate::define('review-test', function ($user) {
             return $user && $user->hasPermissionTo('review-test');
+        });
+
+        // Before gate for admin bypass on all policies
+        Gate::before(function ($user, $ability) {
+            if ($user->isAdmin()) {
+                return true;
+            }
         });
     }
 }

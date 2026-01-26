@@ -6,12 +6,16 @@ enum TaskState: string
 {
     case DRAFT = 'draft';
     case SUBMITTED_TO_SURVEILLANCE = 'submitted_to_surveillance';
-    case ASSIGNED_TO_MPFM = 'assigned_to_mpfm';
+    case ASSIGNED_TO_DEPARTMENT = 'assigned_to_department';
     case IN_PROGRESS = 'in_progress';
-    case MPFM_REVIEWED = 'mpfm_reviewed';
+    case DEPARTMENT_REVIEWED = 'department_reviewed';
     case SURVEILLANCE_REVIEWED = 'surveillance_reviewed';
     case JOB_OFFICER_APPROVED = 'job_officer_approved';
     case COMPLETED = 'completed';
+
+    // Legacy aliases for backward compatibility
+    case ASSIGNED_TO_MPFM = 'assigned_to_mpfm';
+    case MPFM_REVIEWED = 'mpfm_reviewed';
 
     /**
      * Get human-readable label for the state
@@ -21,9 +25,11 @@ enum TaskState: string
         return match($this) {
             self::DRAFT => 'Draft',
             self::SUBMITTED_TO_SURVEILLANCE => 'Submitted to Surveillance',
-            self::ASSIGNED_TO_MPFM => 'Assigned to MPFM',
+            self::ASSIGNED_TO_DEPARTMENT => 'Assigned to Department',
+            self::ASSIGNED_TO_MPFM => 'Assigned to Department', // Legacy alias
             self::IN_PROGRESS => 'In Progress',
-            self::MPFM_REVIEWED => 'MPFM Reviewed',
+            self::DEPARTMENT_REVIEWED => 'Department Reviewed',
+            self::MPFM_REVIEWED => 'Department Reviewed', // Legacy alias
             self::SURVEILLANCE_REVIEWED => 'Surveillance Reviewed',
             self::JOB_OFFICER_APPROVED => 'Job Officer Approved',
             self::COMPLETED => 'Completed',
@@ -38,9 +44,11 @@ enum TaskState: string
         return match($this) {
             self::DRAFT => 'gray',
             self::SUBMITTED_TO_SURVEILLANCE => 'blue',
-            self::ASSIGNED_TO_MPFM => 'purple',
+            self::ASSIGNED_TO_DEPARTMENT => 'purple',
+            self::ASSIGNED_TO_MPFM => 'purple', // Legacy alias
             self::IN_PROGRESS => 'yellow',
-            self::MPFM_REVIEWED => 'indigo',
+            self::DEPARTMENT_REVIEWED => 'indigo',
+            self::MPFM_REVIEWED => 'indigo', // Legacy alias
             self::SURVEILLANCE_REVIEWED => 'teal',
             self::JOB_OFFICER_APPROVED => 'green',
             self::COMPLETED => 'dark-green',
@@ -59,22 +67,31 @@ enum TaskState: string
                 self::SUBMITTED_TO_SURVEILLANCE
             ],
             self::SUBMITTED_TO_SURVEILLANCE => [
-                self::ASSIGNED_TO_MPFM,
+                self::ASSIGNED_TO_DEPARTMENT,
                 self::DRAFT  // Can be sent back
             ],
+            self::ASSIGNED_TO_DEPARTMENT => [
+                self::IN_PROGRESS
+            ],
+            // Legacy alias for backward compatibility
             self::ASSIGNED_TO_MPFM => [
                 self::IN_PROGRESS
             ],
             self::IN_PROGRESS => [
-                self::MPFM_REVIEWED
+                self::DEPARTMENT_REVIEWED
             ],
+            self::DEPARTMENT_REVIEWED => [
+                self::SURVEILLANCE_REVIEWED,
+                self::IN_PROGRESS  // Can be rejected back to operator
+            ],
+            // Legacy alias for backward compatibility
             self::MPFM_REVIEWED => [
                 self::SURVEILLANCE_REVIEWED,
                 self::IN_PROGRESS  // Can be rejected back to operator
             ],
             self::SURVEILLANCE_REVIEWED => [
                 self::JOB_OFFICER_APPROVED,
-                self::MPFM_REVIEWED  // Can be sent back
+                self::DEPARTMENT_REVIEWED  // Can be sent back
             ],
             self::JOB_OFFICER_APPROVED => [
                 self::COMPLETED,
@@ -126,7 +143,7 @@ enum TaskState: string
      */
     public function allowsOperatorStart(): bool
     {
-        return $this === self::ASSIGNED_TO_MPFM;
+        return $this === self::ASSIGNED_TO_DEPARTMENT || $this === self::ASSIGNED_TO_MPFM;
     }
 
     /**
@@ -137,9 +154,11 @@ enum TaskState: string
         return match($this) {
             self::DRAFT => 'document',
             self::SUBMITTED_TO_SURVEILLANCE => 'paper-airplane',
-            self::ASSIGNED_TO_MPFM => 'user-group',
+            self::ASSIGNED_TO_DEPARTMENT => 'user-group',
+            self::ASSIGNED_TO_MPFM => 'user-group', // Legacy alias
             self::IN_PROGRESS => 'clock',
-            self::MPFM_REVIEWED => 'check-circle',
+            self::DEPARTMENT_REVIEWED => 'check-circle',
+            self::MPFM_REVIEWED => 'check-circle', // Legacy alias
             self::SURVEILLANCE_REVIEWED => 'shield-check',
             self::JOB_OFFICER_APPROVED => 'badge-check',
             self::COMPLETED => 'check-badge',

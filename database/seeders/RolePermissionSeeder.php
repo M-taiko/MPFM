@@ -53,6 +53,12 @@ class RolePermissionSeeder extends Seeder
 
             // Well String Requirements Permissions
             'view_well_string_requirements',
+
+            // Multi-Department Workflow Permissions
+            'view_department_tasks',
+            'assign_operators',
+            'review_department_work',
+            'view_all_departments',
         ];
 
         foreach ($permissions as $permission) {
@@ -68,8 +74,16 @@ class RolePermissionSeeder extends Seeder
         $mpfmSupervisorRole = Role::firstOrCreate(['name' => 'mpfm_supervisor']);
         $mpfmOperatorRole = Role::firstOrCreate(['name' => 'mpfm_operator']);
         $operatorRole = Role::firstOrCreate(['name' => 'operator']); // Backward compatibility fallback
+        $departmentManagerRole = Role::firstOrCreate(['name' => 'department_manager']); // NEW: Multi-department manager
 
-        // Admin gets all permissions
+        // Admin gets ALL permissions - full system access
+        // Admins have unrestricted access to:
+        // - All user management operations
+        // - All role and permission management
+        // - All MPFM tests and operational plans
+        // - All department and workflow management
+        // - All reports and analytics
+        // - All system configuration
         $adminRole->givePermissionTo(Permission::all());
 
         // Job Officer permissions
@@ -122,6 +136,21 @@ class RolePermissionSeeder extends Seeder
         $operatorRole->syncPermissions([
             'view_well_tests',
             'view_mpfm_operator_reports',
+        ]);
+
+        // Department Manager permissions (NEW: Multi-department support)
+        $departmentManagerRole->syncPermissions([
+            'view_department_tasks',
+            'assign_operators',
+            'review_department_work',
+            'view_well_tests',
+        ]);
+
+        // Update Surveillance Supervisor - ADD read-only permission, REMOVE assignment
+        $surveillanceSupervisorRole->syncPermissions([
+            'view_well_tests',
+            'view_well_string_requirements',
+            'view_all_departments', // Can see all departments (read-only)
         ]);
     }
 }

@@ -11,7 +11,7 @@ class PlanTask extends Model
     use HasFactory;
 
     protected $fillable = [
-        'monthly_plan_id', 'sno', 'well_number', 'string_number', 'well_full_name',
+        'monthly_plan_id', 'department_id', 'sno', 'well_number', 'string_number', 'well_full_name',
         'tower', 'tower_id', 'oil_string_id', 'flow_route', 'reservoir_layer',
         'test_location', 'electrification_status', 'mpfm_type', 'dhsv_type',
         'sub_category', 'category', 'required_whfp', 'tested_whfp', 'production_rate',
@@ -40,11 +40,19 @@ class PlanTask extends Model
 
     public function monthlyPlan() { return $this->belongsTo(MonthlyPlan::class, 'monthly_plan_id'); }
 
+    // Department relationship
+    public function department() { return $this->belongsTo(Department::class, 'department_id'); }
+
     // Many-to-many: Task can have multiple operators
     public function operators() {
         return $this->belongsToMany(User::class, 'plan_task_operators')
             ->withPivot('assigned_at', 'assigned_by', 'is_primary')
             ->withTimestamps();
+    }
+
+    // Alias for operators() - for backward compatibility and clarity
+    public function assignedOperators() {
+        return $this->operators();
     }
 
     // Get only the primary operator from the pivot table
@@ -321,5 +329,33 @@ class PlanTask extends Model
             'low' => 'secondary',
             default => 'info',
         };
+    }
+
+    //================================================================================
+    // Department Scopes and Helpers
+    //================================================================================
+
+    /**
+     * Scope: Filter tasks by department
+     */
+    public function scopeForDepartment($query, $departmentId)
+    {
+        return $query->where('department_id', $departmentId);
+    }
+
+    /**
+     * Scope: Filter tasks not assigned to any department
+     */
+    public function scopeUnassignedToDepartment($query)
+    {
+        return $query->whereNull('department_id');
+    }
+
+    /**
+     * Check if task is assigned to a specific department
+     */
+    public function isAssignedToDepartment($departmentId): bool
+    {
+        return $this->department_id === $departmentId;
     }
 }
