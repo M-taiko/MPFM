@@ -658,7 +658,7 @@
                             in <strong>{{ $task->department->name }}</strong>
                             @endif
                             - <span class="badge badge-primary" style="padding: 2px 8px; font-size: 0.75rem;">
-                                {{ str_replace('_', ' ', ucfirst($task->state)) }}
+                                {{ str_replace('_', ' ', ucfirst($task->state->value ?? $task->state)) }}
                             </span>
                         </p>
                     </div>
