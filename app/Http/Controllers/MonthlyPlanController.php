@@ -423,8 +423,8 @@ class MonthlyPlanController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('monthly-plans.show', $monthlyPlan)
-                ->with('success', 'Task added to plan successfully.');
+                ->route('monthly-plans.tasks.show', [$monthlyPlan, $task])
+                ->with('success', 'Task created successfully. Review the complete task details below.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -432,6 +432,31 @@ class MonthlyPlanController extends Controller
                 ->with('error', 'Failed to add task: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    /**
+     * Show full details of a specific task
+     */
+    public function taskDetails(MonthlyPlan $monthlyPlan, PlanTask $task)
+    {
+        if ($task->monthly_plan_id !== $monthlyPlan->id) {
+            abort(404, 'Task not found in this plan.');
+        }
+
+        // Load all relationships
+        $task->load([
+            'department',
+            'monthlyPlan',
+            'operators',
+            'primaryOperator',
+            'towerModel',
+            'oilString',
+            'stateHistories',
+            'slaHistory',
+            'mpfmTest'
+        ]);
+
+        return view('monthly_plans.task_details', compact('task', 'monthlyPlan'));
     }
 
     /**

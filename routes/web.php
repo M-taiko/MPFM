@@ -299,6 +299,7 @@ Route::middleware('auth')->group(function () {
         // Add tasks to plan
         // More specific routes first
         Route::get('/{monthlyPlan}/tasks/create', [MonthlyPlanController::class, 'createTask'])->name('tasks.create');
+        Route::get('/{monthlyPlan}/tasks/{task}', [MonthlyPlanController::class, 'taskDetails'])->name('tasks.show');
         Route::get('/{monthlyPlan}/tasks/{task}/details', [MonthlyPlanController::class, 'getTaskDetails'])->name('tasks.details');
         Route::post('/{monthlyPlan}/tasks', [MonthlyPlanController::class, 'storeTask'])->name('tasks.store');
         Route::delete('/{monthlyPlan}/tasks/{task}', [MonthlyPlanController::class, 'deleteTask'])->name('tasks.destroy');
