@@ -24,24 +24,24 @@ class DepartmentController extends Controller
         $this->checkDepartmentAccess($department);
 
         // Get department statistics
-        $totalTasks = $department->planTasks()->count();
-        $completedTasks = $department->planTasks()->where('completion_status', 'completed')->count();
-        $inProgressTasks = $department->planTasks()->where('completion_status', 'in_progress')->count();
-        $pendingTasks = $department->planTasks()->where('completion_status', 'pending')->count();
-        $failedTasks = $department->planTasks()->where('completion_status', 'failed')->count();
+        $totalTasks = $department->tasks()->count();
+        $completedTasks = $department->tasks()->where('completion_status', 'completed')->count();
+        $inProgressTasks = $department->tasks()->where('completion_status', 'in_progress')->count();
+        $pendingTasks = $department->tasks()->where('completion_status', 'pending')->count();
+        $failedTasks = $department->tasks()->where('completion_status', 'failed')->count();
 
         // Calculate completion percentage
         $completionPercentage = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100, 2) : 0;
 
         // Get recent tasks
-        $recentTasks = $department->planTasks()
+        $recentTasks = $department->tasks()
             ->with(['monthlyPlan', 'operators', 'slaHistory'])
             ->latest('created_at')
             ->limit(10)
             ->get();
 
         // Get task by state breakdown
-        $tasksByState = $department->planTasks()
+        $tasksByState = $department->tasks()
             ->select('state')
             ->selectRaw('count(*) as count')
             ->groupBy('state')
@@ -79,7 +79,7 @@ class DepartmentController extends Controller
         // Check access
         $this->checkDepartmentAccess($department);
 
-        $query = $department->planTasks()
+        $query = $department->tasks()
             ->with(['monthlyPlan', 'operators', 'primaryOperator', 'slaHistory', 'department']);
 
         // Filter by status
@@ -180,18 +180,18 @@ class DepartmentController extends Controller
         $period = $request->get('period', '30'); // days
 
         // Task statistics
-        $totalTasks = $department->planTasks()->count();
-        $completedTasks = $department->planTasks()->where('completion_status', 'completed')->count();
-        $failedTasks = $department->planTasks()->where('completion_status', 'failed')->count();
+        $totalTasks = $department->tasks()->count();
+        $completedTasks = $department->tasks()->where('completion_status', 'completed')->count();
+        $failedTasks = $department->tasks()->where('completion_status', 'failed')->count();
         $completionRate = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100, 2) : 0;
 
         // SLA performance
-        $overdueTasks = $department->planTasks()
+        $overdueTasks = $department->tasks()
             ->where('overdue_flag', true)
             ->count();
 
         // Tasks by priority
-        $tasksByPriority = $department->planTasks()
+        $tasksByPriority = $department->tasks()
             ->select('priority')
             ->selectRaw('count(*) as count')
             ->groupBy('priority')
@@ -217,7 +217,7 @@ class DepartmentController extends Controller
             });
 
         // Recent activities
-        $recentActivities = $department->planTasks()
+        $recentActivities = $department->tasks()
             ->with(['stateHistories' => function ($query) {
                 $query->latest('created_at')->limit(5);
             }])
