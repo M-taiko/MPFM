@@ -13,7 +13,12 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('role:admin');
+        $this->middleware(function ($request, $next) {
+            if (!auth()->user()->hasRole('admin')) {
+                abort(403, 'Unauthorized access to user management.');
+            }
+            return $next($request);
+        });
     }
 
     /**
