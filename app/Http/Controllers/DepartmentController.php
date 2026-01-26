@@ -175,14 +175,14 @@ class DepartmentController extends Controller
         $perPage = 15;
         $total = $operators->count();
 
-        $operators = new \Illuminate\Pagination\Paginator(
+        $operators = new \Illuminate\Pagination\LengthAwarePaginator(
             $operators->forPage($page, $perPage)->values(),
+            $total,
             $perPage,
             $page,
             [
                 'path' => request()->url(),
                 'query' => request()->query(),
-                'total' => $total,
             ]
         );
 
