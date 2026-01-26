@@ -131,9 +131,11 @@
                             </td>
                             <td>
                                 @if($task->primaryOperator)
-                                    <small>{{ $task->primaryOperator->name }}</small>
+                                {{-- @dd($task->operators->first()->name) --}}
+                                {{-- @dd($task) --}}
+                                    <small>{{ ($task->operators->first()->name) }}</small>
                                 @elseif($task->operators->count() > 0)
-                                    <small>{{ $task->operators->first()->name }}</small>
+                                    <small>{{ ($task->operators->first()->name) }}</small>
                                 @else
                                     <small class="text-muted">Unassigned</small>
                                 @endif
@@ -146,6 +148,78 @@
                                    class="btn btn-sm btn-outline-primary" title="View Details">
                                     <i class="fe fe-eye"></i>
                                 </a>
+
+                            {{-- asssgin MPFM Operator --}}
+                            {{-- @dd($task->status) --}}
+                         @if($task->status !== 'completed')
+
+                                @if ($task->department_id == 1)
+                                    @can('edit', $task->monthlyPlan)
+                                        <form action="{{ route('operator.tasks.start', $task) }}"
+                                            method="POST"
+                                            style="display: inline;">
+                                            @csrf
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-primary"
+                                                    title="Start Task">
+                                                <i class="fe fe-play"></i>
+                                            </button>
+                                        </form>
+                                    @endcan
+
+
+
+                            @can('assign', $task)
+                                <form action="{{ route('mpfm-supervisor.assign-task', $task) }}"
+                                    method="POST"
+                                    class="assign-form">
+                                    @csrf
+
+                                    {{-- Operators --}}
+                                    <div class="form-group mb-2">
+                                        <label class="small">Operators:</label>
+                                        <select name="operator_ids[]"
+                                                class="form-control form-control-sm select2-operators"
+                                                multiple
+                                                required
+                                                style="width:100%">
+                                            @foreach($availableOperators as $user)
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }} ({{ $user->email }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    {{-- Primary Operator --}}
+                                    <div class="form-group">
+                                        <label class="small">Primary:</label>
+                                        <select name="primary_operator_id"
+                                                class="form-control form-control-sm primary-operator-select"
+                                                required>
+                                            <option value="">-- Select --</option>
+                                            @foreach($availableOperators as $user)
+                                                <option value="{{ $user->id }}">
+                                                    {{ $user->name }} ({{ $user->email }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-sm btn-primary btn-block">
+                                        <i class="fe fe-arrow-right"></i> Assign
+                                    </button>
+                                </form>
+                            @endcan
+                        @endif
+
+
+                            {{-- asssgin MPFM Operator --}}
+
+
+                            @endif
+
                             </td>
                         </tr>
                         @empty

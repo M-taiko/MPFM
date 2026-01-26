@@ -129,11 +129,19 @@ class DepartmentController extends Controller
         $statuses = ['pending', 'in_progress', 'completed', 'failed'];
         $priorities = ['top', 'high', 'normal', 'low'];
 
+            // Get team members (operators in this department)
+        $availableOperators = User::where('department_id', $department->id)
+            ->whereHas('roles', function ($query) {
+                $query->whereIn('name', ['operator', 'mpfm_operator']);
+            })
+            ->get();
+
         return view('departments.tasks', compact(
             'department',
             'tasks',
             'statuses',
-            'priorities'
+            'priorities',
+            'availableOperators'
         ));
     }
 
