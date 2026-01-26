@@ -173,11 +173,17 @@ class DepartmentController extends Controller
         // Paginate the collection manually
         $page = request()->get('page', 1);
         $perPage = 15;
+        $total = $operators->count();
+
         $operators = new \Illuminate\Pagination\Paginator(
-            $operators->forPage($page, $perPage),
+            $operators->forPage($page, $perPage)->values(),
             $perPage,
             $page,
-            ['path' => request()->url(), 'query' => request()->query()]
+            [
+                'path' => request()->url(),
+                'query' => request()->query(),
+                'total' => $total,
+            ]
         );
 
         // Get available operators not yet in this department
