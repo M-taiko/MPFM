@@ -19,6 +19,7 @@ use App\Http\Controllers\MPFMTestController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskStateController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\DepartmentUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -462,6 +463,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/{department}/operators', [DepartmentController::class, 'operators'])->name('operators');
         Route::get('/{department}/reports', [DepartmentController::class, 'reports'])->name('reports');
         Route::post('/{department}/assign-operator', [DepartmentController::class, 'assignOperator'])->name('assign-operator');
+
+        // Department User Management (Supervisor/Admin only)
+        Route::resource('{department}/users', DepartmentUserController::class)->parameters([
+            'department' => 'department',
+            'users' => 'user'
+        ])->names([
+            'index' => 'users.index',
+            'create' => 'users.create',
+            'store' => 'users.store',
+            'show' => 'users.show',
+            'edit' => 'users.edit',
+            'update' => 'users.update',
+            'destroy' => 'users.destroy',
+        ]);
     });
 });
 

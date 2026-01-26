@@ -110,6 +110,7 @@
                         @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('department_manager'))
                         <li><a class="slide-item" href="{{ route('departments.dashboard', $dept->id) }}">Dashboard</a></li>
                         <li><a class="slide-item" href="{{ route('departments.tasks', $dept->id) }}">Tasks</a></li>
+                        <li><a class="slide-item" href="{{ route('departments.users.index', $dept->id) }}">Users</a></li>
                         <li><a class="slide-item" href="{{ route('departments.operators', $dept->id) }}">Team Members</a></li>
                         <li><a class="slide-item" href="{{ route('departments.reports', $dept->id) }}">Reports</a></li>
                         @elseif(auth()->user()->hasRole('operator'))
