@@ -75,6 +75,7 @@ class RolePermissionSeeder extends Seeder
         $mpfmOperatorRole = Role::firstOrCreate(['name' => 'mpfm_operator']);
         $operatorRole = Role::firstOrCreate(['name' => 'operator']); // Backward compatibility fallback
         $departmentManagerRole = Role::firstOrCreate(['name' => 'department_manager']); // NEW: Multi-department manager
+        $departmentSupervisorRole = Role::firstOrCreate(['name' => 'department_supervisor']); // NEW: Department supervisor for user management
 
         // Admin gets ALL permissions - full system access
         // Admins have unrestricted access to:
@@ -144,6 +145,14 @@ class RolePermissionSeeder extends Seeder
             'assign_operators',
             'review_department_work',
             'view_well_tests',
+        ]);
+
+        // Department Supervisor permissions (NEW: Manage users within department)
+        $departmentSupervisorRole->syncPermissions([
+            'manage_users',           // Can create, edit, delete users
+            'view_users',             // Can view users
+            'view_department_tasks',  // Can see department tasks
+            'view_well_tests',        // Can view MPFM tests
         ]);
 
         // Update Surveillance Supervisor - ADD read-only permission, REMOVE assignment
