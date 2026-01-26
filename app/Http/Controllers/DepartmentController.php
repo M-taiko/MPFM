@@ -139,20 +139,35 @@ class DepartmentController extends Controller
         $this->checkDepartmentAccess($department);
 
         // Get all operators in this department
-        $operators = User::where('department_id', $department->id)
+        $operatorUsers = User::where('department_id', $department->id)
             ->whereHas('roles', function ($query) {
-                $query->where('name', 'operator');
+                $query->whereIn('name', ['operator', 'mpfm_operator']);
             })
-            ->with(['planTaskOperators' => function ($query) {
-                $query->where('completion_status', '!=', 'completed');
-            }])
-            ->withCount([
-                'planTaskOperators as total_assigned',
-                'planTaskOperators as completed_tasks' => function ($query) {
-                    $query->where('completion_status', 'completed');
-                }
-            ])
-            ->paginate(15);
+            ->get();
+
+        // Calculate task counts for each operator
+        $operators = $operatorUsers->map(function ($user) use ($department) {
+            $assignedTasks = PlanTask::whereHas('operators', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->where('department_id', $department->id)
+            ->get();
+
+            $user->total_assigned = $assignedTasks->count();
+            $user->completed_tasks = $assignedTasks->where('completion_status', 'completed')->count();
+
+            return $user;
+        });
+
+        // Paginate the collection manually
+        $page = request()->get('page', 1);
+        $perPage = 15;
+        $operators = new \Illuminate\Pagination\Paginator(
+            $operators->forPage($page, $perPage),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         // Get available operators not yet in this department
         $availableOperators = User::where('department_id', '!=', $department->id)
@@ -199,22 +214,26 @@ class DepartmentController extends Controller
             ->toArray();
 
         // Operator performance
-        $operatorPerformance = User::where('department_id', $department->id)
+        $operatorUsers = User::where('department_id', $department->id)
             ->whereHas('roles', function ($query) {
-                $query->where('name', 'operator');
+                $query->whereIn('name', ['operator', 'mpfm_operator']);
             })
-            ->with(['planTaskOperators' => function ($query) {
-                $query->where('completion_status', 'completed');
-            }])
-            ->get()
-            ->map(function ($operator) {
-                return [
-                    'name' => $operator->name,
-                    'email' => $operator->email,
-                    'completed_tasks' => $operator->planTaskOperators->count(),
-                    'total_assigned' => $operator->planTaskOperators()->count(),
-                ];
-            });
+            ->get();
+
+        $operatorPerformance = $operatorUsers->map(function ($operator) use ($department) {
+            $assignedTasks = PlanTask::whereHas('operators', function ($query) use ($operator) {
+                $query->where('user_id', $operator->id);
+            })
+            ->where('department_id', $department->id)
+            ->get();
+
+            return [
+                'name' => $operator->name,
+                'email' => $operator->email,
+                'completed_tasks' => $assignedTasks->where('completion_status', 'completed')->count(),
+                'total_assigned' => $assignedTasks->count(),
+            ];
+        });
 
         // Recent activities
         $recentActivities = $department->tasks()
