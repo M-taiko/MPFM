@@ -159,7 +159,7 @@ class DashboardController extends Controller
     private function getRecentActivity()
     {
         return [
-            'recent_tasks' => PlanTask::with('plan', 'department')
+            'recent_tasks' => PlanTask::with('monthlyPlan', 'department')
                 ->latest()
                 ->limit(5)
                 ->get(),
