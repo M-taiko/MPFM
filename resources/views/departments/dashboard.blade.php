@@ -272,7 +272,7 @@
                                 <h6 class="mb-1">{{ $member->name }}</h6>
                                 <small class="text-muted d-block">{{ $member->email }}</small>
                                 <small class="badge badge-primary mt-1">
-                                    {{ $member->plan_task_operators_count ?? 0 }} Tasks Assigned
+                                    {{ $member->task_count ?? 0 }} Tasks Assigned
                                 </small>
                             </div>
                         </div>

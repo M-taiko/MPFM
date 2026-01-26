@@ -50,12 +50,23 @@ class DepartmentController extends Controller
             ->toArray();
 
         // Get team members (operators in this department)
-        $teamMembers = User::where('department_id', $department->id)
+        $teamMemberUsers = User::where('department_id', $department->id)
             ->whereHas('roles', function ($query) {
-                $query->where('name', 'operator');
+                $query->whereIn('name', ['operator', 'mpfm_operator']);
             })
-            ->withCount('planTaskOperators')
             ->get();
+
+        // Calculate task counts for each team member
+        $teamMembers = $teamMemberUsers->map(function ($user) use ($department) {
+            $taskCount = PlanTask::whereHas('operators', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->where('department_id', $department->id)
+            ->count();
+
+            $user->task_count = $taskCount;
+            return $user;
+        });
 
         return view('departments.dashboard', compact(
             'department',
