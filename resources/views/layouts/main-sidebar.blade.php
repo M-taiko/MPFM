@@ -57,9 +57,10 @@
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('tasks') && !request()->is('tasks/create') ? 'active' : '' }}" href="{{ route('tasks.index') }}">All Tasks</a></li>
+                    <li><a class="slide-item {{ request()->is('tasks') && !request()->is('tasks/create') && !request()->is('tasks/create-advanced') ? 'active' : '' }}" href="{{ route('tasks.index') }}">All Tasks</a></li>
                     @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('job_officer'))
-                    <li><a class="slide-item {{ request()->is('tasks/create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Create Task</a></li>
+                    <li><a class="slide-item {{ request()->is('tasks/create-advanced') ? 'active' : '' }}" href="{{ route('tasks.create-advanced') }}">Create Task (Advanced)</a></li>
+                    <li><a class="slide-item {{ request()->is('tasks/create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Create Task (Basic)</a></li>
                     @endif
                 </ul>
             </li>
