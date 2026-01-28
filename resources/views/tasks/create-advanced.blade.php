@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('content')
 <style>
@@ -202,7 +202,7 @@
                                 @forelse($monthlyPlans ?? [] as $plan)
                                     <option value="{{ $plan->id }}"
                                             {{ old('monthly_plan_id') == $plan->id ? 'selected' : '' }}>
-                                        {{ $plan->title }} ({{ $plan->planned_start_date->format('M Y') }})
+                                        {{ $plan->plan_name ?? 'Plan' }} - {{ $plan->plan_month }} ({{ $plan->status }})
                                     </option>
                                 @empty
                                     <option value="" disabled>No plans available</option>

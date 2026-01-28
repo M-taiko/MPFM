@@ -23,8 +23,8 @@ class TaskCreationController extends Controller
         $towers = Tower::with('oilStrings')->get();
         $departments = Department::active()->get();
         $monthlyPlans = \App\Models\MonthlyPlan::where('status', 'active')
-            ->orWhereNull('status')
-            ->orderBy('planned_start_date', 'desc')
+            ->orWhere('status', 'draft')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('tasks.create-advanced', compact('towers', 'departments', 'monthlyPlans'));

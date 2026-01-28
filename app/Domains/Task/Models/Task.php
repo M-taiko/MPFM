@@ -85,7 +85,7 @@ class Task extends Model
 
     public function assignedTo(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assigned_to_user_id')->nullable();
+        return $this->belongsTo(User::class, 'assigned_to_user_id');
     }
 
     public function operators(): BelongsToMany
@@ -116,7 +116,7 @@ class Task extends Model
 
     public function stateHistories(): HasMany
     {
-        return $this->hasMany(TaskStateHistory::class)->orderBy('changed_at', 'desc');
+        return $this->hasMany(TaskStateHistory::class, 'plan_task_id')->orderBy('created_at', 'desc');
     }
 
     public function slaHistories(): HasMany
