@@ -82,13 +82,20 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-primary btn-assign"
-                                                data-task-id="{{ $task->id }}"
-                                                data-task-title="{{ $task->title }}"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#assignmentModal">
-                                            <i class="fe fe-users"></i> Assign
-                                        </button>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-primary btn-assign"
+                                                    data-task-id="{{ $task->id }}"
+                                                    data-task-title="{{ $task->title }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#assignmentModal">
+                                                <i class="fe fe-users"></i> Assign
+                                            </button>
+                                            @if ($department->code === 'MPFM')
+                                                <a href="{{ route('upload') }}?task_id={{ $task->id }}" class="btn btn-success" title="Upload MPFM test results">
+                                                    <i class="fe fe-upload"></i> Upload
+                                                </a>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @endforeach

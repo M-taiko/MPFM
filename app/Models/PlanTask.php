@@ -21,5 +21,7 @@ class PlanTask extends Task
 {
     // This class simply extends the new Task model from the Domains structure
     // All functionality is inherited from the parent Task class
+    // Overrides the table name to use the legacy plan_tasks table
+    protected $table = 'plan_tasks';
     // Future: Once all references are updated, this alias can be removed
 }

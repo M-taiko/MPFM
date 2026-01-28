@@ -1,305 +1,449 @@
 @extends('layouts.master')
 
 @section('content')
+<style>
+    .modern-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+    }
+
+    .modern-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .task-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 20px !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+    }
+
+    .info-card {
+        background: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .info-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
+    }
+
+    .info-card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border: none;
+    }
+
+    .info-card-header h5 {
+        color: white;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .info-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-section:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #667eea;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .info-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-modern {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .transitions-container {
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .timeline {
+        margin-top: 1.5rem;
+    }
+
+    .timeline-item {
+        display: flex;
+        margin-bottom: 1.5rem;
+    }
+
+    .timeline-marker {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        flex-shrink: 0;
+        margin-right: 1rem;
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.25rem;
+    }
+
+    .timeline-date {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .priority-low { background-color: #d4edda; color: #155724; }
+    .priority-medium { background-color: #fff3cd; color: #856404; }
+    .priority-high { background-color: #f8d7da; color: #721c24; }
+    .priority-critical { background-color: #721c24; color: white; }
+</style>
+
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2>{{ $task->title }}</h2>
-            <p class="text-muted">
-                <small>Created {{ $task->created_at->diffForHumans() }} by {{ $task->createdBy->name }}</small>
-            </p>
-        </div>
-        <div class="col-md-4 text-end">
-            @can('update', $task)
-                <a href="{{ route('tasks.edit', $task) }}" class="btn btn-warning">
-                    <i class="fas fa-edit"></i> Edit
+    <!-- Modern Header -->
+    <div class="modern-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1><i class="fe fe-check-square"></i> {{ $task->title }}</h1>
+                <p class="mb-2" style="opacity: 0.9;">
+                    <i class="fe fe-clock"></i> Created {{ $task->created_at->diffForHumans() }} by {{ $task->createdBy->name }}
+                </p>
+                <div>
+                    <span class="task-badge priority-{{ $task->priority }}" style="background-color: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white;">
+                        <i class="fe fe-flag"></i> {{ ucfirst($task->priority) }}
+                    </span>
+                    <span class="task-badge status-badge" style="background-color: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white;">
+                        {{ $task->state->label() }}
+                    </span>
+                </div>
+            </div>
+            <div class="action-buttons">
+                @can('update', $task)
+                    <a href="{{ route('tasks.edit', $task) }}" class="btn btn-modern btn-warning">
+                        <i class="fe fe-edit-3"></i> Edit
+                    </a>
+                @endcan
+                @if ($task->department && $task->department->code === 'MPFM' && $task->isAssignedTo(Auth::id()))
+                    <a href="{{ route('upload') }}?task_id={{ $task->id }}" class="btn btn-modern" style="background: rgba(76,209,55,0.9); color: white; border: 1px solid rgba(76,209,55,0.3);">
+                        <i class="fe fe-upload"></i> Upload Test Results
+                    </a>
+                @endif
+                <a href="{{ route('tasks.index') }}" class="btn btn-modern" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
+                    <i class="fe fe-arrow-left"></i> Back
                 </a>
-            @endcan
-            @can('delete', $task)
-                <form action="{{ route('tasks.destroy', $task) }}" method="POST" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger"
-                            onclick="return confirm('Are you sure you want to delete this task?')">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </form>
-            @endcan
-            <a href="{{ route('tasks.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back
-            </a>
+            </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-8">
+        <!-- Main Content -->
+        <div class="col-lg-8">
             <!-- Task Details Card -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Task Details</h5>
+            <div class="info-card mb-4">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-file-text"></i> Task Details</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Description</label>
-                            <p>{{ $task->description ?? 'No description provided' }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Notes</label>
-                            <p>{{ $task->notes ?? 'No notes' }}</p>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Task Type</label>
-                            <p>
-                                <span class="badge bg-primary">{{ $task->task_type }}</span>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Current State</label>
-                            <p>
-                                <span class="badge" style="background-color: {{ $task->state->color() }}; padding: 8px 12px;">
-                                    {{ $task->state->label() }}
-                                </span>
-                            </p>
-                        </div>
+                <div class="info-section">
+                    <div class="info-label">Description</div>
+                    <div class="info-value">
+                        {{ $task->description ?? 'No description provided' }}
                     </div>
                 </div>
+                @if ($task->notes)
+                <div class="info-section">
+                    <div class="info-label">Notes</div>
+                    <div class="info-value">
+                        {{ $task->notes }}
+                    </div>
+                </div>
+                @endif
             </div>
 
-            <!-- Assignment Card -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Assignment Information</h5>
+            <!-- Assignment Information -->
+            <div class="info-card mb-4">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-users"></i> Assignment & Location</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Assigned To</label>
-                            @if ($task->assignedTo)
-                                <p>{{ $task->assignedTo->name }}</p>
-                                <small class="text-muted">({{ $task->assignedTo->email }})</small>
-                            @else
-                                <p class="text-muted">Unassigned</p>
-                            @endif
+                <div class="info-section">
+                    <div class="info-row">
+                        <div>
+                            <div class="info-label">Department</div>
+                            <div class="info-value">
+                                <i class="fe fe-briefcase"></i> {{ $task->department->name }}
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Department</label>
-                            <p>{{ $task->department->name }}</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Related Asset</label>
-                            @if ($task->oilString)
-                                <p>Oil String: {{ $task->oilString->name }}</p>
-                            @elseif ($task->tower)
-                                <p>Tower: {{ $task->tower->name }}</p>
-                            @else
-                                <p class="text-muted">No asset assigned</p>
-                            @endif
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Monthly Plan</label>
-                            <p>
-                                <a href="{{ route('monthly-plans.show', $task->monthlyPlan) }}">
-                                    {{ $task->monthlyPlan->name }}
-                                </a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Timelines Card -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">Timeline</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Expected Completion</label>
-                            @if ($task->expected_completion_at)
-                                <p>
-                                    {{ $task->expected_completion_at->format('M d, Y @ H:i') }}
-                                    <br />
-                                    <small class="text-muted">({{ $task->getDaysUntilDue() }} days from now)</small>
-                                </p>
-                            @else
-                                <p class="text-muted">Not set</p>
-                            @endif
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-muted">Actual Completion</label>
-                            @if ($task->actual_completion_at)
-                                <p>{{ $task->actual_completion_at->format('M d, Y @ H:i') }}</p>
-                            @else
-                                <p class="text-muted">Not completed yet</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- State History Card -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">State History</h5>
-                </div>
-                <div class="card-body">
-                    @if ($task->stateHistory->isNotEmpty())
-                        <div class="timeline">
-                            @foreach ($task->stateHistory->reverse() as $history)
-                                <div class="timeline-item mb-3">
-                                    <div class="timeline-marker">
-                                        <span class="badge bg-success">✓</span>
-                                    </div>
-                                    <div class="timeline-content">
-                                        <p class="mb-1">
-                                            <strong>{{ $history->from_state->label() }}</strong>
-                                            <i class="fas fa-arrow-right"></i>
-                                            <strong>{{ $history->to_state->label() }}</strong>
-                                        </p>
-                                        <small class="text-muted">
-                                            By {{ $history->changedBy->name }} ({{ $history->changedBy->roles()->first()?->name }})
-                                            on {{ $history->changed_at->format('M d, Y @ H:i') }}
-                                        </small>
-                                        @if ($history->notes)
-                                            <p class="mt-2 mb-0">
-                                                <em>{{ $history->notes }}</em>
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <p class="text-muted">No state history recorded yet.</p>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-md-4">
-            <!-- Status Card -->
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Status</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Progress</label>
-                        <div class="progress" style="height: 30px;">
-                            <div class="progress-bar" role="progressbar"
-                                 style="width: {{ $task->getProgressPercentage() }}%"
-                                 aria-valuenow="{{ $task->getProgressPercentage() }}"
-                                 aria-valuemin="0" aria-valuemax="100">
-                                <span>{{ $task->getProgressPercentage() }}%</span>
+                        <div>
+                            <div class="info-label">Assigned To</div>
+                            <div class="info-value">
+                                @if ($task->assignedTo)
+                                    <i class="fe fe-user"></i> {{ $task->assignedTo->name }}
+                                @else
+                                    <span class="text-muted">Unassigned</span>
+                                @endif
                             </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Priority</label>
-                        <p>
-                            <span class="badge bg-{{ $task->getPriorityColor() }}">
-                                {{ ucfirst($task->priority) }}
-                            </span>
-                        </p>
-                    </div>
-                    @if ($task->isOverdue())
-                        <div class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Overdue!</strong> This task is {{ $task->getDaysOverdue() }} days overdue.
+                </div>
+                <div class="info-section">
+                    <div class="info-row">
+                        <div>
+                            <div class="info-label">Tower</div>
+                            <div class="info-value">
+                                @if ($task->tower)
+                                    <i class="fe fe-map-pin"></i> {{ $task->tower->name }}
+                                @else
+                                    <span class="text-muted">N/A</span>
+                                @endif
+                            </div>
                         </div>
-                    @endif
+                        <div>
+                            <div class="info-label">Oil String</div>
+                            <div class="info-value">
+                                @if ($task->oilString)
+                                    <i class="fe fe-layers"></i> {{ $task->oilString->name }}
+                                @else
+                                    <span class="text-muted">N/A</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Quick Actions Card -->
-            @if ($task->state !== TaskState::COMPLETED && Auth::check())
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Actions</h5>
+            <!-- Timeline/History Card -->
+            @if ($task->stateHistories && $task->stateHistories->count() > 0)
+            <div class="info-card mb-4">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-activity"></i> State History</h5>
+                </div>
+                <div class="info-section">
+                    <div class="timeline">
+                        @foreach ($task->stateHistories->reverse() as $history)
+                        <div class="timeline-item">
+                            <div class="timeline-marker">
+                                <i class="fe fe-arrow-right"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">
+                                    {{ $history->from_state }} → {{ $history->to_state }}
+                                </div>
+                                <div class="timeline-date">
+                                    {{ $history->created_at->format('M d, Y H:i') }}
+                                    @if ($history->changed_by)
+                                        by {{ $history->changed_by }}
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
-                    <div class="card-body">
+                </div>
+            </div>
+            @endif
+
+            <!-- State Transition Card -->
+            @if ($task->state->value !== \App\Enums\TaskState::COMPLETED->value && Auth::check())
+            <div class="info-card mb-4">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-shuffle"></i> State Transition</h5>
+                </div>
+                <div class="info-section">
+                    @if ($availableTransitions && count($availableTransitions) > 0)
                         <form action="{{ route('tasks.transition', $task) }}" method="POST">
                             @csrf
                             <div class="mb-3">
-                                <label for="newState" class="form-label">Transition To</label>
-                                <select name="new_state" id="newState" class="form-select">
-                                    <option value="">Select new state...</option>
-                                    @foreach ($task->getAvailableTransitions() as $availableState)
-                                        <option value="{{ $availableState->value }}">
-                                            {{ $availableState->label() }}
+                                <label for="newState" class="info-label">Select New State</label>
+                                <select name="new_state" id="newState" class="form-select" style="border-color: #667eea;">
+                                    <option value="">-- Choose a state --</option>
+                                    @foreach ($availableTransitions as $state)
+                                        <option value="{{ $state->value }}">
+                                            {{ $state->label() }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="notes" class="form-label">Notes (Optional)</label>
-                                <textarea name="notes" id="notes" class="form-control" rows="3"
-                                          placeholder="Add notes about this transition..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-check"></i> Update State
+                            <button type="submit" class="btn btn-modern btn-primary-gradient">
+                                <i class="fe fe-check"></i> Transition
                             </button>
                         </form>
+                    @else
+                        <p class="text-muted">
+                            <i class="fe fe-info"></i> No transitions available for this task state.
+                        </p>
+                    @endif
+                </div>
+            </div>
+            @endif
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Summary Card -->
+            <div class="info-card mb-4">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-info"></i> Summary</h5>
+                </div>
+                <div class="info-section">
+                    <div class="info-label">Status</div>
+                    <div class="info-value mb-3">
+                        <span class="status-badge" style="background-color: {{ $task->state->color() }}; color: white;">
+                            {{ $task->state->label() }}
+                        </span>
+                    </div>
+
+                    <div class="info-label">Priority</div>
+                    <div class="info-value mb-3">
+                        <span class="badge priority-{{ $task->priority }}">
+                            {{ ucfirst($task->priority) }}
+                        </span>
+                    </div>
+
+                    <div class="info-label">Task Type</div>
+                    <div class="info-value mb-3">
+                        <span class="badge bg-secondary">{{ $task->task_type }}</span>
+                    </div>
+
+                    <div class="info-label">Monthly Plan</div>
+                    <div class="info-value">
+                        @if ($task->monthlyPlan)
+                            {{ $task->monthlyPlan->plan_name ?? 'Plan' }}
+                        @else
+                            <span class="text-muted">N/A</span>
+                        @endif
                     </div>
                 </div>
+            </div>
+
+            <!-- Dates Card -->
+            <div class="info-card mb-4">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-calendar"></i> Dates</h5>
+                </div>
+                <div class="info-section">
+                    <div class="info-label">Created</div>
+                    <div class="info-value mb-3">
+                        {{ $task->created_at->format('M d, Y H:i') }}
+                    </div>
+
+                    <div class="info-label">Expected Completion</div>
+                    <div class="info-value mb-3">
+                        @if ($task->expected_completion_at)
+                            {{ $task->expected_completion_at->format('M d, Y H:i') }}
+                        @else
+                            <span class="text-muted">Not set</span>
+                        @endif
+                    </div>
+
+                    @if ($task->actual_completion_at)
+                    <div class="info-label">Completed</div>
+                    <div class="info-value">
+                        {{ $task->actual_completion_at->format('M d, Y H:i') }}
+                    </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Assigned Operators Card -->
+            @if ($task->operators && $task->operators->count() > 0)
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h5><i class="fe fe-users"></i> Assigned Operators</h5>
+                </div>
+                <div class="info-section">
+                    @foreach ($task->operators as $operator)
+                    <div class="mb-2">
+                        <span class="badge bg-info">
+                            <i class="fe fe-user"></i> {{ $operator->name }}
+                        </span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
             @endif
         </div>
     </div>
 </div>
 
-<style>
-.timeline {
-    position: relative;
-    padding: 20px 0;
-}
-
-.timeline-item {
-    display: flex;
-    margin-bottom: 30px;
-    position: relative;
-}
-
-.timeline-marker {
-    width: 40px;
-    height: 40px;
-    background: #fff;
-    border: 2px solid #0d6efd;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 20px;
-    flex-shrink: 0;
-}
-
-.timeline-content {
-    flex: 1;
-    padding: 10px 0;
-}
-</style>
+@endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('form[action*="transition"]');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            const newState = document.getElementById('newState').value;
-            if (!newState) {
-                e.preventDefault();
-                alert('Please select a new state');
-            }
+    // Add any JavaScript functionality here
+    document.querySelectorAll('.info-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
         });
-    }
-});
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
 </script>
 @endpush
-@endsection

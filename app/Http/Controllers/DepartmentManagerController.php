@@ -49,12 +49,11 @@ class DepartmentManagerController extends Controller
         $operators = $this->assignmentService->getAvailableOperators($department->id);
 
         // Calculate statistics
-        $allDeptTasks = PlanTask::where('department_id', $department->id);
         $stats = [
-            'total' => $allDeptTasks->count(),
-            'completed' => $allDeptTasks->where('state', TaskState::COMPLETED)->count(),
-            'in_progress' => $allDeptTasks->where('state', TaskState::IN_PROGRESS)->count(),
-            'pending' => $allDeptTasks->where('completion_status', 'pending')->count(),
+            'total' => PlanTask::where('department_id', $department->id)->count(),
+            'completed' => PlanTask::where('department_id', $department->id)->where('state', TaskState::COMPLETED->value)->count(),
+            'in_progress' => PlanTask::where('department_id', $department->id)->where('state', TaskState::IN_PROGRESS->value)->count(),
+            'pending' => PlanTask::where('department_id', $department->id)->where('completion_status', 'pending')->count(),
         ];
 
         $stats['completion_percentage'] = $stats['total'] > 0

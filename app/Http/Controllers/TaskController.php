@@ -215,7 +215,10 @@ class TaskController extends Controller
     {
         $available = [];
 
-        foreach ($task->canTransitionTo() as $state) {
+        // Get available transitions from the task model
+        $transitions = $task->getAvailableTransitions();
+
+        foreach ($transitions as $state) {
             if ($this->stateMachine->canUserTransition($task, $state, $user)) {
                 $available[] = $state;
             }

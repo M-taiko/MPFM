@@ -40,7 +40,7 @@ class Department extends Model
      */
     public function tasks(): HasMany
     {
-        return $this->hasMany(PlanTask::class);
+        return $this->hasMany(PlanTask::class, 'department_id', 'id');
     }
 
     /**
