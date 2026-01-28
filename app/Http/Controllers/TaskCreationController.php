@@ -20,10 +20,11 @@ class TaskCreationController extends Controller
      */
     public function create()
     {
+        // dd();
         $towers = Tower::with('oilStrings')->get();
         $departments = Department::active()->get();
 
-        return view('tasks.create_advanced', compact('towers', 'departments'));
+        return view('tasks.create-advanced', compact('towers', 'departments'));
     }
 
     /**
