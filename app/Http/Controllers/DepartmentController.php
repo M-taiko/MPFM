@@ -35,7 +35,7 @@ class DepartmentController extends Controller
 
         // Get recent tasks
         $recentTasks = $department->tasks()
-            ->with(['monthlyPlan', 'operators', 'slaHistory'])
+            ->with(['monthlyPlan', 'operators', 'slaHistories'])
             ->latest('created_at')
             ->limit(10)
             ->get();
@@ -91,7 +91,7 @@ class DepartmentController extends Controller
         $this->checkDepartmentAccess($department);
 
         $query = $department->tasks()
-            ->with(['monthlyPlan', 'operators', 'primaryOperator', 'slaHistory', 'department']);
+            ->with(['monthlyPlan', 'operators', 'primaryOperator', 'slaHistories', 'department']);
 
         // Filter by status
         if ($request->has('status') && $request->status !== '') {
