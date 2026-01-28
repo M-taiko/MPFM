@@ -10,8 +10,6 @@ use App\Services\MPFMChartService;
 use App\Services\MPFMPlanService;
 use App\Services\TaskStateService;
 use App\Services\TaskSLAService;
-use App\Models\PlanTask;
-use App\Observers\PlanTaskObserver;
 use App\Events\TaskStateChanged;
 use App\Events\SLATriggered;
 use App\Listeners\UpdateMonthlyPlanStatistics;
@@ -58,8 +56,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register PlanTask Observer for automatic statistics updates
-        PlanTask::observe(PlanTaskObserver::class);
+        // PlanTask observer removed in Phase 2 (model deleted, replaced with unified Task model)
 
         // Register Event Listeners for TaskStateChanged
         Event::listen(

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use App\Models\PlanTask;
+use Illuminate\Support\Facades\DB;
 use App\Enums\TaskState;
 
 return new class extends Migration
@@ -11,32 +11,31 @@ return new class extends Migration
      *
      * This migration maps existing completion_status to new state field.
      * This is OPTIONAL and should only be run once after deploying the state machine.
+     *
+     * NOTE: Updated in Phase 2 to use raw SQL instead of PlanTask model (model deleted)
      */
     public function up(): void
     {
         $this->log("Starting migration of existing tasks to new state machine...");
 
-        // Process tasks in chunks to avoid memory issues
-        $totalTasks = 0;
+        // Process tasks using raw SQL (PlanTask model was deleted in Phase 2)
+        $tasks = DB::table('plan_tasks')->get();
+        $totalTasks = $tasks->count();
         $updatedTasks = 0;
 
-        PlanTask::chunk(100, function ($tasks) use (&$totalTasks, &$updatedTasks) {
-            foreach ($tasks as $task) {
-                $totalTasks++;
+        foreach ($tasks as $task) {
+            // Determine appropriate state based on completion_status
+            $newState = $this->determineNewState($task);
 
-                // Determine appropriate state based on completion_status
-                $newState = $this->determineNewState($task);
+            // Only update if state would change
+            if ($task->state !== $newState) {
+                DB::table('plan_tasks')
+                    ->where('id', $task->id)
+                    ->update(['state' => $newState]);
 
-                // Only update if state would change
-                if ($task->state !== $newState) {
-                    $task->update([
-                        'state' => $newState,
-                    ], ['timestamps' => false]); // Don't update timestamps
-
-                    $updatedTasks++;
-                }
+                $updatedTasks++;
             }
-        });
+        }
 
         $this->log("Migration complete. Total tasks: {$totalTasks}, Updated: {$updatedTasks}");
     }
@@ -44,45 +43,45 @@ return new class extends Migration
     /**
      * Determine new state based on existing completion_status
      */
-    protected function determineNewState(PlanTask $task): TaskState
+    protected function determineNewState($task): string
     {
         return match($task->completion_status) {
             // Pending tasks → Check if they're assigned
             'pending' => $task->assigned_operator_id
-                ? TaskState::ASSIGNED_TO_MPFM
-                : TaskState::DRAFT,
+                ? 'assigned_to_mpfm'
+                : 'draft',
 
             // In progress tasks
-            'in_progress' => TaskState::IN_PROGRESS,
+            'in_progress' => 'in_progress',
 
             // Completed tasks
             'completed' => $this->determineCompletedState($task),
 
             // Failed tasks reset to draft
-            'failed' => TaskState::DRAFT,
+            'failed' => 'draft',
 
             // Default to draft
-            default => TaskState::DRAFT,
+            default => 'draft',
         };
     }
 
     /**
      * Determine appropriate state for completed tasks
      */
-    protected function determineCompletedState(PlanTask $task): TaskState
+    protected function determineCompletedState($task): string
     {
         // If task has final_status = 'approved', mark as completed
         if ($task->final_status === 'approved') {
-            return TaskState::COMPLETED;
+            return 'completed';
         }
 
         // If task has mpfm_test_id (test uploaded), mark as MPFM reviewed
         if ($task->mpfm_test_id) {
-            return TaskState::MPFM_REVIEWED;
+            return 'mpfm_reviewed';
         }
 
         // Otherwise, just in progress (technically completed but not reviewed)
-        return TaskState::IN_PROGRESS;
+        return 'in_progress';
     }
 
     /**
@@ -94,26 +93,23 @@ return new class extends Migration
     {
         $this->log("Reverting tasks back to legacy completion_status...");
 
-        $totalTasks = 0;
+        $tasks = DB::table('plan_tasks')->get();
+        $totalTasks = $tasks->count();
         $revertedTasks = 0;
 
-        PlanTask::chunk(100, function ($tasks) use (&$totalTasks, &$revertedTasks) {
-            foreach ($tasks as $task) {
-                $totalTasks++;
+        foreach ($tasks as $task) {
+            // Determine appropriate completion_status based on state
+            $oldStatus = $this->determineOldStatus($task);
 
-                // Determine appropriate completion_status based on state
-                $oldStatus = $this->determineOldStatus($task);
+            // Only update if status would change
+            if ($task->completion_status !== $oldStatus) {
+                DB::table('plan_tasks')
+                    ->where('id', $task->id)
+                    ->update(['completion_status' => $oldStatus]);
 
-                // Only update if status would change
-                if ($task->completion_status !== $oldStatus) {
-                    $task->update([
-                        'completion_status' => $oldStatus,
-                    ], ['timestamps' => false]);
-
-                    $revertedTasks++;
-                }
+                $revertedTasks++;
             }
-        });
+        }
 
         $this->log("Rollback complete. Total tasks: {$totalTasks}, Reverted: {$revertedTasks}");
     }
@@ -121,19 +117,19 @@ return new class extends Migration
     /**
      * Determine old completion_status based on new state
      */
-    protected function determineOldStatus(PlanTask $task): string
+    protected function determineOldStatus($task): string
     {
         return match($task->state) {
-            TaskState::DRAFT,
-            TaskState::SUBMITTED_TO_SURVEILLANCE,
-            TaskState::ASSIGNED_TO_MPFM => 'pending',
+            'draft',
+            'submitted_to_surveillance',
+            'assigned_to_mpfm' => 'pending',
 
-            TaskState::IN_PROGRESS,
-            TaskState::MPFM_REVIEWED,
-            TaskState::SURVEILLANCE_REVIEWED,
-            TaskState::JOB_OFFICER_APPROVED => 'in_progress',
+            'in_progress',
+            'mpfm_reviewed',
+            'surveillance_reviewed',
+            'job_officer_approved' => 'in_progress',
 
-            TaskState::COMPLETED => 'completed',
+            'completed' => 'completed',
 
             default => 'pending',
         };

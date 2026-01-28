@@ -11,18 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('plan_tasks', function (Blueprint $table) {
-            $table->foreignId('department_id')
-                ->nullable()
-                ->after('monthly_plan_id')
-                ->constrained('departments')
-                ->nullOnDelete()
-                ->comment('Which department this task is assigned to');
+        // Only add department_id column if it doesn't already exist (idempotent)
+        if (!Schema::hasColumn('plan_tasks', 'department_id')) {
+            Schema::table('plan_tasks', function (Blueprint $table) {
+                $table->foreignId('department_id')
+                    ->nullable()
+                    ->after('monthly_plan_id')
+                    ->constrained('departments')
+                    ->nullOnDelete()
+                    ->comment('Which department this task is assigned to');
 
-            $table->index('department_id');
-            $table->index(['department_id', 'completion_status']);
-            $table->index(['department_id', 'state']);
-        });
+                $table->index('department_id');
+                $table->index(['department_id', 'completion_status']);
+                $table->index(['department_id', 'state']);
+            });
+        }
     }
 
     /**
@@ -31,7 +34,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('plan_tasks', function (Blueprint $table) {
-            $table->dropForeignIdFor('departments');
+            $table->dropForeign(['department_id']);
             $table->dropColumn('department_id');
         });
     }

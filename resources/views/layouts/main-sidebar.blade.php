@@ -47,6 +47,23 @@
                 </a>
             </li>
 
+            <!-- UNIFIED TASK MANAGEMENT (Phase 2 - Enterprise Refactoring) -->
+            <li class="side-item side-item-category">Task Management</li>
+
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('tasks*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-check-square"></i>
+                    <span class="side-menu__label">Tasks</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->is('tasks') && !request()->is('tasks/create') ? 'active' : '' }}" href="{{ route('tasks.index') }}">All Tasks</a></li>
+                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('job_officer'))
+                    <li><a class="slide-item {{ request()->is('tasks/create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Create Task</a></li>
+                    @endif
+                </ul>
+            </li>
+
             <!-- Monthly Planning (Job Officer & Admin) -->
             @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_production_supervisor_reports'))
             <li class="side-item side-item-category">Planning & Oversight</li>

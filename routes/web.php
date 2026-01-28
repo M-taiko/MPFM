@@ -10,7 +10,6 @@ use App\Http\Controllers\VxLogController;
 use App\Http\Controllers\WellTestController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MPFMPlanController;
-use App\Http\Controllers\OperatorPlanController;
 use App\Http\Controllers\OilFieldController;
 use App\Http\Controllers\TowerController;
 use App\Http\Controllers\OilStringController;
@@ -20,6 +19,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskStateController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DepartmentUserController;
+use App\Http\Controllers\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -158,30 +158,6 @@ Route::post('/well-tests/compare', [WellTestController::class, 'compare'])
 
 /*
 |--------------------------------------------------------------------------
-| Operator Plans
-|--------------------------------------------------------------------------
-*/
-Route::prefix('operator-plans')->group(function () {
-    Route::get('well-test/{wellTestId}', [OperatorPlanController::class, 'index'])->name('operator_plans.index');
-    Route::get('well-test/{wellTestId}/create', [OperatorPlanController::class, 'create'])->name('operator_plans.create');
-    Route::post('well-test/{wellTestId}', [OperatorPlanController::class, 'store'])->name('operator_plans.store');
-    Route::get('{id}', [OperatorPlanController::class, 'show'])->name('operator_plans.show');
-    Route::get('{id}/edit', [OperatorPlanController::class, 'edit'])->name('operator_plans.edit');
-    Route::put('{id}', [OperatorPlanController::class, 'update'])->name('operator_plans.update');
-    Route::delete('{id}', [OperatorPlanController::class, 'destroy'])->name('operator_plans.destroy');
-
-    // AJAX routes for operator plan operations
-    Route::post('{id}/complete', [OperatorPlanController::class, 'markCompleted'])->name('operator_plans.complete');
-    Route::post('{id}/pending', [OperatorPlanController::class, 'markPending'])->name('operator_plans.pending');
-    Route::post('well-test/{wellTestId}/reorder', [OperatorPlanController::class, 'reorder'])->name('operator_plans.reorder');
-    Route::get('well-test/{wellTestId}/next-step', [OperatorPlanController::class, 'getNextStep'])->name('operator_plans.next_step');
-    Route::get('well-test/{wellTestId}/statistics', [OperatorPlanController::class, 'getStatistics'])->name('operator_plans.statistics');
-    Route::get('well-test/{wellTestId}/completed-steps', [OperatorPlanController::class, 'getCompletedSteps'])->name('operator_plans.completed_steps');
-    Route::get('well-test/{wellTestId}/pending-steps', [OperatorPlanController::class, 'getPendingSteps'])->name('operator_plans.pending_steps');
-});
-
-/*
-|--------------------------------------------------------------------------
 | MPFM Plans
 |--------------------------------------------------------------------------
 */
@@ -240,13 +216,11 @@ Route::get('/reports/date-shift', [ReportController::class, 'dateShift'])->name(
 
 /*
 |--------------------------------------------------------------------------
-| Daily Plans (Multi-Operator Workflow)
+| Daily Plans - DEPRECATED (Use Unified Task System instead - Phase 2)
 |--------------------------------------------------------------------------
 */
 use App\Http\Controllers\SupervisorDashboardController;
 use App\Http\Controllers\OperatorDashboardController;
-use App\Http\Controllers\DailyPlanController;
-use App\Http\Controllers\PlanTaskController;
 use App\Http\Controllers\MonthlyPlanController;
 use App\Http\Controllers\MPFMSupervisorController;
 use App\Http\Controllers\SurveillanceSupervisorController;
@@ -266,30 +240,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/calendar', [OperatorDashboardController::class, 'calendar'])->name('calendar');
         Route::get('/history', [OperatorDashboardController::class, 'history'])->name('history');
     });
-
-    // Daily Plans Resource
-    Route::resource('daily-plans', DailyPlanController::class)->except(['index']);
-    Route::get('daily-plans', [DailyPlanController::class, 'index'])->name('daily-plans.index');
-
-    // Daily Plan Actions
-    Route::post('daily-plans/{dailyPlan}/activate', [DailyPlanController::class, 'activate'])->name('daily-plans.activate');
-    Route::post('daily-plans/{dailyPlan}/cancel', [DailyPlanController::class, 'cancel'])->name('daily-plans.cancel');
-    Route::post('daily-plans/{dailyPlan}/clone', [DailyPlanController::class, 'clone'])->name('daily-plans.clone');
-
-    // Plan Import from plan.txt
-    Route::get('daily-plans/import/form', [DailyPlanController::class, 'showImportForm'])->name('daily-plans.import.form');
-    Route::post('daily-plans/import', [DailyPlanController::class, 'importFromPlanTxt'])->name('daily-plans.import');
-
-    // Plan Approval (MPFM Supervisor)
-    Route::get('daily-plans/{dailyPlan}/approve/form', [DailyPlanController::class, 'showApprovalForm'])->name('daily-plans.approve.form');
-    Route::post('daily-plans/{dailyPlan}/approve', [DailyPlanController::class, 'approve'])->name('daily-plans.approve');
-    Route::post('daily-plans/{dailyPlan}/reject', [DailyPlanController::class, 'reject'])->name('daily-plans.reject');
-
-    // Plan Tasks (will be created next)
-    Route::post('daily-plans/{dailyPlan}/tasks', [PlanTaskController::class, 'store'])->name('plan-tasks.store');
-    Route::get('plan-tasks/{task}/edit', [PlanTaskController::class, 'edit'])->name('plan-tasks.edit');
-    Route::put('plan-tasks/{task}', [PlanTaskController::class, 'update'])->name('plan-tasks.update');
-    Route::delete('plan-tasks/{task}', [PlanTaskController::class, 'destroy'])->name('plan-tasks.destroy');
 
     // API Routes for AJAX calls
     Route::get('/api/oil-fields/{oilField}/towers', [App\Http\Controllers\Api\OilFieldApiController::class, 'getTowers']);
@@ -477,6 +427,25 @@ Route::middleware('auth')->group(function () {
             'update' => 'users.update',
             'destroy' => 'users.destroy',
         ]);
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Unified Task Management System (Phase 1 Enterprise Refactoring)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('tasks')->name('tasks.')->group(function () {
+        // Main CRUD operations
+        Route::get('/', [TaskController::class, 'index'])->name('index');
+        Route::get('/create', [TaskController::class, 'create'])->name('create');
+        Route::post('/', [TaskController::class, 'store'])->name('store');
+        Route::get('/{task}', [TaskController::class, 'show'])->name('show');
+        Route::get('/{task}/edit', [TaskController::class, 'edit'])->name('edit');
+        Route::put('/{task}', [TaskController::class, 'update'])->name('update');
+        Route::delete('/{task}', [TaskController::class, 'destroy'])->name('destroy');
+
+        // State transition
+        Route::post('/{task}/transition', [TaskController::class, 'transition'])->name('transition');
     });
 });
 

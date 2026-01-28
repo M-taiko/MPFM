@@ -10,7 +10,12 @@
       "Bash(mysql:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash([AppModelsPlanTask].\"\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash([AppModelsPlanTask].\"\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(del \"app\\\\Http\\\\Controllers\\\\PlanTaskController.php\" \"app\\\\Http\\\\Controllers\\\\DailyPlanController.php\" \"app\\\\Http\\\\Controllers\\\\OperatorPlanController.php\")",
+      "Bash(del \"app\\\\Models\\\\PlanTask.php\" \"app\\\\Models\\\\DailyPlan.php\" \"app\\\\Models\\\\OperatorPlan.php\")",
+      "Bash(ls:*)",
+      "Read(//c/xampp/htdocs/MPFM/**)",
+      "Bash(git rm:*)"
     ]
   }
 }

@@ -32,6 +32,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Disable foreign key checks to avoid constraint violations
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('departments');
+        Schema::enableForeignKeyConstraints();
     }
 };

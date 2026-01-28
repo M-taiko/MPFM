@@ -5,9 +5,10 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\WellStringRequirement;
-use App\Models\PlanTask;
+use App\Domains\Task\Models\Task;
 use App\Policies\WellStringRequirementPolicy;
 use App\Policies\TaskStatePolicy;
+use App\Policies\TaskPolicy;
 use App\Policies\AdminPolicy;
 
 class AuthServiceProvider extends ServiceProvider
@@ -19,7 +20,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         WellStringRequirement::class => WellStringRequirementPolicy::class,
-        PlanTask::class => TaskStatePolicy::class,
+        Task::class => TaskPolicy::class,
     ];
 
     /**
