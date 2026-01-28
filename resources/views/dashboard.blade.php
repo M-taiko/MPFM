@@ -17,6 +17,8 @@
         padding: 40px 0;
         margin-bottom: 40px;
         box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+        border-bottom-right-radius: 16px;
+        border-bottom-left-radius: 16px;
     }
 
     .dashboard-header h1 {
@@ -394,6 +396,7 @@
 <div class="dashboard-header">
     <div class="container-fluid">
         <h1><i class="fas fa-chart-line mr-3"></i>System Dashboard</h1>
+        <h6>Hello , Welcome Back Mr / {{auth()->user()->name}}</h6>
         <p>Real-time monitoring of all workflow systems and operations</p>
     </div>
 </div>
@@ -766,7 +769,7 @@
                 datasets: [{
                     data: stateValues,
                     backgroundColor: colors.slice(0, stateLabels.length),
-                    borderColor: white,
+                    borderColor: 'white',
                     borderWidth: 2
                 }]
             },
