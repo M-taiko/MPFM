@@ -21,6 +21,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DepartmentUserController;
 use App\Http\Controllers\TaskController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -439,6 +440,11 @@ Route::middleware('auth')->group(function () {
         // Main CRUD operations
         Route::get('/', [TaskController::class, 'index'])->name('index');
         Route::get('/create', [TaskController::class, 'create'])->name('create');
+
+        // Dynamic task creation with cascading dropdowns (MUST be before /{task} route)
+        Route::get('/create-advanced', [TaskCreationController::class, 'create'])->name('create-advanced');
+        Route::post('/store-advanced', [TaskCreationController::class, 'store'])->name('store-advanced');
+
         Route::post('/', [TaskController::class, 'store'])->name('store');
         Route::get('/{task}', [TaskController::class, 'show'])->name('show');
         Route::get('/{task}/edit', [TaskController::class, 'edit'])->name('edit');
@@ -447,10 +453,6 @@ Route::middleware('auth')->group(function () {
 
         // State transition
         Route::post('/{task}/transition', [TaskController::class, 'transition'])->name('transition');
-
-        // Dynamic task creation with cascading dropdowns
-        Route::get('/create-advanced', [TaskCreationController::class, 'create'])->name('create-advanced');
-        Route::post('/store-advanced', [TaskCreationController::class, 'store'])->name('store-advanced');
 
         // AJAX endpoints for dynamic form population
         Route::post('/api/get-oil-strings', [TaskCreationController::class, 'getOilStrings'])->name('get-oil-strings');
