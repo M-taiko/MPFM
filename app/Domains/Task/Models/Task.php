@@ -121,7 +121,7 @@ class Task extends Model
 
     public function slaHistories(): HasMany
     {
-        return $this->hasMany(TaskSLAHistory::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(TaskSLAHistory::class, 'plan_task_id')->orderBy('created_at', 'desc');
     }
 
     public function surveillanceSupervisor(): BelongsTo
