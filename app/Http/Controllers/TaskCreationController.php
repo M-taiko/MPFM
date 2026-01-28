@@ -116,7 +116,7 @@ class TaskCreationController extends Controller
             'department_id' => 'required|exists:departments,id',
             'test_type_id' => 'nullable|exists:department_test_types,id',
             'priority' => 'required|in:low,medium,high,critical',
-            'expected_completion_at' => 'nullable|date_format:Y-m-d H:i|after:now',
+            'expected_completion_at' => 'nullable|date_format:Y-m-d H:i',
             'department_requirements' => 'nullable|array',
         ]);
 
@@ -134,24 +134,43 @@ class TaskCreationController extends Controller
             }
         }
 
+        // Get or create default monthly plan for current month
+        $monthlyPlan = \App\Models\MonthlyPlan::firstOrCreate(
+            [
+                'month' => now()->format('Y-m'),
+                'status' => 'active'
+            ],
+            [
+                'title' => 'Monthly Plan - ' . now()->format('F Y'),
+                'description' => 'Auto-generated plan for ' . now()->format('F Y'),
+                'planned_start_date' => now()->startOfMonth(),
+                'planned_end_date' => now()->endOfMonth(),
+                'created_by_user_id' => auth()->id(),
+            ]
+        );
+
+        // Get department for task type
+        $department = Department::findOrFail($validated['department_id']);
+        $taskType = strtolower(str_replace(' ', '_', $department->code ?? 'general'));
+
         // Create task
         $task = \App\Domains\Task\Models\Task::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'monthly_plan_id' => $request->input('monthly_plan_id') ?? 1, // Default plan
+            'monthly_plan_id' => $monthlyPlan->id,
             'department_id' => $validated['department_id'],
-            'state' => 'draft',
+            'state' => \App\Enums\TaskState::DRAFT->value,
             'priority' => $validated['priority'],
             'oil_string_id' => $validated['oil_string_id'],
             'tower_id' => $validated['tower_id'],
-            'expected_completion_at' => $validated['expected_completion_at'],
+            'expected_completion_at' => $validated['expected_completion_at'] ? \Carbon\Carbon::createFromFormat('Y-m-d H:i', $validated['expected_completion_at']) : null,
             'created_by_user_id' => auth()->id(),
-            'task_type' => 'plan_task',
-            'department_requirements' => $validated['department_requirements'] ?? null,
+            'task_type' => $taskType,
+            'type_specific_data' => $validated['department_requirements'] ?? [],
         ]);
 
-        return redirect()->route('tasks.show', $task)
-            ->with('success', 'Task created successfully');
+        return redirect()->route('tasks.index')
+            ->with('success', 'Task created successfully. Assign it to an operator now.');
     }
 
     /**

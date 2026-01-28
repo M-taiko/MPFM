@@ -227,6 +227,7 @@ use App\Http\Controllers\MPFMSupervisorController;
 use App\Http\Controllers\SurveillanceSupervisorController;
 use App\Http\Controllers\TaskArchiveController;
 use App\Http\Controllers\TaskCreationController;
+use App\Http\Controllers\DepartmentTaskController;
 
 Route::middleware('auth')->group(function () {
     // Supervisor Routes
@@ -458,6 +459,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/api/get-oil-strings', [TaskCreationController::class, 'getOilStrings'])->name('get-oil-strings');
         Route::post('/api/get-department-requirements', [TaskCreationController::class, 'getDepartmentRequirements'])->name('get-department-requirements');
         Route::post('/api/get-test-type-details', [TaskCreationController::class, 'getTestTypeDetails'])->name('get-test-type-details');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Department Task Management
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('department-tasks')->name('department-tasks.')->group(function () {
+        Route::get('/{department_id}', [DepartmentTaskController::class, 'index'])->name('index');
+
+        // AJAX endpoints for task assignment
+        Route::post('/api/get-assignment-modal', [DepartmentTaskController::class, 'getAssignmentModal'])->name('get-assignment-modal');
+        Route::post('/api/assign-operator', [DepartmentTaskController::class, 'assignOperator'])->name('assign-operator');
+        Route::post('/api/remove-operator', [DepartmentTaskController::class, 'removeOperator'])->name('remove-operator');
     });
 });
 

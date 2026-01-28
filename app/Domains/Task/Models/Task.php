@@ -22,6 +22,7 @@ class Task extends Model
     protected $table = 'tasks';
 
     protected $fillable = [
+        'title',              // Task title
         'monthly_plan_id',
         'department_id',
         'task_type',          // New: MPFM, wireline, production, drilling, etc.
@@ -93,7 +94,7 @@ class Task extends Model
             User::class,
             'task_operators',
             'task_id',
-            'operator_id'
+            'user_id'
         )->withPivot('assigned_at', 'assigned_by', 'is_primary')
          ->withTimestamps();
     }

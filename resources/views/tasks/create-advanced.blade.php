@@ -7,7 +7,7 @@
             <h2>Create New Task</h2>
             <p class="text-muted">Select tower, oil string, and department to see dynamic requirements</p>
         </div>
-    </div> 
+    </div>
 
     <form action="{{ route('tasks.store-advanced') }}" method="POST" id="taskForm">
         @csrf
@@ -61,7 +61,7 @@
                         <!-- Expected Completion -->
                         <div class="mb-3">
                             <label for="expected_completion_at" class="form-label">Expected Completion</label>
-                            <input type="datetime-local"
+                            <input type="date"
                                    class="form-control @error('expected_completion_at') is-invalid @enderror"
                                    id="expected_completion_at" name="expected_completion_at"
                                    value="{{ old('expected_completion_at') }}">
