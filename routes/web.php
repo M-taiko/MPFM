@@ -225,6 +225,7 @@ use App\Http\Controllers\MonthlyPlanController;
 use App\Http\Controllers\MPFMSupervisorController;
 use App\Http\Controllers\SurveillanceSupervisorController;
 use App\Http\Controllers\TaskArchiveController;
+use App\Http\Controllers\TaskCreationController;
 
 Route::middleware('auth')->group(function () {
     // Supervisor Routes
@@ -446,6 +447,15 @@ Route::middleware('auth')->group(function () {
 
         // State transition
         Route::post('/{task}/transition', [TaskController::class, 'transition'])->name('transition');
+
+        // Dynamic task creation with cascading dropdowns
+        Route::get('/create-advanced', [TaskCreationController::class, 'create'])->name('create-advanced');
+        Route::post('/store-advanced', [TaskCreationController::class, 'store'])->name('store-advanced');
+
+        // AJAX endpoints for dynamic form population
+        Route::post('/api/get-oil-strings', [TaskCreationController::class, 'getOilStrings'])->name('get-oil-strings');
+        Route::post('/api/get-department-requirements', [TaskCreationController::class, 'getDepartmentRequirements'])->name('get-department-requirements');
+        Route::post('/api/get-test-type-details', [TaskCreationController::class, 'getTestTypeDetails'])->name('get-test-type-details');
     });
 });
 
