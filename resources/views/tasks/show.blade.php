@@ -192,7 +192,7 @@
                     </a>
                 @endcan
                 @if ($task->department && $task->department->code === 'MPFM' && $task->isAssignedTo(Auth::id()))
-                    <a href="{{ route('upload') }}?task_id={{ $task->id }}" class="btn btn-modern" style="background: rgba(76,209,55,0.9); color: white; border: 1px solid rgba(76,209,55,0.3);">
+                    <a href="{{ route('upload.form') }}?task_id={{ $task->id }}" class="btn btn-modern" style="background: rgba(76,209,55,0.9); color: white; border: 1px solid rgba(76,209,55,0.3);">
                         <i class="fe fe-upload"></i> Upload Test Results
                     </a>
                 @endif

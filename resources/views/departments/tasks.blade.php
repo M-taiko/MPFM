@@ -91,7 +91,7 @@
                                                 <i class="fe fe-users"></i> Assign
                                             </button>
                                             @if ($department->code === 'MPFM')
-                                                <a href="{{ route('upload') }}?task_id={{ $task->id }}" class="btn btn-success" title="Upload MPFM test results">
+                                                <a href="{{ route('upload.form') }}?task_id={{ $task->id }}" class="btn btn-success" title="Upload MPFM test results">
                                                     <i class="fe fe-upload"></i> Upload
                                                 </a>
                                             @endif
