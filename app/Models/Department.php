@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Department extends Model
@@ -49,6 +50,22 @@ class Department extends Model
     {
         return $this->tasks()
             ->whereNotIn('state', ['completed']);
+    }
+
+    /**
+     * Get the workflow configuration for this department
+     */
+    public function workflow(): HasOne
+    {
+        return $this->hasOne(\App\Domains\MPFM\Models\DepartmentWorkflow::class);
+    }
+
+    /**
+     * Get all test types for this department
+     */
+    public function testTypes(): HasMany
+    {
+        return $this->hasMany(\App\Domains\MPFM\Models\DepartmentTestType::class);
     }
 
     /**
