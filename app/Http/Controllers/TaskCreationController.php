@@ -20,11 +20,14 @@ class TaskCreationController extends Controller
      */
     public function create()
     {
-        // dd();
         $towers = Tower::with('oilStrings')->get();
         $departments = Department::active()->get();
+        $monthlyPlans = \App\Models\MonthlyPlan::where('status', 'active')
+            ->orWhereNull('status')
+            ->orderBy('planned_start_date', 'desc')
+            ->get();
 
-        return view('tasks.create-advanced', compact('towers', 'departments'));
+        return view('tasks.create-advanced', compact('towers', 'departments', 'monthlyPlans'));
     }
 
     /**
@@ -114,9 +117,10 @@ class TaskCreationController extends Controller
             'tower_id' => 'required|exists:towers,id',
             'oil_string_id' => 'required|exists:oil_strings,id',
             'department_id' => 'required|exists:departments,id',
+            'monthly_plan_id' => 'required|exists:monthly_plans,id',
             'test_type_id' => 'nullable|exists:department_test_types,id',
             'priority' => 'required|in:low,medium,high,critical',
-            'expected_completion_at' => 'nullable|date_format:Y-m-d H:i',
+            'expected_completion_at' => 'nullable|date_format:Y-m-d\TH:i',
             'department_requirements' => 'nullable|array',
         ]);
 
@@ -134,36 +138,28 @@ class TaskCreationController extends Controller
             }
         }
 
-        // Get or create default monthly plan for current month
-        $monthlyPlan = \App\Models\MonthlyPlan::firstOrCreate(
-            [
-                'month' => now()->format('Y-m'),
-                'status' => 'active'
-            ],
-            [
-                'title' => 'Monthly Plan - ' . now()->format('F Y'),
-                'description' => 'Auto-generated plan for ' . now()->format('F Y'),
-                'planned_start_date' => now()->startOfMonth(),
-                'planned_end_date' => now()->endOfMonth(),
-                'created_by_user_id' => auth()->id(),
-            ]
-        );
-
         // Get department for task type
         $department = Department::findOrFail($validated['department_id']);
         $taskType = strtolower(str_replace(' ', '_', $department->code ?? 'general'));
+
+        // Parse datetime-local format (Y-m-d\TH:i)
+        $expectedCompletion = null;
+        if ($validated['expected_completion_at']) {
+            // datetime-local format is: 2026-01-28T14:30
+            $expectedCompletion = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $validated['expected_completion_at']);
+        }
 
         // Create task
         $task = \App\Domains\Task\Models\Task::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
-            'monthly_plan_id' => $monthlyPlan->id,
+            'monthly_plan_id' => $validated['monthly_plan_id'],
             'department_id' => $validated['department_id'],
             'state' => \App\Enums\TaskState::DRAFT->value,
             'priority' => $validated['priority'],
             'oil_string_id' => $validated['oil_string_id'],
             'tower_id' => $validated['tower_id'],
-            'expected_completion_at' => $validated['expected_completion_at'] ? \Carbon\Carbon::createFromFormat('Y-m-d H:i', $validated['expected_completion_at']) : null,
+            'expected_completion_at' => $expectedCompletion,
             'created_by_user_id' => auth()->id(),
             'task_type' => $taskType,
             'type_specific_data' => $validated['department_requirements'] ?? [],
