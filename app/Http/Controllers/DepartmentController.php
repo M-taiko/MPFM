@@ -91,7 +91,7 @@ class DepartmentController extends Controller
         $this->checkDepartmentAccess($department);
 
         $query = $department->tasks()
-            ->with(['monthlyPlan', 'operators', 'primaryOperator', 'slaHistories', 'department']);
+            ->with(['monthlyPlan', 'operators', 'slaHistories', 'department']);
 
         // Filter by status
         if ($request->has('status') && $request->status !== '') {
