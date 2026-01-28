@@ -273,7 +273,7 @@
                                                 @php
                                                     $responsible = null;
                                                     if ($task->state === \App\Enums\TaskState::IN_PROGRESS) {
-                                                        $responsible = $task->primaryOperator()->first()?->name ?? 'Unassigned';
+                                                        $responsible = $task->getPrimaryOperator()?->name ?? 'Unassigned';
                                                     } elseif ($task->state === \App\Enums\TaskState::SUBMITTED_TO_SURVEILLANCE) {
                                                         $responsible = \App\Models\User::role('surveillance_supervisor')->first()?->name ?? 'Unassigned';
                                                     }

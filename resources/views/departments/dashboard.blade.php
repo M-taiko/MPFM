@@ -229,8 +229,8 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($task->primaryOperator)
-                                            <small>{{ $task->primaryOperator->name }}</small>
+                                        @if($task->getPrimaryOperator())
+                                            <small>{{ $task->getPrimaryOperator()->name }}</small>
                                         @else
                                             <small class="text-muted">Unassigned</small>
                                         @endif

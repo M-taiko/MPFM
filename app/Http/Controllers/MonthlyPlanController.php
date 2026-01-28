@@ -452,7 +452,7 @@ class MonthlyPlanController extends Controller
             'towerModel',
             'oilString',
             'stateHistories',
-            'slaHistory',
+            'slaHistories',
             'mpfmTest'
         ]);
 

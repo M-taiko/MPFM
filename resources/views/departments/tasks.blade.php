@@ -50,7 +50,7 @@
                                             #{{ $task->id }}
                                         </a>
                                     </td>
-                                    <td>{{ $task->title }}</td>
+                                    <td>{{ $task->well_full_name ?? $task->well_number }}</td>
                                     <td>
                                         <span class="badge badge-{{ $task->getPriorityColor() }}">
                                             {{ ucfirst($task->priority) }}
@@ -58,7 +58,7 @@
                                     </td>
                                     <td>
                                         <span class="badge badge-secondary">
-                                            {{ $task->state->name }}
+                                            {{ $task->state }}
                                         </span>
                                     </td>
                                     <td>

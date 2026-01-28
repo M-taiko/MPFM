@@ -182,11 +182,19 @@ class PlanTask extends Model
     }
 
     /**
-     * Get the primary operator for this task
+     * Get the primary operator relationship for this task
      */
-    public function primaryOperator()
+    public function primaryOperator(): BelongsToMany
     {
-        return $this->operators()->wherePivot('is_primary', true)->first();
+        return $this->operators()->wherePivot('is_primary', true);
+    }
+
+    /**
+     * Get the first primary operator (helper method)
+     */
+    public function getPrimaryOperator()
+    {
+        return $this->primaryOperator()->first();
     }
 
     /**
