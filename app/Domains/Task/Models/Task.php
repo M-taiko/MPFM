@@ -95,23 +95,23 @@ class Task extends Model
             'task_operators',
             'task_id',
             'user_id'
-        )->withPivot('assigned_at', 'assigned_by', 'is_primary')
+        )->withPivot('assigned_at', 'is_primary')
          ->withTimestamps();
     }
 
     public function oilString(): BelongsTo
     {
-        return $this->belongsTo(OilString::class, 'oil_string_id')->nullable();
+        return $this->belongsTo(OilString::class, 'oil_string_id');
     }
 
     public function tower(): BelongsTo
     {
-        return $this->belongsTo(Tower::class, 'tower_id')->nullable();
+        return $this->belongsTo(Tower::class, 'tower_id');
     }
 
     public function mpfmTest(): BelongsTo
     {
-        return $this->belongsTo(MPFMTest::class, 'mpfm_test_id')->nullable();
+        return $this->belongsTo(MPFMTest::class, 'mpfm_test_id');
     }
 
     public function stateHistories(): HasMany
