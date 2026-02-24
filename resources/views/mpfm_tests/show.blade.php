@@ -22,6 +22,16 @@
                     <a href="{{ route('mpfm_tests.string_analysis', $mpfmTest->oil_string_id) }}" class="btn btn-primary btn-sm">
                         <i class="fe fe-trending-up mr-2"></i>String Analysis
                     </a>
+
+                    <!-- Supervisor Review Decision Button -->
+                    @if(auth()->check() && (auth()->user()->hasRole(['department_supervisor', 'surveillance_supervisor', 'hq_supervisor']) || auth()->user()->id === 1))
+                        @if(in_array($mpfmTest->status, ['submitted', 'approved_by_department', 'draft']))
+                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#supervisorReviewModal">
+                            <i class="fe fe-check-square mr-2"></i>Supervisor Review
+                        </button>
+                        @endif
+                    @endif
+
                     @can('update', $mpfmTest)
                     <a href="{{ route('mpfm_tests.edit', $mpfmTest->id) }}" class="btn btn-primary btn-sm">
                         <i class="fe fe-edit"></i> Edit
@@ -951,5 +961,12 @@ document.getElementById('testReviewForm')?.addEventListener('submit', function(e
     }
 });
 </script>
+
+<!-- Include Supervisor Review Modal -->
+@include('mpfm_tests.supervisor-review-modal')
+
+<!-- Data attribute for user role (for JavaScript) -->
+<div style="display: none;" data-user-role="{{ auth()->user()->roles->first()->name ?? 'operator' }}"></div>
+
 @endpush
 

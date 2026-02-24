@@ -85,9 +85,9 @@
                                     <th>Scheduled Date</th>
                                     <th>Plan Name</th>
                                     <th>Tower / Field</th>
-                                    <th>Well (البير)</th>
-                                    <th>String (رقم الاسترينج)</th>
-                                    <th>Device (نوع الجهاز)</th>
+                                    <th>Well</th>
+                                    <th>String</th>
+                                    <th>Device</th>
                                     <th>Priority</th>
                                     <th>Status</th>
                                     <th>SLA Status</th>
@@ -101,17 +101,19 @@
                                     <td><strong>{{ $task->sno ?? '-' }}</strong></td>
                                     <td>
                                         @if($task->scheduled_date)
-                                            {{ $task->scheduled_date->format('d M Y') }}
+                                            <span class="badge badge-light">{{ $task->scheduled_date->format('d M Y') }}</span>
                                         @else
-                                            <span class="text-muted">-</span>
+                                            <span class="badge badge-secondary">Not scheduled</span>
                                         @endif
                                     </td>
                                     <td>{{ $task->monthlyPlan->plan_name ?? '-' }}</td>
                                     <td>
                                         @if($task->towerModel && $task->towerModel->oilField)
-                                            {{ $task->towerModel->oilField->name }} / {{ $task->towerModel->name }}
+                                            <span class="badge badge-info">{{ $task->towerModel->oilField->name }} / {{ $task->towerModel->name }}</span>
+                                        @elseif($task->tower)
+                                            <span class="badge badge-info">{{ $task->tower }}</span>
                                         @else
-                                            <span class="text-muted">-</span>
+                                            <span class="badge badge-secondary">Not assigned</span>
                                         @endif
                                     </td>
                                     <td>
@@ -132,7 +134,13 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
-                                    <td>{{ $task->mpfm_device ?? '-' }}</td>
+                                    <td>
+                                        @if($task->mpfm_device)
+                                            <span class="badge badge-primary">{{ $task->mpfm_device }}</span>
+                                        @else
+                                            <span class="badge badge-secondary">Not specified</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         <span class="badge badge-{{ $task->priority_badge_class }}">
                                             {{ ucfirst($task->priority) }}
@@ -182,15 +190,24 @@
                                                     <i class="fe fe-trending-up"></i>
                                                 </a>
                                             @endif
-                                            @if($task->status === 'pending')
-                                            <form action="{{ route('operator.tasks.start', $task) }}" method="POST" style="display: inline;">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="btn btn-sm btn-primary"
-                                                        title="Start Task">
-                                                    <i class="fe fe-play"></i>
-                                                </button>
-                                            </form>
+                                            @if($task->completion_status === 'pending' || $task->completion_status === null)
+                                            <a href="{{ route('upload.form') }}?task_id={{ $task->id }}"
+                                               class="btn btn-sm btn-primary"
+                                               title="Upload Log File">
+                                                <i class="fe fe-upload"></i> Upload
+                                            </a>
+                                            @elseif($task->completion_status === 'in_progress')
+                                            <a href="{{ route('upload.form') }}?task_id={{ $task->id }}"
+                                               class="btn btn-sm btn-success"
+                                               title="Upload Log File">
+                                                <i class="fe fe-upload"></i> Upload
+                                            </a>
+                                            @elseif($task->completion_status !== 'completed')
+                                            <a href="{{ route('upload.form') }}?task_id={{ $task->id }}"
+                                               class="btn btn-sm btn-warning"
+                                               title="Upload Log File">
+                                                <i class="fe fe-upload"></i> Start
+                                            </a>
                                             @endif
                                         </div>
                                     </td>

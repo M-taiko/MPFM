@@ -12,7 +12,6 @@ class DepartmentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('department-access')->except(['dashboard', 'tasks', 'operators', 'reports']);
     }
 
     /**
@@ -46,7 +45,10 @@ class DepartmentController extends Controller
             ->selectRaw('count(*) as count')
             ->groupBy('state')
             ->get()
-            ->pluck('count', 'state')
+            ->mapWithKeys(function ($item) {
+                $stateLabel = is_object($item->state) ? $item->state->label() : ucwords(str_replace('_', ' ', $item->state ?? ''));
+                return [$stateLabel => $item->count];
+            })
             ->toArray();
 
         // Get team members (operators in this department)
@@ -342,5 +344,51 @@ class DepartmentController extends Controller
         $user->update(['department_id' => $department->id]);
 
         return response()->json(['message' => 'Operator assigned successfully']);
+    }
+
+    /**
+     * Assign a task to an operator (department manager only)
+     */
+    public function assignTaskToOperator(Department $department, PlanTask $task, Request $request)
+    {
+        // Check access
+        $this->checkDepartmentAccess($department);
+
+        // Verify task belongs to this department
+        if ($task->department_id !== $department->id) {
+            return response()->json(['success' => false, 'message' => 'Task does not belong to this department'], 403);
+        }
+
+        $validated = $request->validate([
+            'operator_id' => 'required|exists:users,id',
+        ]);
+
+        $operator = User::find($validated['operator_id']);
+
+        // Verify operator is in this department
+        if ($operator->department_id !== $department->id || !$operator->hasRole(['operator', 'mpfm_operator'])) {
+            return response()->json(['success' => false, 'message' => 'Operator is not in this department'], 403);
+        }
+
+        // Assign operator to task (many-to-many through task_operators)
+        // First check if already assigned
+        if (!$task->operators()->where('user_id', $operator->id)->exists()) {
+            $task->operators()->attach($operator->id, [
+                'is_primary' => true,
+                'assigned_at' => now()
+            ]);
+        }
+
+        // Update task assignment details
+        $task->update([
+            'assigned_operator_id' => $operator->id,
+            'assigned_at' => now(),
+            'assigned_by' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Task assigned to {$operator->name} successfully"
+        ]);
     }
 }

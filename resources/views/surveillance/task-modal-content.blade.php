@@ -209,7 +209,7 @@
                     <h6 class="mb-1">Assigned</h6>
                     <p class="text-muted mb-0">
                         @if($task->assigned_at)
-                            {{ $task->assigned_at->format('d M Y H:i') }}
+                            {{ is_string($task->assigned_at) ? $task->assigned_at : $task->assigned_at->format('d M Y H:i') }}
                         @else
                             Pending
                         @endif

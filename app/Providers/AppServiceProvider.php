@@ -59,10 +59,8 @@ class AppServiceProvider extends ServiceProvider
         // PlanTask observer removed in Phase 2 (model deleted, replaced with unified Task model)
 
         // Register Event Listeners for TaskStateChanged
-        Event::listen(
-            TaskStateChanged::class,
-            [UpdateMonthlyPlanStatistics::class, NotifyStakeholders::class]
-        );
+        Event::listen(TaskStateChanged::class, UpdateMonthlyPlanStatistics::class);
+        Event::listen(TaskStateChanged::class, NotifyStakeholders::class);
 
         // Register Event Listener for SLATriggered
         Event::listen(

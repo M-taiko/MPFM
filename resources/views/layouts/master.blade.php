@@ -23,12 +23,13 @@
 		<div class="main-content app-content">
 			@include('layouts.main-header')
 			<!-- container -->
-			<div class="container-fluid">
+			<div class="container-fluid mt-4">
 				@yield('page-header')
 				@yield('content')
 				@include('layouts.sidebar')
 				@include('layouts.models')
             	@include('layouts.footer')
+				
 				@include('layouts.footer-scripts')
 				@yield('scripts')
 				@stack('scripts')

@@ -986,13 +986,16 @@ table.modern-table tbody tr:hover {
             <input type="hidden" name="test_date" value="{{ $summary['test_date'] ?? 'N/A' }}">
             <input type="hidden" name="test_type" value="{{ $summary['test_type'] ?? 'N/A' }}">
             <input type="hidden" name="full_average_row" value="{{ json_encode($full_average_row) }}">
-            @if(isset($task_id))
+            @if(isset($task_id) && $task_id)
             <input type="hidden" name="task_id" value="{{ $task_id }}">
+            @endif
+            @if(isset($new_task_id) && $new_task_id)
+            <input type="hidden" name="new_task_id" value="{{ $new_task_id }}">
             @endif
 
             <button type="submit" class="btn btn-modern-success">
                 <i class="fe fe-save mr-2"></i>
-                @if(isset($task_id))
+                @if((isset($task_id) && $task_id) || (isset($new_task_id) && $new_task_id))
                     Complete Task & Save Test
                 @else
                     Save Test to Archive

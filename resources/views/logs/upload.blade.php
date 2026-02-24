@@ -262,7 +262,10 @@
     <div class="upload-header">
         <ol class="breadcrumb breadcrumb-modern">
             <li class="breadcrumb-item"><a href="{{ url('/dashboard') }}"><i class="fe fe-home mr-2"></i>Home</a></li>
-            @if(isset($task))
+            @if(isset($newTask))
+            <li class="breadcrumb-item"><a href="{{ route('tasks.show', $newTask) }}">Task #{{ $newTask->id }}</a></li>
+            <li class="breadcrumb-item active">Upload Log</li>
+            @elseif(isset($task))
             <li class="breadcrumb-item"><a href="{{ route('operator.tasks') }}">My Tasks</a></li>
             <li class="breadcrumb-item active">Upload Log for {{ $task->task_identifier }}</li>
             @else
@@ -275,20 +278,20 @@
                 <div class="d-flex align-items-center">
                     <i class="fe fe-upload" style="font-size: 2.5rem; margin-right: 1rem;"></i>
                     <div>
-                        <h1 class="mb-1" style="font-size: 1.75rem; font-weight: 700;">
-                            @if(isset($task))
-                                Upload Test Log
-                            @else
-                                Upload Well Test Log
-                            @endif
-                        </h1>
+                        <h1 class="mb-1" style="font-size: 1.75rem; font-weight: 700;">Upload Well Test Log</h1>
                         <div style="opacity: 0.9; font-size: 1rem;">
                             Upload and analyze VX log files from MPFM testing
                         </div>
                     </div>
                 </div>
             </div>
-            @if(isset($task))
+            @if(isset($newTask))
+            <div class="col-md-4 text-right">
+                <a href="{{ route('tasks.show', $newTask) }}" class="btn btn-modern-outline">
+                    <i class="fe fe-arrow-left"></i> Back to Task
+                </a>
+            </div>
+            @elseif(isset($task))
             <div class="col-md-4 text-right">
                 <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-modern-outline">
                     <i class="fe fe-arrow-left"></i>Back to Task
@@ -298,8 +301,39 @@
         </div>
     </div>
 
-    @if(isset($task))
-    <!-- Task Context Card -->
+    @if(isset($newTask))
+    <!-- New Task Context Card -->
+    <div class="task-context-card">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h5 style="color: #1e40af; font-weight: 700; margin-bottom: 1rem;">
+                    <i class="fe fe-info mr-2"></i>Task: {{ $newTask->title }}
+                </h5>
+                @if($newTask->tower)
+                <div class="info-badge">
+                    <i class="fe fe-layers" style="color: #667eea;"></i>
+                    <strong>Tower:</strong> {{ $newTask->tower->name }}
+                </div>
+                @endif
+                @if($newTask->oilString)
+                <div class="info-badge">
+                    <i class="fe fe-droplet" style="color: #667eea;"></i>
+                    <strong>String:</strong> {{ $newTask->oilString->name }}
+                </div>
+                @endif
+                <div class="info-badge">
+                    <i class="fe fe-briefcase" style="color: #667eea;"></i>
+                    <strong>Department:</strong> {{ $newTask->department?->name ?? 'N/A' }}
+                </div>
+                <div class="info-badge">
+                    <i class="fe fe-flag" style="color: #667eea;"></i>
+                    <strong>Priority:</strong> {{ ucfirst($newTask->priority) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    @elseif(isset($task))
+    <!-- Legacy Task Context Card -->
     <div class="task-context-card">
         <div class="row align-items-center">
             <div class="col-md-8">
@@ -309,15 +343,34 @@
 
                 <div class="info-badge">
                     <i class="fe fe-map-pin" style="color: #667eea;"></i>
-                    <strong>Field:</strong> {{ $task->oilString->tower->oilField->name }}
+                    <strong>Field:</strong>
+                    @if($task->towerModel && $task->towerModel->oilField)
+                        {{ $task->towerModel->oilField->name }}
+                    @elseif($task->oilString && $task->oilString->tower && $task->oilString->tower->oilField)
+                        {{ $task->oilString->tower->oilField->name }}
+                    @else
+                        {{ $autoFillData['field'] ?? 'N/A' }}
+                    @endif
                 </div>
                 <div class="info-badge">
                     <i class="fe fe-layers" style="color: #667eea;"></i>
-                    <strong>Tower:</strong> {{ $task->oilString->tower->name }}
+                    <strong>Tower:</strong>
+                    @if($task->towerModel)
+                        {{ $task->towerModel->name }}
+                    @elseif($task->oilString && $task->oilString->tower)
+                        {{ $task->oilString->tower->name }}
+                    @else
+                        {{ $autoFillData['wellhead_tower'] ?? 'N/A' }}
+                    @endif
                 </div>
                 <div class="info-badge">
                     <i class="fe fe-droplet" style="color: #667eea;"></i>
-                    <strong>String:</strong> {{ $task->oilString->name }}
+                    <strong>String:</strong>
+                    @if($task->oilString)
+                        {{ $task->oilString->name }}
+                    @else
+                        {{ $autoFillData['wellhead_string'] ?? 'N/A' }}
+                    @endif
                 </div>
                 <div class="info-badge">
                     <i class="fe fe-tool" style="color: #667eea;"></i>
@@ -396,15 +449,19 @@
         <form action="{{ route('process.log') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
             @csrf
 
-            @if(isset($task))
+            @if(isset($newTask))
+            <input type="hidden" name="new_task_id" value="{{ $newTask->id }}">
+            @elseif(isset($task))
             <input type="hidden" name="task_id" value="{{ $task->id }}">
             @endif
+
+            @php $hasTask = isset($task) || isset($newTask); @endphp
 
             <!-- Well Information Section -->
             <div class="form-section-title">
                 <i class="fe fe-info mr-2"></i>
                 Well Information
-                @if(isset($task))
+                @if($hasTask)
                 <span style="font-size: 0.85rem; margin-left: 1rem; opacity: 0.8;">
                     <i class="fe fe-check-circle" style="color: #10b981;"></i> Auto-filled from task
                 </span>
@@ -418,7 +475,7 @@
                         <input type="text" name="client" class="modern-form-input @error('client') is-invalid @enderror"
                                placeholder="e.g., ADNOC"
                                value="{{ old('client', $autoFillData['client'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }} required>
+                               {{ $hasTask ? 'readonly' : '' }} required>
                         @error('client')
                             <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
                         @enderror
@@ -431,7 +488,7 @@
                         <input type="text" name="field" class="modern-form-input @error('field') is-invalid @enderror"
                                placeholder="e.g., Upper Zakum"
                                value="{{ old('field', $autoFillData['field'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }} required>
+                               {{ $hasTask ? 'readonly' : '' }} required>
                         @error('field')
                             <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
                         @enderror
@@ -444,7 +501,7 @@
                         <input type="text" name="well" class="modern-form-input @error('well') is-invalid @enderror"
                                placeholder="e.g., ZK-23"
                                value="{{ old('well', $autoFillData['well'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }} required>
+                               {{ $hasTask ? 'readonly' : '' }} required>
                         @error('well')
                             <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
                         @enderror
@@ -458,7 +515,7 @@
             <div class="form-section-title">
                 <i class="fe fe-settings mr-2"></i>
                 Test Configuration
-                @if(isset($task))
+                @if($hasTask)
                 <span style="font-size: 0.85rem; margin-left: 1rem; opacity: 0.8;">
                     <i class="fe fe-check-circle" style="color: #10b981;"></i> Auto-filled from task
                 </span>
@@ -472,7 +529,7 @@
                         <input type="text" name="wellhead_tower" class="modern-form-input"
                                placeholder="Tower Name"
                                value="{{ old('wellhead_tower', $autoFillData['wellhead_tower'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }}>
+                               {{ $hasTask ? 'readonly' : '' }}>
                     </div>
                 </div>
 
@@ -482,7 +539,7 @@
                         <input type="text" name="wellhead_string" class="modern-form-input"
                                placeholder="String Name"
                                value="{{ old('wellhead_string', $autoFillData['wellhead_string'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }}>
+                               {{ $hasTask ? 'readonly' : '' }}>
                     </div>
                 </div>
 
@@ -501,7 +558,7 @@
                         <input type="text" name="operator" class="modern-form-input @error('operator') is-invalid @enderror"
                                placeholder="Operator Name"
                                value="{{ old('operator', $autoFillData['operator'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }} required>
+                               {{ $hasTask ? 'readonly' : '' }} required>
                         @error('operator')
                             <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
                         @enderror
@@ -515,7 +572,7 @@
                         <label class="modern-form-label">Test Date</label>
                         <input type="date" name="test_date" class="modern-form-input @error('test_date') is-invalid @enderror"
                                value="{{ old('test_date', $autoFillData['test_date'] ?? '') }}"
-                               {{ isset($task) ? 'readonly' : '' }} required>
+                               {{ $hasTask ? 'readonly' : '' }} required>
                         @error('test_date')
                             <div style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ $message }}</div>
                         @enderror
@@ -525,7 +582,7 @@
                 <div class="col-md-6">
                     <div class="modern-form-group">
                         <label class="modern-form-label">Test Type</label>
-                        @if(isset($task))
+                        @if($hasTask)
                             <!-- When task is set, use readonly select and hidden input for form submission -->
                             <select class="modern-form-input" disabled>
                                 <option value="flow" {{ old('test_type', $autoFillData['test_type'] ?? '') == 'flow' ? 'selected' : '' }}>Flow Test</option>

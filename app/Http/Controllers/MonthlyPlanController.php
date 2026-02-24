@@ -176,7 +176,7 @@ class MonthlyPlanController extends Controller
     }
 
     /**
-     * Show form to add task to plan
+     * Show form to add task to plan — redirects to unified tasks/create form
      */
     public function createTask(MonthlyPlan $monthlyPlan)
     {
@@ -184,16 +184,8 @@ class MonthlyPlanController extends Controller
             return back()->with('error', 'Cannot add tasks to this plan in its current status.');
         }
 
-        $towers = Tower::all();
-        $operators = User::role('operator')->get();
-        $departments = Department::where('is_active', true)
-            ->orderBy('display_order')
-            ->get();
-
-        // Get oil strings with tower relationship for cascading dropdowns
-        $oilStrings = OilString::with('tower')->get();
-
-        return view('monthly_plans.create_task', compact('monthlyPlan', 'towers', 'operators', 'departments', 'oilStrings'));
+        // Use the unified task creation form, pre-selecting this monthly plan
+        return redirect()->route('tasks.create', ['monthly_plan_id' => $monthlyPlan->id]);
     }
 
     /**
@@ -339,7 +331,7 @@ class MonthlyPlanController extends Controller
     }
 
     /**
-     * Store new task in plan
+     * Store new task in plan — delegates to TaskController (unified logic)
      */
     public function storeTask(Request $request, MonthlyPlan $monthlyPlan)
     {
@@ -347,91 +339,11 @@ class MonthlyPlanController extends Controller
             return back()->with('error', 'Cannot add tasks to this plan in its current status.');
         }
 
-        try {
-            $request->validate([
-            'department_id' => 'required|exists:departments,id',
-            'sno' => 'required|integer',
-            'well_number' => 'required|string',
-            'string_number' => 'required|string',
-            'tower' => 'nullable|string',
-            'flow_route' => 'nullable|string',
-            'reservoir_layer' => 'nullable|string',
-            'test_location' => 'nullable|string',
-            'mpfm_type' => 'nullable|string',
-            'dhsv_type' => 'nullable|string',
-            'category' => 'nullable|string',
-            'required_whfp' => 'nullable|numeric',
-            'scheduled_date' => 'nullable|date',
-            'priority' => 'nullable|in:normal,high,top',
-            ]);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            throw $e;
-        }
+        // Ensure monthly_plan_id is set to this plan
+        $request->merge(['monthly_plan_id' => $monthlyPlan->id]);
 
-        try {
-            DB::beginTransaction();
-
-            // Find or create tower
-            $tower = null;
-            if ($request->tower) {
-                $tower = Tower::firstOrCreate(
-                    ['name' => $request->tower],
-                    ['oil_field_id' => 1] // Default oil field
-                );
-            }
-
-            // Find or create oil string
-            $oilString = null;
-            $wellFullName = $request->well_number . '/' . $request->string_number;
-            if ($tower) {
-                $oilString = OilString::firstOrCreate([
-                    'name' => $wellFullName,
-                    'tower_id' => $tower->id
-                ]);
-            }
-
-            // Create task
-            $task = PlanTask::create([
-                'monthly_plan_id' => $monthlyPlan->id,
-                'department_id' => $request->department_id,
-                'sno' => $request->sno,
-                'well_number' => $request->well_number,
-                'string_number' => $request->string_number,
-                'well_full_name' => $wellFullName,
-                'tower' => $request->tower,
-                'tower_id' => $tower?->id,
-                'oil_string_id' => $oilString?->id,
-                'flow_route' => $request->flow_route,
-                'reservoir_layer' => $request->reservoir_layer,
-                'test_location' => $request->test_location,
-                'electrification_status' => $request->electrification_status,
-                'mpfm_type' => $request->mpfm_type,
-                'dhsv_type' => $request->dhsv_type,
-                'sub_category' => $request->sub_category,
-                'category' => $request->category,
-                'required_whfp' => $request->required_whfp,
-                'production_rate' => $request->production_rate,
-                'scheduled_date' => $request->scheduled_date,
-                'priority' => $request->priority ?? 'normal',
-                'supervisor_remarks' => $request->supervisor_remarks,
-                'hq_notes' => $request->hq_notes,
-            ]);
-
-            // Update plan statistics
-            $monthlyPlan->updateStatistics();
-
-            DB::commit();
-
-            return redirect()
-                ->route('monthly-plans.tasks.show', [$monthlyPlan, $task])
-                ->with('success', 'Task created successfully. Review the complete task details below.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()
-                ->with('error', 'Failed to add task: ' . $e->getMessage())
-                ->withInput();
-        }
+        // Delegate to the unified TaskController@store
+        return app(TaskController::class)->store($request);
     }
 
     /**

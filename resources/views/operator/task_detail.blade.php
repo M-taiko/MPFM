@@ -199,29 +199,54 @@
 
                     <!-- Task Actions -->
                     <hr>
+                    @php
+                        $deptCode = strtoupper($task->department->code ?? 'MPFM');
+                        $isMpfm   = $deptCode === 'MPFM';
+                        $completeUrl = $isMpfm
+                            ? route('upload.form') . '?task_id=' . $task->id
+                            : route('dept.complete', $task);
+                    @endphp
                     <div class="d-flex justify-content-between align-items-center">
-                        @if($task->status === 'pending')
-                            <form action="{{ route('operator.tasks.start', $task) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fe fe-play mr-2"></i>Start This Task
-                                </button>
-                            </form>
-                        @elseif($task->status === 'in_progress')
+                        @if($task->completion_status === 'pending' || $task->completion_status === null)
+                            <a href="{{ $completeUrl }}" class="btn btn-primary btn-lg">
+                                <i class="fe fe-play mr-2"></i>Start This Task
+                            </a>
+                        @elseif($task->completion_status === 'in_progress')
                             <div>
-                                <p class="mb-2"><strong>Scheduled for:</strong> {{ $task->scheduled_date->format('d M Y') }}</p>
-                                <a href="{{ route('upload.form') }}?task_id={{ $task->id }}" class="btn btn-success btn-lg">
+                                <p class="mb-2"><strong>Scheduled for:</strong>
+                                    @if($task->scheduled_date)
+                                        {{ $task->scheduled_date->format('d M Y') }}
+                                    @else
+                                        Not scheduled
+                                    @endif
+                                </p>
+                                @if($isMpfm)
+                                <a href="{{ $completeUrl }}" class="btn btn-success btn-lg">
                                     <i class="fe fe-upload mr-2"></i>Upload Log & Complete Task
                                 </a>
+                                @else
+                                <a href="{{ $completeUrl }}" class="btn btn-success btn-lg">
+                                    <i class="fe fe-check-circle mr-2"></i>Complete Task
+                                </a>
+                                @endif
                             </div>
-                        @elseif($task->status === 'completed')
+                        @elseif($task->completion_status === 'completed')
                             <div class="alert alert-success w-100">
                                 <i class="fe fe-check-circle mr-2"></i>
                                 <strong>Task Completed</strong><br>
                                 @if($task->completed_at)
                                 Completed at: {{ $task->completed_at->format('d M Y H:i') }}<br>
                                 @endif
+                                @if(!$isMpfm)
+                                <a href="{{ route('dept.result', $task) }}" class="btn btn-sm btn-outline-success mt-2">
+                                    <i class="fe fe-eye mr-1"></i>View Completion Details
+                                </a>
+                                @endif
                             </div>
+                        @else
+                            <a href="{{ $completeUrl }}" class="btn btn-warning btn-lg">
+                                <i class="fe fe-play mr-2"></i>Start This Task
+                            </a>
                         @endif
                     </div>
 
@@ -346,7 +371,7 @@
                                 <h6 class="mb-1">Assigned</h6>
                                 <p class="text-muted mb-0 small">
                                     @if($task->assigned_at)
-                                        {{ $task->assigned_at->format('d M Y H:i') }}
+                                        {{ is_string($task->assigned_at) ? $task->assigned_at : $task->assigned_at->format('d M Y H:i') }}
                                     @else
                                         Pending
                                     @endif

@@ -11,21 +11,23 @@ class TaskSLAHistory extends Model
     protected $table = 'task_sla_histories';
 
     protected $fillable = [
-        'task_id',
-        'entered_state',
+        'plan_task_id',
+        'sla_duration_hours',
         'expected_completion_at',
-        'actual_completion_at',
+        'overdue_detected_at',
+        'notification_sent_at',
+        'notified_to_role',
         'escalation_level',
-        'escalated_at',
-        'escalated_to_user_id',
-        'resolved_at',
+        'resolution_at',
+        'notes',
+        'metadata',
     ];
 
     protected $casts = [
         'expected_completion_at' => 'datetime',
-        'actual_completion_at' => 'datetime',
-        'escalated_at' => 'datetime',
-        'resolved_at' => 'datetime',
+        'overdue_detected_at' => 'datetime',
+        'notification_sent_at' => 'datetime',
+        'resolution_at' => 'datetime',
     ];
 
     /**

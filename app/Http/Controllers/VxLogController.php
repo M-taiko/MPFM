@@ -10,6 +10,7 @@ use DateTime;
 use App\Models\WellTest;
 use App\Models\PlanTask;
 use App\Models\MPFMTest;
+use App\Domains\Task\Models\Task as NewTask;
 use App\Services\MPFMCalculationService;
 use App\Services\MPFMParsingService;
 use App\Services\MPFMChartService;
@@ -19,6 +20,8 @@ use App\Services\MPFMValidationService;
 use App\Services\MPFMDetailedMetricsExtractorService;
 use App\Enums\TaskState;
 use App\Notifications\TaskCompletedNotification;
+use App\Notifications\TestUploadedNotification;
+use App\Models\User;
 
 class VxLogController extends Controller
 {
@@ -45,46 +48,85 @@ class VxLogController extends Controller
     {
         $taskId = $request->get('task_id');
         $task = null;
+        $newTask = null;
         $autoFillData = [];
 
         if ($taskId) {
-            $task = PlanTask::with([
-                'monthlyPlan',
-                'towerModel',
-                'oilString',
-                'operators'
-            ])->findOrFail($taskId);
+            // Try new Task model first, then fall back to PlanTask
+            $newTask = NewTask::with(['tower', 'oilString', 'operators', 'monthlyPlan'])->find($taskId);
 
-            // Ensure operator can only access their task (multi-operator support)
-            if (!$task->isAssignedTo(auth()->id())) {
-                abort(403, 'Unauthorized access to task');
+            if ($newTask) {
+                // New-style task: check access
+                $isAssigned = $newTask->assigned_to_user_id == auth()->id()
+                           || $newTask->operators()->where('user_id', auth()->id())->exists();
+
+                if (!$isAssigned && !auth()->user()->hasAnyRole(['admin', 'surveillance_supervisor', 'department_supervisor'])) {
+                    abort(403, 'Unauthorized access to task');
+                }
+
+                // Transition to IN_PROGRESS if still ASSIGNED_TO_DEPARTMENT
+                if ($newTask->state->value === 'assigned_to_department') {
+                    $sm = app(\App\Domains\Task\Services\TaskStateMachine::class);
+                    try {
+                        $sm->transition($newTask, \App\Enums\TaskState::IN_PROGRESS, auth()->user(), 'Started via upload form');
+                    } catch (\Exception $e) {
+                        // Continue even if transition fails
+                    }
+                }
+
+                $autoFillData = [
+                    'client'             => 'ADNOC',
+                    'field'              => $newTask->tower?->oilField?->name ?? 'N/A',
+                    'well'               => $newTask->title ?? ('Task #' . $newTask->id),
+                    'wellhead_tower'     => $newTask->tower?->name ?? 'N/A',
+                    'wellhead_string'    => $newTask->oilString?->string_identifier ?? $newTask->oilString?->name ?? 'N/A',
+                    'operator'           => auth()->user()->name,
+                    'test_date'          => $newTask->expected_completion_at?->format('Y-m-d') ?? now()->format('Y-m-d'),
+                    'mpfm_device'        => 'MPFM',
+                    'test_type'          => 'flow',
+                    'expected_oil_rate'  => null,
+                    'expected_gas_rate'  => null,
+                    'expected_water_cut' => null,
+                    'expected_pressure'  => null,
+                    'expected_temperature' => null,
+                ];
+            } else {
+                // Legacy PlanTask
+                $task = PlanTask::with([
+                    'monthlyPlan',
+                    'towerModel',
+                    'oilString',
+                    'operators'
+                ])->findOrFail($taskId);
+
+                if (!$task->isAssignedTo(auth()->id())) {
+                    abort(403, 'Unauthorized access to task');
+                }
+
+                if ($task->completion_status === 'pending') {
+                    $task->update(['completion_status' => 'in_progress']);
+                }
+
+                $autoFillData = [
+                    'client'             => 'ADNOC',
+                    'field'              => $task->towerModel?->oilField?->name ?? $task->tower ?? 'N/A',
+                    'well'               => $task->well_full_name ?? $task->well_number ?? $task->towerModel?->well_name ?? 'N/A',
+                    'wellhead_tower'     => $task->towerModel?->name ?? $task->tower ?? 'N/A',
+                    'wellhead_string'    => $task->oilString?->string_identifier ?? $task->string_number ?? 'N/A',
+                    'operator'           => auth()->user()->name,
+                    'test_date'          => $task->scheduled_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
+                    'mpfm_device'        => $task->mpfm_type ?? $task->category ?? 'MPFM',
+                    'test_type'          => $task->category ?? 'flow',
+                    'expected_oil_rate'  => $task->expected_oil_rate ?? $task->production_rate ?? null,
+                    'expected_gas_rate'  => $task->expected_gas_rate ?? null,
+                    'expected_water_cut' => $task->expected_water_cut ?? null,
+                    'expected_pressure'  => $task->required_whfp ?? null,
+                    'expected_temperature' => $task->expected_temperature ?? null,
+                ];
             }
-
-            // Mark task as in_progress if it's pending
-            if ($task->completion_status === 'pending') {
-                $task->update(['completion_status' => 'in_progress']);
-            }
-
-            // Prepare auto-fill data from monthly plan task structure
-            $autoFillData = [
-                'client' => 'ADNOC',
-                'field' => $task->towerModel?->oilField?->name ?? $task->tower ?? 'N/A',
-                'well' => $task->well_full_name ?? $task->well_number ?? $task->towerModel?->well_name ?? 'N/A',
-                'wellhead_tower' => $task->towerModel?->name ?? $task->tower ?? 'N/A',
-                'wellhead_string' => $task->oilString?->string_identifier ?? $task->string_number ?? 'N/A',
-                'operator' => auth()->user()->name,
-                'test_date' => $task->scheduled_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
-                'mpfm_device' => $task->mpfm_type ?? $task->category ?? 'MPFM',
-                'test_type' => $task->category ?? 'flow',
-                'expected_oil_rate' => $task->expected_oil_rate ?? $task->production_rate ?? null,
-                'expected_gas_rate' => $task->expected_gas_rate ?? null,
-                'expected_water_cut' => $task->expected_water_cut ?? null,
-                'expected_pressure' => $task->required_whfp ?? null,
-                'expected_temperature' => $task->expected_temperature ?? null,
-            ];
         }
 
-        return view('logs.upload', compact('task', 'autoFillData'));
+        return view('logs.upload', compact('task', 'newTask', 'autoFillData'));
     }
 
     public function processLogFile(Request $request)
@@ -103,6 +145,7 @@ class VxLogController extends Controller
             'upstream_choke' => 'nullable|string',
             'downstream_choke' => 'nullable|string',
             'task_id' => 'nullable|exists:plan_tasks,id',
+            'new_task_id' => 'nullable|exists:tasks,id',
         ]);
 
         // Validate file extension
@@ -140,13 +183,13 @@ class VxLogController extends Controller
             $displayData['temp_file_path'] = $tempFilePath;
             $displayData['filename'] = $file->getClientOriginalName();
             $displayData['task_id'] = $request->input('task_id');
+            $displayData['new_task_id'] = $request->input('new_task_id');
 
-            // Transition task to MPFM_REVIEWED when file is uploaded
+            // Transition legacy PlanTask state when file is uploaded
             if ($request->input('task_id')) {
                 $task = PlanTask::find($request->input('task_id'));
                 if ($task && $task->isAssignedTo(auth()->id())) {
                     try {
-                        // Transition from IN_PROGRESS to MPFM_REVIEWED
                         $this->taskStateService->transition(
                             $task,
                             TaskState::MPFM_REVIEWED,
@@ -154,8 +197,23 @@ class VxLogController extends Controller
                             'Test log file uploaded: ' . $file->getClientOriginalName()
                         );
                     } catch (\Exception $e) {
-                        // Log error but continue with upload
                         \Log::warning('Failed to transition task state: ' . $e->getMessage());
+                    }
+                }
+            }
+
+            // Transition new-style Task to DEPARTMENT_REVIEWED when file is uploaded
+            if ($request->input('new_task_id')) {
+                $newTask = NewTask::find($request->input('new_task_id'));
+                if ($newTask) {
+                    $sm = app(\App\Domains\Task\Services\TaskStateMachine::class);
+                    try {
+                        if ($newTask->state->value === 'in_progress') {
+                            $sm->transition($newTask, \App\Enums\TaskState::DEPARTMENT_REVIEWED, auth()->user(),
+                                'Test log uploaded: ' . $file->getClientOriginalName());
+                        }
+                    } catch (\Exception $e) {
+                        \Log::warning('Failed to transition new task state: ' . $e->getMessage());
                     }
                 }
             }
@@ -252,6 +310,7 @@ class VxLogController extends Controller
         'temp_file_path' => 'required|string',
         'filename' => 'required|string',
         'task_id' => 'nullable|exists:plan_tasks,id',
+        'new_task_id' => 'nullable|exists:tasks,id',
     ]);
 
     $data = $request->all();
@@ -374,13 +433,86 @@ class VxLogController extends Controller
                 'state' => TaskState::COMPLETED,
             ]);
 
-            // Notify supervisor if daily plan exists
+            // Notify stakeholders about test upload
+            $operator = auth()->user();
+
+            // Get department supervisor
+            if ($task->department) {
+                $departmentManager = User::where('department_id', $task->department->id)
+                    ->whereHas('roles', function($q) {
+                        $q->where('name', 'department_manager');
+                    })
+                    ->first();
+
+                if ($departmentManager) {
+                    $departmentManager->notify(new TestUploadedNotification($task, $operator));
+                }
+            }
+
+            // Notify surveillance supervisor
+            if ($task->surveillance_supervisor_id) {
+                $surveillanceSupervisor = User::find($task->surveillance_supervisor_id);
+                if ($surveillanceSupervisor) {
+                    $surveillanceSupervisor->notify(new TestUploadedNotification($task, $operator));
+                }
+            }
+
+            // Notify all admins
+            $admins = User::whereHas('roles', function($q) {
+                $q->where('name', 'admin');
+            })->get();
+
+            foreach ($admins as $admin) {
+                $admin->notify(new TestUploadedNotification($task, $operator));
+            }
+
+            // Also notify supervisor if daily plan exists (existing logic)
             if ($task->monthlyPlan && $task->monthlyPlan->createdBy) {
                 $task->monthlyPlan->createdBy->notify(new TaskCompletedNotification($task, $mpfmTest));
             }
 
             return redirect()->route('operator.tasks.show', $task)
                 ->with('success', 'Test uploaded and task completed successfully!');
+        }
+
+        // Handle new-style Task completion if new_task_id is present
+        if (isset($data['new_task_id']) && $data['new_task_id']) {
+            $newTask = NewTask::find($data['new_task_id']);
+            if ($newTask) {
+                // Create MPFMTest linked to new task
+                $mpfmTest = MPFMTest::create([
+                    'user_id'          => auth()->id(),
+                    'tower_id'         => $newTask->tower_id,
+                    'oil_string_id'    => $newTask->oil_string_id,
+                    'task_id'          => $newTask->id,
+                    'well_test_id'     => $wellTest->id,
+                    'test_date'        => $summary['test_date'] ?? now()->format('Y-m-d'),
+                    'oil_rate'         => $averages['oil_rate'] ?? null,
+                    'gas_rate'         => $averages['gas_rate'] ?? null,
+                    'water_cut'        => $averages['water_cut'] ?? null,
+                    'pressure'         => $averages['pressure'] ?? null,
+                    'temperature'      => $averages['temperature'] ?? null,
+                    'gor'              => $averages['gor'] ?? null,
+                    'calculated_kpis'  => $averages,
+                    'log_file_path'    => $permanentPath,
+                    'raw_log_data'     => $parsedData,
+                    'test_duration_minutes' => $this->calculateTestDuration($summary['start_time'], $summary['end_time']),
+                ]);
+
+                // Transition task state to DEPARTMENT_REVIEWED
+                $sm = app(\App\Domains\Task\Services\TaskStateMachine::class);
+                try {
+                    if (in_array($newTask->state->value, ['in_progress', 'assigned_to_department'])) {
+                        $sm->transition($newTask, \App\Enums\TaskState::DEPARTMENT_REVIEWED, auth()->user(),
+                            'MPFM test uploaded: ' . $data['filename']);
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Could not transition new task after upload: ' . $e->getMessage());
+                }
+
+                return redirect()->route('tasks.show', $newTask)
+                    ->with('success', 'Test uploaded and task submitted for review!');
+            }
         }
 
     } catch (\Exception $e) {

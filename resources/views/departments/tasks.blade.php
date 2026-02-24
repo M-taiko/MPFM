@@ -1,4 +1,4 @@
-@extends("layouts.app")
+@extends("layouts.master")
 
 @section("content")
 <div class="container-fluid">
@@ -83,6 +83,13 @@
                                     </td>
                                     <td>
                                         <div class="btn-group btn-group-sm" role="group">
+                                            <!-- View Details Button for Supervisors -->
+                                            @if(auth()->user()->hasRole(['department_supervisor', 'surveillance_supervisor', 'job_officer', 'hq_supervisor', 'admin']))
+                                            <a href="{{ route('tasks.supervisor-view', $task->id) }}" class="btn btn-info" title="View task workflow and details">
+                                                <i class="fe fe-eye"></i> View
+                                            </a>
+                                            @endif
+
                                             <button type="button" class="btn btn-primary btn-assign"
                                                     data-task-id="{{ $task->id }}"
                                                     data-task-title="{{ $task->title }}"

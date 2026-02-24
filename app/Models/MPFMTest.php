@@ -65,6 +65,23 @@ class MPFMTest extends Model
         'detailed_metrics', 'flow_rate_metrics', 'pvt_metrics',
         'pressure_temperature_metrics', 'ratio_metrics', 'cumulative_metrics',
         'data_quality_metrics',
+        // Supervisor approval fields
+        'department_supervisor_id',
+        'surveillance_supervisor_id',
+        'approved_by_department_at',
+        'approved_by_surveillance_at',
+        // Rejection fields
+        'rejected_by_user_id',
+        'rejected_by_role',
+        'rejected_reason',
+        'rejected_details',
+        'rejected_at',
+        // Re-test request fields
+        'retest_requested_by_user_id',
+        'retest_reason',
+        'retest_details',
+        'retest_requested_at',
+        'supervisor_remarks',
     ];
 
     protected $casts = [

@@ -206,7 +206,11 @@
                                 <tr>
                                     <td>
                                         <strong>{{ $task->well_full_name }}</strong><br>
-                                        <small class="text-muted">Plan: {{ $task->monthlyPlan->plan_name ?? 'N/A' }}</small>
+                                        <small class="text-muted">
+                                            <i class="fe fe-calendar"></i> {{ $task->monthlyPlan->plan_name ?? 'N/A' }}
+                                            <br>
+                                            <i class="fe fe-hash"></i> SNO: {{ $task->sno ?? 'N/A' }}
+                                        </small>
                                     </td>
                                     <td>
                                         @if($task->completion_status === 'completed')
@@ -236,10 +240,22 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('monthly-plans.tasks.show', [$task->monthlyPlan, $task]) }}"
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fe fe-eye"></i> View
-                                        </a>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            @if($task->completion_status === 'pending' && !$task->getPrimaryOperator())
+                                                <button type="button" class="btn btn-success btn-assign-operator"
+                                                        data-task-id="{{ $task->id }}"
+                                                        data-task-name="{{ $task->well_full_name }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#assignOperatorModal">
+                                                    <i class="fe fe-plus"></i> Assign
+                                                </button>
+                                            @endif
+                                            <a href="{{ route('monthly-plans.tasks.show', [$task->monthlyPlan, $task]) }}"
+                                               class="btn btn-outline-primary"
+                                               title="View task details">
+                                                <i class="fe fe-eye"></i> View
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
@@ -310,5 +326,242 @@
         border-radius: 6px;
         padding: 12px 15px;
     }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .btn-assign-operator-modal {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+    }
+
+    .btn-assign-operator-modal:hover {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-assign-operator-modal:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .form-select {
+        border: 1px solid #dee2e6;
+        padding: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .form-select.is-invalid {
+        border-color: #dc3545;
+        animation: shake 0.3s;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .alert-fixed {
+        animation: slideIn 0.3s ease-in;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .btn-assign-operator {
+        white-space: nowrap;
+    }
 </style>
+
+<!-- Assign Operator Modal -->
+<div class="modal fade" id="assignOperatorModal" tabindex="-1" aria-labelledby="assignOperatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignOperatorModalLabel">
+                    <i class="fe fe-user-check"></i> Assign Operator to Task
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-4">
+                    <strong>Task:</strong> <span id="modalTaskName">--</span>
+                </div>
+
+                <div class="mb-3">
+                    <label for="operatorSelect" class="form-label"><strong>Select Operator</strong></label>
+                    <select id="operatorSelect" class="form-select form-select-lg" required>
+                        <option value="">-- Choose an Operator --</option>
+                        @foreach($teamMembers as $member)
+                            <option value="{{ $member->id }}">
+                                {{ $member->name }}
+                                @if($member->email) ({{ $member->email }}) @endif
+                                - {{ $member->task_count ?? 0 }} tasks
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                @if($teamMembers->isEmpty())
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fe fe-alert-triangle"></i>
+                        <strong>No operators available</strong> in this department.
+                        <a href="{{ route('departments.operators', $department->id) }}" class="alert-link">
+                            Add team members
+                        </a>
+                    </div>
+                @endif
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    <i class="fe fe-x"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-assign-operator-modal" onclick="assignTaskToOperator()">
+                    <i class="fe fe-check-circle"></i> Assign Operator
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
+
+@push('scripts')
+<script>
+    let currentTaskId = null;
+    let assignOperatorModal = null;
+
+    // Initialize modal
+    document.addEventListener('DOMContentLoaded', function() {
+        assignOperatorModal = new bootstrap.Modal(document.getElementById('assignOperatorModal'), {
+            backdrop: 'static',
+            keyboard: false
+        });
+    });
+
+    // Handle assign button clicks
+    document.querySelectorAll('.btn-assign-operator').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentTaskId = this.dataset.taskId;
+            const taskName = this.dataset.taskName;
+
+            // Update modal content
+            document.getElementById('modalTaskName').textContent = taskName;
+            document.getElementById('operatorSelect').value = '';
+
+            // Show modal
+            if (assignOperatorModal) {
+                assignOperatorModal.show();
+            }
+        });
+    });
+
+    // Assign task to operator
+    function assignTaskToOperator() {
+        const operatorId = document.getElementById('operatorSelect').value;
+
+        if (!operatorId) {
+            // Show error in modal
+            const select = document.getElementById('operatorSelect');
+            select.classList.add('is-invalid');
+            setTimeout(() => {
+                select.classList.remove('is-invalid');
+            }, 2000);
+            return;
+        }
+
+        if (!currentTaskId) {
+            alert('No task selected. Please refresh and try again.');
+            return;
+        }
+
+        // Disable button and show loading state
+        const assignBtn = event.target;
+        const originalText = assignBtn.innerHTML;
+        assignBtn.disabled = true;
+        assignBtn.innerHTML = '<i class="fe fe-loader"></i> Assigning...';
+
+        // Send assignment request to server
+        fetch(`/departments/{{ $department->id }}/tasks/${currentTaskId}/assign-operator`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                operator_id: parseInt(operatorId)
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload
+                if (assignOperatorModal) {
+                    assignOperatorModal.hide();
+                }
+
+                // Show success message before reload
+                const successDiv = document.createElement('div');
+                successDiv.className = 'alert alert-success alert-fixed';
+                successDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                successDiv.innerHTML = '<i class="fe fe-check-circle"></i> ' + data.message;
+                document.body.appendChild(successDiv);
+
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                assignBtn.disabled = false;
+                assignBtn.innerHTML = originalText;
+                alert('Error: ' + (data.message || 'Failed to assign task'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            assignBtn.disabled = false;
+            assignBtn.innerHTML = originalText;
+            alert('An error occurred: ' + error.message);
+        });
+    }
+
+    // Close modal when backdrop is clicked
+    document.getElementById('assignOperatorModal').addEventListener('hidden.bs.modal', function() {
+        currentTaskId = null;
+        document.getElementById('operatorSelect').value = '';
+    });
+</script>
+@endpush

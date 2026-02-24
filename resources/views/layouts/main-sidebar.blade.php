@@ -38,8 +38,29 @@
             </div>
         </div>
 
+        @php
+            /* ── Department map: code → [db_id, icon, label] ── */
+            $deptMap = [
+                'MPFM'        => ['id' => 1, 'icon' => 'fe-activity',   'label' => 'MPFM Operations'],
+                'WIRELINE'    => ['id' => 2, 'icon' => 'fe-git-branch',  'label' => 'Wire Line'],
+                'PRODUCTION'  => ['id' => 3, 'icon' => 'fe-droplet',     'label' => 'Production Ops'],
+                'DRILLING'    => ['id' => 4, 'icon' => 'fe-layers',      'label' => 'Drilling Services'],
+                'COMPLETION'  => ['id' => 5, 'icon' => 'fe-anchor',      'label' => 'Well Completion'],
+                'WORKOVER'    => ['id' => 6, 'icon' => 'fe-tool',        'label' => 'Workover'],
+                'MAINTENANCE' => ['id' => 7, 'icon' => 'fe-settings',    'label' => 'Maintenance'],
+            ];
+            $isAdmin   = auth()->user()->hasRole('admin');
+            $isManager = auth()->user()->hasRole('department_manager');
+            $isOfficer = auth()->user()->hasRole('job_officer');
+            $isOp      = auth()->user()->hasRole('operator') || auth()->user()->hasRole('mpfm_operator');
+            $userDeptId = auth()->user()->department_id;
+        @endphp
+
         <ul class="side-menu">
-            <!-- Dashboard -->
+
+            {{-- ══════════════════════════════════════
+                 Dashboard
+            ══════════════════════════════════════ --}}
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ url('/dashboard') }}">
                     <i class="side-menu__icon fe fe-home"></i>
@@ -47,9 +68,29 @@
                 </a>
             </li>
 
-            <!-- UNIFIED TASK MANAGEMENT (Phase 2 - Enterprise Refactoring) -->
-            <li class="side-item side-item-category">Task Management</li>
+            {{-- ══════════════════════════════════════
+                 My Tasks — Operator only
+            ══════════════════════════════════════ --}}
+            @if($isOp && !$isAdmin)
+            <li class="side-item side-item-category">My Work</li>
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('operator*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-clipboard"></i>
+                    <span class="side-menu__label">My Tasks</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->routeIs('operator.dashboard') ? 'active' : '' }}" href="{{ route('operator.dashboard') }}">Dashboard</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('operator.tasks') ? 'active' : '' }}" href="{{ route('operator.tasks') }}">All Tasks</a></li>
+                </ul>
+            </li>
+            @endif
 
+            {{-- ══════════════════════════════════════
+                 Task Management — Admin / Job Officer
+            ══════════════════════════════════════ --}}
+            @if($isAdmin || $isOfficer)
+            <li class="side-item side-item-category">Task Management</li>
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('tasks*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-check-square"></i>
@@ -57,37 +98,116 @@
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('tasks') && !request()->is('tasks/create') && !request()->is('tasks/create-advanced') ? 'active' : '' }}" href="{{ route('tasks.index') }}">All Tasks</a></li>
-                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('job_officer'))
-                    <li><a class="slide-item {{ request()->is('tasks/create-advanced') ? 'active' : '' }}" href="{{ route('tasks.create-advanced') }}">Create Task (Advanced)</a></li>
-                    <li><a class="slide-item {{ request()->is('tasks/create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Create Task (Basic)</a></li>
-                    @endif
+                    <li><a class="slide-item {{ request()->routeIs('tasks.index') ? 'active' : '' }}" href="{{ route('tasks.index') }}">All Tasks</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('tasks.create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Create Task</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('tasks.import') ? 'active' : '' }}" href="{{ route('tasks.import') }}">
+                        <i class="fe fe-upload" style="font-size:.75rem;margin-right:4px;"></i>Import from Excel
+                    </a></li>
                 </ul>
             </li>
 
-            <!-- Monthly Planning (Job Officer & Admin) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->can('view_production_supervisor_reports'))
-            <li class="side-item side-item-category">Planning & Oversight</li>
-
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('monthly-plans*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-clipboard"></i>
+                    <i class="side-menu__icon fe fe-calendar"></i>
                     <span class="side-menu__label">Monthly Plans</span>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('monthly-plans') && !request()->is('monthly-plans/create') ? 'active' : '' }}" href="{{ route('monthly-plans.index') }}">All Plans</a></li>
-                    <li><a class="slide-item {{ request()->is('monthly-plans/create') ? 'active' : '' }}" href="{{ route('monthly-plans.create') }}">Create New Plan</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('monthly-plans.index') ? 'active' : '' }}" href="{{ route('monthly-plans.index') }}">All Plans</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('monthly-plans.create') ? 'active' : '' }}" href="{{ route('monthly-plans.create') }}">Create New Plan</a></li>
                 </ul>
             </li>
             @endif
 
-            <!-- Surveillance & Monitoring (Surveillance Supervisor & Admin) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('production_supervisor'))
-            @if(!auth()->user()->hasRole('admin') && !auth()->user()->can('view_production_supervisor_reports'))
-            <li class="side-item side-item-category">Monitoring & Review</li>
-            @endif
+            {{-- ══════════════════════════════════════
+                 Departments — كل قسم submenu مستقل
+            ══════════════════════════════════════ --}}
+            <li class="side-item side-item-category">Departments</li>
 
+            @foreach($deptMap as $code => $dept)
+            @php
+                /* الـ operator يشوف قسمه بس، الباقي يشوف الكل */
+                $showDept = $isAdmin || $isManager || $isOfficer
+                            || auth()->user()->hasRole('surveillance_supervisor')
+                            || auth()->user()->hasRole('production_supervisor')
+                            || ($isOp && $userDeptId == $dept['id']);
+
+                $deptActive = request()->is('dept/' . $code . '*')
+                           || request()->is('departments/' . $dept['id'] . '*');
+            @endphp
+            @if($showDept)
+            <li class="slide">
+                <a class="side-menu__item {{ $deptActive ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe {{ $dept['icon'] }}"></i>
+                    <span class="side-menu__label">{{ $dept['label'] }}</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    {{-- Dashboard --}}
+                    <li>
+                        <a class="slide-item {{ request()->is('dept/' . $code . '/dashboard') ? 'active' : '' }}"
+                           href="{{ route('dept.dashboard', $code) }}">
+                            <i class="fe fe-bar-chart-2" style="font-size:.75rem;margin-right:4px;"></i>Dashboard
+                        </a>
+                    </li>
+
+                    {{-- Tasks --}}
+                    <li>
+                        <a class="slide-item {{ request()->is('dept/' . $code . '/tasks') ? 'active' : '' }}"
+                           href="{{ route('dept.tasks', $code) }}">
+                            <i class="fe fe-list" style="font-size:.75rem;margin-right:4px;"></i>Tasks
+                        </a>
+                    </li>
+
+                    {{-- MPFM: رابط خاص لرفع الـ log --}}
+                    @if($code === 'MPFM')
+                    <li>
+                        <a class="slide-item {{ request()->is('upload') ? 'active' : '' }}"
+                           href="{{ url('/upload') }}">
+                            <i class="fe fe-upload" style="font-size:.75rem;margin-right:4px;"></i>Upload Log
+                        </a>
+                    </li>
+                    <li>
+                        <a class="slide-item {{ request()->is('well-tests*') ? 'active' : '' }}"
+                           href="{{ route('well_tests.index') }}">
+                            <i class="fe fe-archive" style="font-size:.75rem;margin-right:4px;"></i>Test Archive
+                        </a>
+                    </li>
+                    @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('mpfm_supervisor'))
+                    <li>
+                        <a class="slide-item {{ request()->is('mpfm-tests/trending*') ? 'active' : '' }}"
+                           href="{{ route('mpfm_tests.trending_dashboard') }}">
+                            <i class="fe fe-trending-up" style="font-size:.75rem;margin-right:4px;"></i>Analytics
+                        </a>
+                    </li>
+                    @endif
+                    @endif
+
+                    {{-- Team Members — Manager / Admin فقط --}}
+                    @if($isAdmin || ($isManager && $userDeptId == $dept['id']))
+                    <li>
+                        <a class="slide-item {{ request()->is('departments/' . $dept['id'] . '/operators') ? 'active' : '' }}"
+                           href="{{ route('departments.operators', $dept['id']) }}">
+                            <i class="fe fe-users" style="font-size:.75rem;margin-right:4px;"></i>Team Members
+                        </a>
+                    </li>
+                    <li>
+                        <a class="slide-item {{ request()->is('departments/' . $dept['id'] . '/reports') ? 'active' : '' }}"
+                           href="{{ route('departments.reports', $dept['id']) }}">
+                            <i class="fe fe-file-text" style="font-size:.75rem;margin-right:4px;"></i>Reports
+                        </a>
+                    </li>
+                    @endif
+                </ul>
+            </li>
+            @endif
+            @endforeach
+
+            {{-- ══════════════════════════════════════
+                 Surveillance
+            ══════════════════════════════════════ --}}
+            @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('production_supervisor'))
+            <li class="side-item side-item-category">Surveillance</li>
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('surveillance*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-eye"></i>
@@ -95,87 +215,17 @@
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.dashboard') }}">Dashboard</a></li>
-                    <li><a class="slide-item {{ request()->is('surveillance') && !request()->is('surveillance/dashboard') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('surveillance.dashboard') ? 'active' : '' }}" href="{{ route('surveillance.dashboard') }}">Dashboard</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('surveillance.index') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
                 </ul>
             </li>
             @endif
 
-            <!-- Department Operations Section -->
-            @php
-                $departments = App\Models\Department::where('is_active', true)->orderBy('display_order')->get();
-                $userDepartmentId = auth()->user()->department_id;
-            @endphp
-
-            @if($departments->count() > 0 && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('department_manager') || auth()->user()->hasRole('operator')))
-            <li class="side-item side-item-category">Department Operations</li>
-
-            @foreach($departments as $dept)
-                @php
-                    $canViewDept = auth()->user()->hasRole('admin') ||
-                                   (auth()->user()->hasRole('department_manager') && $userDepartmentId == $dept->id) ||
-                                   (auth()->user()->hasRole('operator') && $userDepartmentId == $dept->id);
-                @endphp
-
-                @if($canViewDept)
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->is('departments/' . $dept->id . '*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                        <i class="side-menu__icon fe fe-layers"></i>
-                        <span class="side-menu__label">{{ $dept->name }}</span>
-                        <i class="angle fe fe-chevron-down"></i>
-                    </a>
-                    <ul class="slide-menu">
-                        @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('department_manager'))
-                        <li><a class="slide-item" href="{{ route('departments.dashboard', $dept->id) }}">Dashboard</a></li>
-                        <li><a class="slide-item" href="{{ route('departments.tasks', $dept->id) }}">Tasks</a></li>
-                        <li><a class="slide-item" href="{{ route('departments.users.index', $dept->id) }}">Users</a></li>
-                        <li><a class="slide-item" href="{{ route('departments.operators', $dept->id) }}">Team Members</a></li>
-                        <li><a class="slide-item" href="{{ route('departments.reports', $dept->id) }}">Reports</a></li>
-                        @elseif(auth()->user()->hasRole('operator'))
-                        <li><a class="slide-item" href="{{ route('operator.dashboard') }}">My Tasks</a></li>
-                        <li><a class="slide-item" href="{{ route('operator.tasks') }}">All Tasks</a></li>
-                        @endif
-                    </ul>
-                </li>
-                @endif
-            @endforeach
-            @endif
-
-            <!-- MPFM Testing & Analysis -->
-            <li class="side-item side-item-category">MPFM Operations</li>
-
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('upload') || request()->is('well-tests*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-activity"></i>
-                    <span class="side-menu__label">MPFM Tests</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('upload') ? 'active' : '' }}" href="{{ url('/upload') }}">Upload Log File</a></li>
-                    <li><a class="slide-item {{ request()->is('well-tests') ? 'active' : '' }}" href="{{ route('well_tests.index') }}">Test Archive</a></li>
-                    <li><a class="slide-item" href="{{ route('well_tests.compare') }}">Compare Tests</a></li>
-                </ul>
-            </li>
-
-            <!-- MPFM Validation & Analytics (Admin & Supervisors only) -->
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('mpfm_supervisor'))
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('mpfm-tests/trending*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
-                    <i class="side-menu__icon fe fe-trending-up"></i>
-                    <span class="side-menu__label">Analytics & Trending</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu">
-                    <li><a class="slide-item {{ request()->is('mpfm-tests/trending-dashboard') ? 'active' : '' }}" href="{{ route('mpfm_tests.trending_dashboard') }}">Trending Dashboard</a></li>
-                    <li><a class="slide-item" href="{{ route('mpfm_tests.index') }}">All Tests</a></li>
-                </ul>
-            </li>
-            @endif
-
-            <!-- Field Infrastructure (Admin only) -->
-            @if(auth()->user()->hasRole('admin'))
+            {{-- ══════════════════════════════════════
+                 Infrastructure — Admin only
+            ══════════════════════════════════════ --}}
+            @if($isAdmin)
             <li class="side-item side-item-category">Infrastructure</li>
-
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('oil-fields*') || request()->is('towers*') || request()->is('oil-strings*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-map"></i>
@@ -190,10 +240,11 @@
             </li>
             @endif
 
-            <!-- Administration (Admin only) -->
+            {{-- ══════════════════════════════════════
+                 Administration — Admin only
+            ══════════════════════════════════════ --}}
             @can('manage_users')
             <li class="side-item side-item-category">Administration</li>
-
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('users*') || request()->is('roles*') || request()->is('permissions*') ? 'active' : '' }}" data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-users"></i>
@@ -207,6 +258,7 @@
                 </ul>
             </li>
             @endcan
+
         </ul>
     </div>
 </aside>

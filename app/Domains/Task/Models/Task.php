@@ -141,30 +141,36 @@ class Task extends Model
     public function canTransitionTo(TaskState $newState): bool
     {
         $allowedTransitions = [
-            TaskState::DRAFT => [TaskState::SUBMITTED_TO_SURVEILLANCE],
-            TaskState::SUBMITTED_TO_SURVEILLANCE => [
-                TaskState::ASSIGNED_TO_DEPARTMENT,
-                TaskState::DRAFT,
+            TaskState::DRAFT->value => [
+                TaskState::SUBMITTED_TO_SURVEILLANCE->value,
             ],
-            TaskState::ASSIGNED_TO_DEPARTMENT => [TaskState::IN_PROGRESS],
-            TaskState::IN_PROGRESS => [TaskState::DEPARTMENT_REVIEWED],
-            TaskState::DEPARTMENT_REVIEWED => [
-                TaskState::SURVEILLANCE_REVIEWED,
-                TaskState::IN_PROGRESS,
+            TaskState::SUBMITTED_TO_SURVEILLANCE->value => [
+                TaskState::ASSIGNED_TO_DEPARTMENT->value,
+                TaskState::DRAFT->value,
             ],
-            TaskState::SURVEILLANCE_REVIEWED => [
-                TaskState::JOB_OFFICER_APPROVED,
-                TaskState::DEPARTMENT_REVIEWED,
+            TaskState::ASSIGNED_TO_DEPARTMENT->value => [
+                TaskState::IN_PROGRESS->value,
             ],
-            TaskState::JOB_OFFICER_APPROVED => [
-                TaskState::COMPLETED,
-                TaskState::SURVEILLANCE_REVIEWED,
+            TaskState::IN_PROGRESS->value => [
+                TaskState::DEPARTMENT_REVIEWED->value,
             ],
-            TaskState::COMPLETED => [],
+            TaskState::DEPARTMENT_REVIEWED->value => [
+                TaskState::SURVEILLANCE_REVIEWED->value,
+                TaskState::IN_PROGRESS->value,
+            ],
+            TaskState::SURVEILLANCE_REVIEWED->value => [
+                TaskState::JOB_OFFICER_APPROVED->value,
+                TaskState::DEPARTMENT_REVIEWED->value,
+            ],
+            TaskState::JOB_OFFICER_APPROVED->value => [
+                TaskState::COMPLETED->value,
+                TaskState::SURVEILLANCE_REVIEWED->value,
+            ],
+            TaskState::COMPLETED->value => [],
         ];
 
         return in_array(
-            $newState,
+            $newState->value,
             $allowedTransitions[$this->state->value] ?? []
         );
     }
@@ -311,13 +317,19 @@ class Task extends Model
     public function getAvailableTransitions(): array
     {
         $allowedTransitions = [
-            TaskState::DRAFT->value => [TaskState::SUBMITTED_TO_SURVEILLANCE],
+            TaskState::DRAFT->value => [
+                TaskState::SUBMITTED_TO_SURVEILLANCE,
+            ],
             TaskState::SUBMITTED_TO_SURVEILLANCE->value => [
                 TaskState::ASSIGNED_TO_DEPARTMENT,
                 TaskState::DRAFT,
             ],
-            TaskState::ASSIGNED_TO_DEPARTMENT->value => [TaskState::IN_PROGRESS],
-            TaskState::IN_PROGRESS->value => [TaskState::DEPARTMENT_REVIEWED],
+            TaskState::ASSIGNED_TO_DEPARTMENT->value => [
+                TaskState::IN_PROGRESS,
+            ],
+            TaskState::IN_PROGRESS->value => [
+                TaskState::DEPARTMENT_REVIEWED,
+            ],
             TaskState::DEPARTMENT_REVIEWED->value => [
                 TaskState::SURVEILLANCE_REVIEWED,
                 TaskState::IN_PROGRESS,

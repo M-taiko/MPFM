@@ -182,7 +182,7 @@ class OperatorDashboardController extends Controller
             abort(403, 'You are not authorized to view this task.');
         }
 
-        $planTask->load(['monthlyPlan', 'towerModel', 'oilString', 'mpfmTest', 'assigner']);
+        $planTask->load(['monthlyPlan', 'towerModel', 'oilString', 'mpfmTest', 'assignedBy', 'department']);
 
         return view('operator.task_detail', ['task' => $planTask]);
     }

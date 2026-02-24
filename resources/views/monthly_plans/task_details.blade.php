@@ -56,7 +56,13 @@
 
                             <h6 class="text-uppercase font-weight-bold text-muted mb-2" style="font-size: 12px;">Current State</h6>
                             <p class="mb-0">
-                                <span class="badge badge-success">{{ $task->state?->label() ?? 'Draft' }}</span>
+                                <span class="badge badge-success">
+                                    @if($task->state)
+                                        {{ is_string($task->state) ? ucwords(str_replace('_', ' ', $task->state)) : $task->state->label() }}
+                                    @else
+                                        Draft
+                                    @endif
+                                </span>
                             </p>
                         </div>
 
@@ -243,7 +249,7 @@
                                     @endif
                                 </div>
                                 <small class="text-muted d-block mt-1">
-                                    Assigned: {{ $operator->pivot->assigned_at->format('M d, Y') }}
+                                    Assigned: {{ is_string($operator->pivot->assigned_at) ? $operator->pivot->assigned_at : ($operator->pivot->assigned_at ? $operator->pivot->assigned_at->format('M d, Y') : 'N/A') }}
                                 </small>
                             </div>
                             @endforeach
@@ -300,7 +306,11 @@
                                 <div class="timeline-marker" style="width: 12px; height: 12px; background: #667eea; border-radius: 50%; margin-right: 10px; margin-top: 4px;"></div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">
-                                        {{ $history->to_state?->label() ?? 'Unknown State' }}
+                                        @if($history->to_state)
+                                            {{ is_string($history->to_state) ? ucwords(str_replace('_', ' ', $history->to_state)) : $history->to_state->label() }}
+                                        @else
+                                            Unknown State
+                                        @endif
                                     </h6>
                                     <small class="text-muted">
                                         {{ $history->created_at->format('M d, Y H:i') }}

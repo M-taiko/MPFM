@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TaskState;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -49,6 +50,7 @@ class PlanTask extends Model
         'assigned_by',
         'surveillance_supervisor_id',
         'surveillance_assigned_at',
+        'assigned_by_surveillance_at',
         'expected_completion_at',
         'overdue_flag',
         'sla_notified_at',
@@ -70,11 +72,20 @@ class PlanTask extends Model
         'scheduled_date' => 'date',
         'assigned_at' => 'datetime',
         'surveillance_assigned_at' => 'datetime',
+        'assigned_by_surveillance_at' => 'datetime',
         'expected_completion_at' => 'datetime',
         'sla_notified_at' => 'datetime',
         'completed_at' => 'datetime',
         'is_recurring' => 'boolean',
         'overdue_flag' => 'boolean',
+        'state' => \App\Enums\TaskState::class,
+    ];
+
+    protected $appends = [
+        'task_identifier',
+        'status',
+        'status_badge_class',
+        'priority_badge_class',
     ];
 
     /**
@@ -99,6 +110,14 @@ class PlanTask extends Model
     public function assignedOperator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_operator_id');
+    }
+
+    /**
+     * Alias for assignedOperator for backward compatibility
+     */
+    public function operator(): BelongsTo
+    {
+        return $this->assignedOperator();
     }
 
     /**
@@ -198,6 +217,58 @@ class PlanTask extends Model
     }
 
     /**
+     * Get task identifier (well number or SNO)
+     */
+    public function getTaskIdentifierAttribute(): string
+    {
+        return $this->well_number ?? ('Task #' . $this->sno);
+    }
+
+    /**
+     * Get MPFM device display (uses mpfm_type or category)
+     */
+    public function getMpfmDeviceAttribute(): ?string
+    {
+        return $this->attributes['mpfm_type'] ?? $this->attributes['category'] ?? null;
+    }
+
+    /**
+     * Get status attribute (alias for completion_status)
+     */
+    public function getStatusAttribute(): string
+    {
+        return $this->completion_status ?? 'pending';
+    }
+
+    /**
+     * Get status badge class for display
+     */
+    public function getStatusBadgeClassAttribute(): string
+    {
+        return match ($this->completion_status) {
+            'completed' => 'success',
+            'in_progress' => 'info',
+            'failed' => 'danger',
+            'pending' => 'secondary',
+            default => 'secondary',
+        };
+    }
+
+    /**
+     * Get priority badge class for display
+     */
+    public function getPriorityBadgeClassAttribute(): string
+    {
+        return match ($this->priority) {
+            'normal' => 'secondary',
+            'high' => 'warning',
+            'top' => 'danger',
+            'low' => 'light',
+            default => 'secondary',
+        };
+    }
+
+    /**
      * Get the priority color for badge display
      */
     public function getPriorityColor(): string
@@ -208,6 +279,58 @@ class PlanTask extends Model
             'top' => 'danger',
             default => 'secondary',
         };
+    }
+
+    /**
+     * Get hours until SLA expiry
+     * Returns null if no SLA deadline is set
+     */
+    public function getHoursUntilSLAExpiry(): ?float
+    {
+        if ($this->expected_completion_at === null) {
+            return null;
+        }
+
+        $hoursRemaining = now()->diffInMinutes($this->expected_completion_at) / 60;
+        return $hoursRemaining;
+    }
+
+    /**
+     * Get formatted overdue duration string
+     */
+    public function getOverdueDurationFormatted(): string
+    {
+        if ($this->expected_completion_at === null) {
+            return 'No SLA set';
+        }
+
+        $minutesOverdue = $this->expected_completion_at->diffInMinutes(now());
+        if ($minutesOverdue <= 0) {
+            return 'On track';
+        }
+
+        $hoursOverdue = intdiv($minutesOverdue, 60);
+        $daysOverdue = intdiv($hoursOverdue, 24);
+
+        if ($daysOverdue > 0) {
+            return $daysOverdue . 'd ' . ($hoursOverdue % 24) . 'h overdue';
+        } elseif ($hoursOverdue > 0) {
+            return $hoursOverdue . 'h overdue';
+        } else {
+            return $minutesOverdue . 'm overdue';
+        }
+    }
+
+    /**
+     * Check if task is overdue
+     */
+    public function isOverdue(): bool
+    {
+        if ($this->expected_completion_at === null) {
+            return false;
+        }
+
+        return now()->greaterThan($this->expected_completion_at);
     }
 
     /**
@@ -232,5 +355,40 @@ class PlanTask extends Model
     public function scopeByState($query, $state)
     {
         return $query->where('state', $state);
+    }
+
+    /**
+     * Scope: Get today's tasks
+     */
+    public function scopeToday($query)
+    {
+        return $query->whereDate('scheduled_date', today());
+    }
+
+    /**
+     * Scope: Get this week's tasks
+     */
+    public function scopeThisWeek($query)
+    {
+        return $query->whereBetween('scheduled_date', [
+            today()->startOfWeek(),
+            today()->endOfWeek()
+        ]);
+    }
+
+    /**
+     * Scope: Get pending tasks
+     */
+    public function scopePending($query)
+    {
+        return $query->where('completion_status', 'pending');
+    }
+
+    /**
+     * Scope: Get completed tasks
+     */
+    public function scopeCompleted($query)
+    {
+        return $query->where('completion_status', 'completed');
     }
 }

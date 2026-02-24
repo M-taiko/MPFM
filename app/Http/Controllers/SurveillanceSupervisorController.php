@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\MonthlyPlan;
 use App\Models\PlanTask;
+use App\Models\Department;
+use App\Models\Tower;
+use App\Models\OilString;
 use App\Enums\TaskState;
+use App\Domains\Task\Models\Task;
 use Illuminate\Http\Request;
 
 class SurveillanceSupervisorController extends Controller
@@ -13,8 +17,8 @@ class SurveillanceSupervisorController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            // Check if user has surveillance_supervisor or production_supervisor role
-            if (!auth()->user()->hasRole(['surveillance_supervisor', 'production_supervisor'])) {
+            // Check if user has surveillance_supervisor, production_supervisor, or admin role
+            if (!auth()->user()->hasRole(['surveillance_supervisor', 'production_supervisor', 'admin'])) {
                 abort(403, 'Unauthorized');
             }
             return $next($request);
@@ -43,25 +47,118 @@ class SurveillanceSupervisorController extends Controller
                 ];
             });
 
-        // KPI Counters - All tasks from all plans
-        $totalTasks = PlanTask::count();
-        $completedTasks = PlanTask::where('completion_status', 'completed')->orWhere('state', 'completed')->count();
-        $pendingTasks = PlanTask::where('completion_status', 'pending')->count();
-        $overdueTasks = PlanTask::where('completion_status', 'pending')
-            ->where('scheduled_date', '<', now()->startOfDay())
-            ->count();
+        // Get all departments with their performance metrics
+        $departments = Department::with(['tasks' => function ($query) {
+            $query->with(['monthlyPlan']);
+        }])->get()->map(function ($dept) {
+            $tasks = $dept->tasks;
+            $completedTasks = $tasks->where('completion_status', 'completed')->count();
+            $totalTasks = $tasks->count();
 
-        // DataTable data will be loaded via AJAX
+            return [
+                'id' => $dept->id,
+                'code' => $dept->code,
+                'name' => $dept->name,
+                'total_tasks' => $totalTasks,
+                'completed_tasks' => $completedTasks,
+                'pending_tasks' => $tasks->where('completion_status', 'pending')->count(),
+                'in_progress_tasks' => $tasks->where('completion_status', 'in_progress')->count(),
+                'failed_tasks' => $tasks->where('completion_status', 'failed')->count(),
+                'progress' => $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100, 1) : 0,
+                'completion_rate' => $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0,
+            ];
+        })->sortByDesc('completion_rate');
+
+        // ── New Tasks (from Task model) waiting for surveillance review ──
+        $newTasksForReview = Task::where('state', TaskState::SUBMITTED_TO_SURVEILLANCE->value)
+            ->with(['department', 'createdBy', 'monthlyPlan', 'tower', 'oilString'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // ── Tasks already assigned to departments (visible to depts) ──
+        $assignedNewTasks = Task::where('state', TaskState::ASSIGNED_TO_DEPARTMENT->value)
+            ->with(['department', 'createdBy', 'monthlyPlan'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // ── KPI Counters combining both models ──
+        $totalTasks     = PlanTask::count() + Task::count();
+        $completedTasks = PlanTask::where('completion_status', 'completed')->count()
+                        + Task::where('state', TaskState::COMPLETED->value)->count();
+        $pendingTasks   = PlanTask::where('completion_status', 'pending')->count()
+                        + Task::whereIn('state', [
+                            TaskState::SUBMITTED_TO_SURVEILLANCE->value,
+                            TaskState::ASSIGNED_TO_DEPARTMENT->value,
+                          ])->count();
+        $overdueTasks   = PlanTask::where('completion_status', 'pending')
+                            ->where('scheduled_date', '<', now()->startOfDay())->count()
+                        + Task::whereNotIn('state', [TaskState::COMPLETED->value])
+                            ->whereNotNull('expected_completion_at')
+                            ->where('expected_completion_at', '<', now())->count();
+
+        // ── Unassigned PlanTasks (legacy) ──
+        $unassignedTasks = PlanTask::where(function ($query) {
+                $query->whereNull('department_id')
+                      ->orWhere('completion_status', 'pending');
+            })
+            ->with(['monthlyPlan', 'towerModel', 'oilString', 'department'])
+            ->orderBy('created_at', 'asc')
+            ->limit(20)
+            ->get();
+
+        $allDepartments = Department::active()->get();
+
+        // ── Towers with oil string counts and task counts ──
+        $towers = Tower::with(['oilStrings'])
+            ->withCount('oilStrings')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($tower) {
+                return [
+                    'id'            => $tower->id,
+                    'name'          => $tower->name,
+                    'code'          => $tower->code,
+                    'status'        => $tower->status,
+                    'strings_count' => $tower->oil_strings_count,
+                    'tasks_count'   => PlanTask::where('tower_id', $tower->id)->count()
+                                     + Task::where('tower_id', $tower->id)->count(),
+                ];
+            });
+
+        // ── Oil Strings with tower info and task counts ──
+        $oilStrings = OilString::with(['tower'])
+            ->orderBy('name')
+            ->get()
+            ->map(function ($s) {
+                return [
+                    'id'          => $s->id,
+                    'name'        => $s->name,
+                    'code'        => $s->code,
+                    'status'      => $s->status,
+                    'tower_name'  => $s->tower->name ?? '—',
+                    'tower_id'    => $s->tower_id,
+                    'tasks_count' => PlanTask::where('oil_string_id', $s->id)->count()
+                                   + Task::where('oil_string_id', $s->id)->count(),
+                ];
+            });
+
         if ($request->ajax()) {
             return $this->getDashboardTasksData($request);
         }
 
         return view('surveillance.dashboard', compact(
             'activePlans',
+            'departments',
             'totalTasks',
             'completedTasks',
             'pendingTasks',
-            'overdueTasks'
+            'overdueTasks',
+            'unassignedTasks',
+            'allDepartments',
+            'newTasksForReview',
+            'assignedNewTasks',
+            'towers',
+            'oilStrings'
         ));
     }
 
@@ -330,6 +427,81 @@ class SurveillanceSupervisorController extends Controller
             return redirect()->back()->with('success', 'Plan rejected. Job Officer will be notified for corrections.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to reject plan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get modal content for task assignment (AJAX)
+     */
+    public function getTaskAssignmentModal(PlanTask $task)
+    {
+        // Get all active departments for dropdown
+        $departments = Department::active()->get();
+
+        return view('surveillance.assign-task-modal', compact('task', 'departments'));
+    }
+
+    /**
+     * Approve a new Task (Task model) — assign it to department
+     */
+    public function approveNewTask(Task $task, Request $request)
+    {
+        $request->validate(['remarks' => 'nullable|string|max:1000']);
+
+        if ($task->state->value !== TaskState::SUBMITTED_TO_SURVEILLANCE->value) {
+            return back()->with('error', 'Task is not pending surveillance review.');
+        }
+
+        $task->update([
+            'state'                      => TaskState::ASSIGNED_TO_DEPARTMENT->value,
+            'surveillance_supervisor_id' => auth()->id(),
+            'surveillance_assigned_at'   => now(),
+            'supervisor_remarks'         => $request->remarks,
+        ]);
+
+        return back()->with('success', "Task \"{$task->title}\" approved and assigned to {$task->department->name}.");
+    }
+
+    /**
+     * Reject a new Task (Task model) — send back to job officer
+     */
+    public function rejectNewTask(Task $task, Request $request)
+    {
+        $request->validate(['remarks' => 'required|string|max:1000']);
+
+        if ($task->state->value !== TaskState::SUBMITTED_TO_SURVEILLANCE->value) {
+            return back()->with('error', 'Task is not pending surveillance review.');
+        }
+
+        $task->update([
+            'state'              => TaskState::DRAFT->value,
+            'supervisor_remarks' => $request->remarks,
+        ]);
+
+        return back()->with('success', "Task \"{$task->title}\" rejected and sent back to Job Officer.");
+    }
+
+    /**
+     * Assign task to department (AJAX)
+     */
+    public function assignTaskToDepartment(PlanTask $task, Department $department, Request $request)
+    {
+        try {
+            // Update task with department assignment
+            $task->update([
+                'department_id' => $department->id,
+                'assigned_by_surveillance_at' => now(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Task assigned to {$department->name} successfully"
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to assign task: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

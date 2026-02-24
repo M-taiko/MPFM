@@ -16,7 +16,14 @@
       "Bash(ls:*)",
       "Read(//c/xampp/htdocs/MPFM/**)",
       "Bash(git rm:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(composer require:*)",
+      "Bash(composer show:*)",
+      "Bash(python:*)",
+      "Bash(/c/xampp/mysql/bin/mysql.exe:*)",
+      "Bash(test:*)",
+      "Bash(python3:*)",
+      "Bash(dir:*)"
     ]
   }
 }

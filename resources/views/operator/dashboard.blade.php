@@ -262,18 +262,22 @@
                                         <hr>
 
                                         <div class="d-flex justify-content-between align-items-center">
-                                            @if($task->status === 'pending')
+                                            @if($task->completion_status === 'pending' || $task->completion_status === null)
                                                 <button type="button" class="btn btn-sm btn-primary" onclick="event.stopPropagation(); window.location.href='{{ route('upload.form') }}?task_id={{ $task->id }}'">
                                                     <i class="fe fe-play mr-1"></i>Start Task
                                                 </button>
-                                            @elseif($task->status === 'in_progress')
+                                            @elseif($task->completion_status === 'in_progress')
                                                 <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-sm btn-success" onclick="event.stopPropagation()">
                                                     <i class="fe fe-check mr-1"></i>Complete Task
                                                 </a>
-                                            @elseif($task->status === 'completed')
+                                            @elseif($task->completion_status === 'completed')
                                                 <span class="text-success small">
                                                     <i class="fe fe-check-circle mr-1"></i>Completed
                                                 </span>
+                                            @else
+                                                <button type="button" class="btn btn-sm btn-warning" onclick="event.stopPropagation(); window.location.href='{{ route('upload.form') }}?task_id={{ $task->id }}'">
+                                                    <i class="fe fe-play mr-1"></i>Start Task
+                                                </button>
                                             @endif
                                         </div>
                                     </div>
@@ -345,9 +349,13 @@
                                         <a href="{{ route('operator.tasks.show', $task) }}" class="btn btn-sm btn-info">
                                             <i class="fe fe-eye"></i>
                                         </a>
-                                        @if($task->status === 'pending')
+                                        @if($task->completion_status === 'pending' || $task->completion_status === null)
                                         <button type="button" class="btn btn-sm btn-primary" onclick="window.location.href='{{ route('upload.form') }}?task_id={{ $task->id }}'">
-                                            <i class="fe fe-play"></i>
+                                            <i class="fe fe-play"></i> Start
+                                        </button>
+                                        @elseif($task->completion_status !== 'completed' && $task->completion_status !== 'in_progress')
+                                        <button type="button" class="btn btn-sm btn-warning" onclick="window.location.href='{{ route('upload.form') }}?task_id={{ $task->id }}'">
+                                            <i class="fe fe-play"></i> Start
                                         </button>
                                         @endif
                                     </td>

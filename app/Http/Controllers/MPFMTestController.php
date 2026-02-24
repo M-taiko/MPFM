@@ -424,7 +424,29 @@ class MPFMTestController extends Controller
             'mpfmOperationalPlan'
         ]);
 
-        return view('mpfm_tests.show', compact('mpfmTest'));
+        // Prepare KPIs for display
+        $kpis = [];
+
+        // Extract production rates from calculated_kpis or raw fields
+        if ($mpfmTest->calculated_kpis) {
+            $kpis = $mpfmTest->calculated_kpis;
+        }
+
+        // Fallback to raw database fields if calculated_kpis is empty
+        if (empty($kpis['oil_rate']) && $mpfmTest->qo_sc) {
+            $kpis['oil_rate'] = $mpfmTest->qo_sc ?? ($mpfmTest->qo_lc ?? 0);
+        }
+        if (empty($kpis['gas_rate']) && $mpfmTest->qg_sc) {
+            $kpis['gas_rate'] = $mpfmTest->qg_sc ?? ($mpfmTest->qg_lc ?? 0);
+        }
+        if (empty($kpis['avg_pressure']) && $mpfmTest->pressure_avg) {
+            $kpis['pressure'] = $mpfmTest->pressure_avg;
+        }
+        if (empty($kpis['avg_temperature']) && $mpfmTest->temperature_avg) {
+            $kpis['temperature'] = $mpfmTest->temperature_avg;
+        }
+
+        return view('mpfm_tests.show', compact('mpfmTest', 'kpis'));
     }
 
     /**
@@ -684,6 +706,265 @@ class MPFMTestController extends Controller
         }
 
         return response()->download($filePath, basename($filePath));
+    }
+
+    /**
+     * Approve test by Department Supervisor
+     * Transitions: draft/submitted -> approved_by_department
+     * Next step: Surveillance Supervisor review
+     */
+    public function approveByDepartment(Request $request, MPFMTest $mpfmTest)
+    {
+        // Check authorization
+        if (!auth()->user()->hasRole(['department_supervisor', 'hq_supervisor'])) {
+            return redirect()->back()->with('error', 'Unauthorized action');
+        }
+
+        $validated = $request->validate([
+            'approval_notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $mpfmTest->update([
+                'status' => 'approved_by_department',
+                'supervisor_remarks' => $validated['approval_notes'] ?? null,
+                'department_supervisor_id' => auth()->id(),
+                'approved_by_department_at' => now(),
+            ]);
+
+            // Log state transition
+            \App\Models\Activity::create([
+                'subject_type' => MPFMTest::class,
+                'subject_id' => $mpfmTest->id,
+                'description' => 'Test approved by Department Supervisor',
+                'causer_id' => auth()->id(),
+                'properties' => [
+                    'from_status' => 'submitted',
+                    'to_status' => 'approved_by_department',
+                    'notes' => $validated['approval_notes'] ?? null,
+                ],
+            ]);
+
+            // Send notification to Surveillance Supervisor
+            $surveillanceSupervisors = \App\Models\User::role('surveillance_supervisor')
+                ->where('department_id', $mpfmTest->department_id)
+                ->get();
+
+            foreach ($surveillanceSupervisors as $supervisor) {
+                $supervisor->notify(new \App\Notifications\TestAwaitingSurveillanceApprovalNotification($mpfmTest));
+            }
+
+            return redirect()->back()->with('success', 'Test approved by Department. Forwarded to Surveillance Supervisor for review.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error approving test: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Approve test by Surveillance Supervisor
+     * Can skip Department Supervisor level
+     * Transitions: draft/submitted/approved_by_department -> approved_by_surveillance
+     * Next step: Automatic forward to Job Officer
+     */
+    public function approveBySurveillance(Request $request, MPFMTest $mpfmTest)
+    {
+        // Check authorization
+        if (!auth()->user()->hasRole(['surveillance_supervisor', 'hq_supervisor'])) {
+            return redirect()->back()->with('error', 'Unauthorized action');
+        }
+
+        $validated = $request->validate([
+            'approval_notes' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $oldStatus = $mpfmTest->status;
+
+            $mpfmTest->update([
+                'status' => 'approved_by_surveillance',
+                'surveillance_supervisor_id' => auth()->id(),
+                'approved_by_surveillance_at' => now(),
+                'supervisor_remarks' => $validated['approval_notes'] ?? $mpfmTest->supervisor_remarks,
+            ]);
+
+            // Log state transition
+            \App\Models\Activity::create([
+                'subject_type' => MPFMTest::class,
+                'subject_id' => $mpfmTest->id,
+                'description' => 'Test approved by Surveillance Supervisor (skipped Department level)',
+                'causer_id' => auth()->id(),
+                'properties' => [
+                    'from_status' => $oldStatus,
+                    'to_status' => 'approved_by_surveillance',
+                    'notes' => $validated['approval_notes'] ?? null,
+                ],
+            ]);
+
+            // Notify Department Supervisor about the approval
+            $departmentSupervisor = \App\Models\User::find($mpfmTest->department_supervisor_id ?? null);
+            if ($departmentSupervisor) {
+                $departmentSupervisor->notify(new \App\Notifications\TestApprovedBySurveillanceNotification($mpfmTest));
+            }
+
+            // Forward to Job Officer
+            $jobOfficers = \App\Models\User::role('job_officer')
+                ->where('department_id', $mpfmTest->department_id)
+                ->get();
+
+            foreach ($jobOfficers as $officer) {
+                $officer->notify(new \App\Notifications\TestReadyForJobOfficerReviewNotification($mpfmTest));
+            }
+
+            // Notify Operator
+            $mpfmTest->user->notify(new \App\Notifications\TestApprovedNotification($mpfmTest));
+
+            return redirect()->back()->with('success', 'Test approved by Surveillance. Automatically forwarded to Job Officer.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error approving test: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reject test (from any supervisor level)
+     * Transitions: any -> rejected
+     * Action: Request operator to re-upload/resubmit
+     */
+    public function rejectTest(Request $request, MPFMTest $mpfmTest)
+    {
+        // Check authorization
+        if (!auth()->user()->hasRole(['department_supervisor', 'surveillance_supervisor', 'hq_supervisor'])) {
+            return redirect()->back()->with('error', 'Unauthorized action');
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|in:invalid_data,equipment_failure,test_interrupted,calibration_issue,environmental_conditions,data_quality,other',
+            'rejection_details' => 'required|string|max:2000',
+        ]);
+
+        try {
+            $rejectedByRole = auth()->user()->roles->first()->name ?? 'supervisor';
+
+            $mpfmTest->update([
+                'status' => 'rejected',
+                'rejected_reason' => $validated['rejection_reason'],
+                'rejected_details' => $validated['rejection_details'],
+                'rejected_by_user_id' => auth()->id(),
+                'rejected_by_role' => $rejectedByRole,
+                'rejected_at' => now(),
+            ]);
+
+            // Log state transition
+            \App\Models\Activity::create([
+                'subject_type' => MPFMTest::class,
+                'subject_id' => $mpfmTest->id,
+                'description' => 'Test rejected by ' . ucfirst(str_replace('_', ' ', $rejectedByRole)),
+                'causer_id' => auth()->id(),
+                'properties' => [
+                    'rejection_reason' => $validated['rejection_reason'],
+                    'rejection_details' => $validated['rejection_details'],
+                ],
+            ]);
+
+            // Notify Operator to re-upload
+            $mpfmTest->user->notify(new \App\Notifications\TestRejectedNotification($mpfmTest, $validated['rejection_reason'], $validated['rejection_details']));
+
+            return redirect()->back()->with('success', 'Test rejected. Operator has been notified to re-upload.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error rejecting test: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Request a re-test (from any supervisor level)
+     * Creates a new task for operator to perform re-test
+     * Keeps original test data for reference
+     */
+    public function requestRetest(Request $request, MPFMTest $mpfmTest)
+    {
+        // Check authorization
+        if (!auth()->user()->hasRole(['department_supervisor', 'surveillance_supervisor', 'hq_supervisor'])) {
+            return redirect()->back()->with('error', 'Unauthorized action');
+        }
+
+        $validated = $request->validate([
+            'retest_reason' => 'required|string|in:data_inconsistency,incomplete_test,equipment_suspect,validation_failed,trend_unusual,anomaly_detected,other',
+            'retest_details' => 'required|string|max:2000',
+            'expected_retest_date' => 'required|date|after:today',
+            'retest_priority' => 'required|string|in:high,normal,low',
+        ]);
+
+        try {
+            // Mark original test as pending re-test
+            $mpfmTest->update([
+                'status' => 'retest_requested',
+                'retest_reason' => $validated['retest_reason'],
+                'retest_details' => $validated['retest_details'],
+                'retest_requested_by_user_id' => auth()->id(),
+                'retest_requested_at' => now(),
+            ]);
+
+            // Create a new task for the operator to perform re-test
+            $newTask = \App\Domains\Task\Models\Task::create([
+                'title' => 'Re-test MPFM - ' . $mpfmTest->oilString->name . ' (Test #' . $mpfmTest->id . ')',
+                'description' => $validated['retest_details'],
+                'department_id' => $mpfmTest->department_id,
+                'task_type' => 'mpfm',
+                'state' => \App\Enums\TaskState::DRAFT,
+                'priority' => $this->mapPriorityLevel($validated['retest_priority']),
+                'oil_string_id' => $mpfmTest->oil_string_id,
+                'tower_id' => $mpfmTest->tower_id,
+                'assigned_to_user_id' => $mpfmTest->user_id, // Assign back to same operator
+                'created_by_user_id' => auth()->id(),
+                'expected_completion_at' => \Carbon\Carbon::parse($validated['expected_retest_date']),
+                'type_specific_data' => [
+                    'original_test_id' => $mpfmTest->id,
+                    'retest_reason' => $validated['retest_reason'],
+                    'retest_instructions' => $validated['retest_details'],
+                ],
+            ]);
+
+            // Log state transition
+            \App\Models\Activity::create([
+                'subject_type' => MPFMTest::class,
+                'subject_id' => $mpfmTest->id,
+                'description' => 'Re-test requested by ' . auth()->user()->name,
+                'causer_id' => auth()->id(),
+                'properties' => [
+                    'new_task_id' => $newTask->id,
+                    'retest_reason' => $validated['retest_reason'],
+                    'expected_retest_date' => $validated['expected_retest_date'],
+                ],
+            ]);
+
+            // Notify Operator about the new task
+            $mpfmTest->user->notify(new \App\Notifications\ReteststRequestedNotification($mpfmTest, $newTask, $validated['retest_details']));
+
+            // Notify Department Supervisor
+            if ($mpfmTest->department->supervisor) {
+                $mpfmTest->department->supervisor->notify(new \App\Notifications\RetestTaskCreatedNotification($newTask, $mpfmTest));
+            }
+
+            return redirect()->back()->with('success', 'Re-test task created and operator notified.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error creating re-test task: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to map priority level
+     */
+    private function mapPriorityLevel($level)
+    {
+        return match($level) {
+            'high' => 'critical',
+            'normal' => 'normal',
+            'low' => 'low',
+            default => 'normal',
+        };
     }
 }
 

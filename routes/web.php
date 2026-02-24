@@ -19,7 +19,10 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TaskStateController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DepartmentUserController;
+use App\Http\Controllers\DepartmentTaskController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskImportController;
+use App\Http\Controllers\NotificationController;
 
 
 /*
@@ -52,6 +55,19 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Notifications
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::post('/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
+    Route::post('/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
+    Route::delete('/{id}', [NotificationController::class, 'delete'])->name('delete');
+    Route::delete('/', [NotificationController::class, 'deleteAll'])->name('delete-all');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -199,6 +215,25 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('mpfm-tests', MPFMTestController::class)->names('mpfm_tests');
 
+// MPFM Test Supervisor Review Actions - Role-based approval workflow
+Route::middleware('auth')->group(function () {
+    Route::post('/mpfm-tests/{mpfmTest}/approve-by-department', [MPFMTestController::class, 'approveByDepartment'])
+        ->name('mpfm_tests.approve_by_department')
+        ->middleware('can:approve-test-as-department');
+
+    Route::post('/mpfm-tests/{mpfmTest}/approve-by-surveillance', [MPFMTestController::class, 'approveBySurveillance'])
+        ->name('mpfm_tests.approve_by_surveillance')
+        ->middleware('can:approve-test-as-surveillance');
+
+    Route::post('/mpfm-tests/{mpfmTest}/reject', [MPFMTestController::class, 'rejectTest'])
+        ->name('mpfm_tests.reject')
+        ->middleware('can:reject-test');
+
+    Route::post('/mpfm-tests/{mpfmTest}/request-retest', [MPFMTestController::class, 'requestRetest'])
+        ->name('mpfm_tests.request_retest')
+        ->middleware('can:request-retest');
+});
+
 // AJAX routes for dynamic dropdowns
 Route::get('/ajax/operational-plans/towers/{oilFieldId}', [MPFMOperationalPlanController::class, 'getTowers'])->name('ajax.operational_plans.towers');
 Route::get('/ajax/operational-plans/oil-strings/{towerId}', [MPFMOperationalPlanController::class, 'getOilStrings'])->name('ajax.operational_plans.oil_strings');
@@ -227,7 +262,6 @@ use App\Http\Controllers\MPFMSupervisorController;
 use App\Http\Controllers\SurveillanceSupervisorController;
 use App\Http\Controllers\TaskArchiveController;
 use App\Http\Controllers\TaskCreationController;
-use App\Http\Controllers\DepartmentTaskController;
 
 Route::middleware('auth')->group(function () {
     // Supervisor Routes
@@ -300,6 +334,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/plans/{monthlyPlan}/tasks/{planTask}/reject', [SurveillanceSupervisorController::class, 'rejectTask'])->name('reject-task');
         Route::post('/plans/{monthlyPlan}/approve', [SurveillanceSupervisorController::class, 'approvePlan'])->name('approve');
         Route::post('/plans/{monthlyPlan}/reject', [SurveillanceSupervisorController::class, 'rejectPlan'])->name('reject');
+
+        // AJAX endpoints for task assignment modal (legacy PlanTask)
+        Route::get('/tasks/{task}/assign-modal', [SurveillanceSupervisorController::class, 'getTaskAssignmentModal'])->name('task-assign-modal');
+        Route::post('/tasks/{task}/assign-to-department/{department}', [SurveillanceSupervisorController::class, 'assignTaskToDepartment'])->name('assign-task-to-department');
+
+        // New Task model — approve/reject from surveillance
+        Route::post('/new-tasks/{task}/approve', [SurveillanceSupervisorController::class, 'approveNewTask'])->name('new-task.approve');
+        Route::post('/new-tasks/{task}/reject',  [SurveillanceSupervisorController::class, 'rejectNewTask'])->name('new-task.reject');
     });
 
     // MPFM Supervisor Routes - Review and Assign
@@ -416,6 +458,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{department}/operators', [DepartmentController::class, 'operators'])->name('operators');
         Route::get('/{department}/reports', [DepartmentController::class, 'reports'])->name('reports');
         Route::post('/{department}/assign-operator', [DepartmentController::class, 'assignOperator'])->name('assign-operator');
+        Route::post('/{department}/tasks/{task}/assign-operator', [DepartmentController::class, 'assignTaskToOperator'])->name('assign-task-operator');
 
         // Department User Management (Supervisor/Admin only)
         Route::resource('{department}/users', DepartmentUserController::class)->parameters([
@@ -442,11 +485,20 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [TaskController::class, 'index'])->name('index');
         Route::get('/create', [TaskController::class, 'create'])->name('create');
 
+        // Bulk import from Excel
+        Route::get('/import', [TaskImportController::class, 'index'])->name('import');
+        Route::post('/import', [TaskImportController::class, 'store'])->name('import.store');
+        Route::get('/import/template', [TaskImportController::class, 'downloadTemplate'])->name('import.template');
+
         // Dynamic task creation with cascading dropdowns (MUST be before /{task} route)
         Route::get('/create-advanced', [TaskCreationController::class, 'create'])->name('create-advanced');
         Route::post('/store-advanced', [TaskCreationController::class, 'store'])->name('store-advanced');
 
         Route::post('/', [TaskController::class, 'store'])->name('store');
+
+        // Supervisor task view (must be before /{task} route to avoid conflicts)
+        Route::get('/{task}/supervisor-view', [TaskController::class, 'supervisorView'])->name('supervisor-view');
+
         Route::get('/{task}', [TaskController::class, 'show'])->name('show');
         Route::get('/{task}/edit', [TaskController::class, 'edit'])->name('edit');
         Route::put('/{task}', [TaskController::class, 'update'])->name('update');
@@ -455,9 +507,13 @@ Route::middleware('auth')->group(function () {
         // State transition
         Route::post('/{task}/transition', [TaskController::class, 'transition'])->name('transition');
 
+        // Assign operator and transition to assigned_to_department
+        Route::post('/{task}/assign', [TaskController::class, 'assign'])->name('assign');
+
         // AJAX endpoints for dynamic form population
         Route::post('/api/get-oil-strings', [TaskCreationController::class, 'getOilStrings'])->name('get-oil-strings');
         Route::post('/api/get-department-requirements', [TaskCreationController::class, 'getDepartmentRequirements'])->name('get-department-requirements');
+        Route::get('/api/department-fields/{code}', [DepartmentTaskController::class, 'getFields'])->name('api.department-fields');
         Route::post('/api/get-test-type-details', [TaskCreationController::class, 'getTestTypeDetails'])->name('get-test-type-details');
     });
 
@@ -473,6 +529,22 @@ Route::middleware('auth')->group(function () {
         Route::post('/api/get-assignment-modal', [DepartmentTaskController::class, 'getAssignmentModal'])->name('get-assignment-modal');
         Route::post('/api/assign-operator', [DepartmentTaskController::class, 'assignOperator'])->name('assign-operator');
         Route::post('/api/remove-operator', [DepartmentTaskController::class, 'removeOperator'])->name('remove-operator');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Department-Specific Dashboards & Task Completion
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('dept')->name('dept.')->group(function () {
+        // Dashboard for each department by code (MPFM, WIRELINE, etc.)
+        Route::get('/{code}/dashboard', [DepartmentTaskController::class, 'dashboard'])->name('dashboard');
+        Route::get('/{code}/tasks',     [DepartmentTaskController::class, 'deptTasks'])->name('tasks');
+
+        // Task completion flow
+        Route::get('/complete/{planTask}',   [DepartmentTaskController::class, 'showCompletion'])->name('complete');
+        Route::post('/complete/{planTask}',  [DepartmentTaskController::class, 'storeCompletion'])->name('complete.store');
+        Route::get('/result/{planTask}',     [DepartmentTaskController::class, 'completionResult'])->name('result');
     });
 });
 

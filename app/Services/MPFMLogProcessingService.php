@@ -267,12 +267,21 @@ class MPFMLogProcessingService
         $startTime = $this->parseDateTimeSafe($this->findTimeValue($firstRow), Carbon::today());
         $endTime = $this->parseDateTimeSafe($this->findTimeValue(end($rows)), Carbon::today());
 
+        // Calculate durations
+        $durationMinutes = $startTime && $endTime ? $startTime->diffInMinutes($endTime) : null;
+        $durationHours = $durationMinutes ? round($durationMinutes / 60, 2) : null;
+
         // Build comprehensive MPFM data with multiple fallback strategies
         $mpfmData = [
             // Basic test information
             'test_date' => $startTime ? $startTime->format('Y-m-d') : date('Y-m-d'),
             'shift' => $this->determineShift($startTime),
-            'duration_minutes' => $startTime && $endTime ? $startTime->diffInMinutes($endTime) : null,
+            'duration_minutes' => $durationMinutes,
+            'test_duration_hours' => $durationHours,
+            'test_started_at' => $startTime,
+            'test_completed_at' => $endTime,
+            'test_total_data_points' => count($rows),
+            'test_stable_duration_hours' => $this->calculateStableDuration($rows, $startTime),
 
             // Production rates - comprehensive extraction
             'oil_rate' => $this->safeGetValue($averages, ['oil_rate_avg', 'qo_sc_avg', 'qo_lc_avg']) ??
@@ -346,6 +355,36 @@ class MPFMLogProcessingService
                                      $this->extractNumericValue($firstRow, ['dp', 'differential_pressure', 'delta_p']),
             'flow_velocity' => $this->safeGetValue($averages, ['velocity_avg']) ??
                              $this->extractNumericValue($firstRow, ['velocity', 'flow_velocity', 'v_flow']),
+
+            // Line conditions (LC) density fields - stored in database as po_lc, pw_lc, pg_lc
+            'po_lc' => $this->safeGetValue($averages, ['po_lc', 'oil_density_lc']) ??
+                      $this->extractNumericValue($firstRow, ['po_lc', 'oil_density[kg/m3]', 'rho_oil_lc']),
+            'pw_lc' => $this->safeGetValue($averages, ['pw_lc', 'water_density_lc']) ??
+                      $this->extractNumericValue($firstRow, ['pw_lc', 'water_density[kg/m3]', 'rho_water_lc']),
+            'pg_lc' => $this->safeGetValue($averages, ['pg_lc', 'gas_density_lc']) ??
+                      $this->extractNumericValue($firstRow, ['pg_lc', 'gas_density[kg/m3]', 'rho_gas_lc']),
+
+            // Mass flow rates (kg/d) - stored in database as mo_lc, mw_lc, mg_lc
+            'mo_lc' => $this->safeGetValue($averages, ['mo_lc', 'oil_mass_flow']) ??
+                      $this->extractNumericValue($firstRow, ['mo_lc', 'oil_mass_flow[kg/d]', 'mass_oil_lc']),
+            'mw_lc' => $this->safeGetValue($averages, ['mw_lc', 'water_mass_flow']) ??
+                      $this->extractNumericValue($firstRow, ['mw_lc', 'water_mass_flow[kg/d]', 'mass_water_lc']),
+            'mg_lc' => $this->safeGetValue($averages, ['mg_lc', 'gas_mass_flow']) ??
+                      $this->extractNumericValue($firstRow, ['mg_lc', 'gas_mass_flow[kg/d]', 'mass_gas_lc']),
+
+            // Formation volume factors (FVF) - dimensionless
+            'bo' => $this->safeGetValue($averages, ['bo', 'bo_avg', 'oil_fvf']) ??
+                   $this->extractNumericValue($firstRow, ['bo[Sm3/m3]', 'bo', 'BO', 'formation_oil']),
+            'bw' => $this->safeGetValue($averages, ['bw', 'bw_avg', 'water_fvf']) ??
+                   $this->extractNumericValue($firstRow, ['bw[Sm3/m3]', 'bw', 'BW', 'formation_water']),
+            'bg' => $this->safeGetValue($averages, ['bg', 'bg_avg', 'gas_fvf']) ??
+                   $this->extractNumericValue($firstRow, ['bg[Sm3/m3]', 'bg', 'BG', 'formation_gas']),
+
+            // PVT properties
+            'z_factor' => $this->safeGetValue($averages, ['z_factor', 'z_factor_avg', 'compressibility']) ??
+                         $this->extractNumericValue($firstRow, ['Z', 'Z-factor', 'z_factor', 'compressibility']),
+            'rst' => $this->safeGetValue($averages, ['rst', 'rst_avg', 'solution_gor']) ??
+                    $this->extractNumericValue($firstRow, ['Rst[Scf/STB]', 'Rst', 'RST', 'solution_gor']),
         ];
 
         return $mpfmData;
@@ -803,6 +842,83 @@ class MPFMLogProcessingService
             'labels' => $labels ?? [],
             'datasets' => $datasets
         ];
+    }
+
+    /**
+     * Calculate stable duration - the period after the test stabilizes
+     * Tries to detect when production rates stabilize and calculates duration from that point
+     */
+    private function calculateStableDuration(array $rows, ?Carbon $startTime): ?float
+    {
+        if (count($rows) < 5 || !$startTime) {
+            return null;
+        }
+
+        // Find the last row which should be the end time
+        $lastRow = end($rows);
+        $endTime = $this->parseDateTimeSafe($this->findTimeValue($lastRow), Carbon::today());
+
+        if (!$endTime) {
+            return null;
+        }
+
+        // Try to detect stability by checking oil rate variance
+        $oilRateColumn = $this->findColumnByName(array_keys($rows[0] ?? []), ['qo_sc[STB/d]', 'qo_lc[bbl/d]', 'oil_rate']);
+
+        if (!$oilRateColumn) {
+            // If we can't find oil rate, assume stability starts at 50% of the test
+            $totalMinutes = $startTime->diffInMinutes($endTime);
+            return $totalMinutes ? round(($totalMinutes * 0.5) / 60, 2) : null;
+        }
+
+        // Calculate oil rates and find when variance stabilizes
+        $oilRates = [];
+        $timestamps = [];
+        foreach ($rows as $row) {
+            if (isset($row[$oilRateColumn]) && is_numeric($row[$oilRateColumn])) {
+                $oilRates[] = (float) $row[$oilRateColumn];
+                $time = $this->parseDateTimeSafe($this->findTimeValue($row), Carbon::today());
+                if ($time) {
+                    $timestamps[] = $time;
+                }
+            }
+        }
+
+        if (count($oilRates) < 5) {
+            // Not enough data, return full duration
+            $totalMinutes = $startTime->diffInMinutes($endTime);
+            return $totalMinutes ? round($totalMinutes / 60, 2) : null;
+        }
+
+        // Find the point where variance stabilizes (using rolling average)
+        $windowSize = max(3, (int)(count($oilRates) * 0.1)); // 10% of data points
+        $stabilityThreshold = 5; // 5% threshold
+
+        $stabilityStartIndex = null;
+        for ($i = $windowSize; $i < count($oilRates); $i++) {
+            $window = array_slice($oilRates, $i - $windowSize, $windowSize);
+            $avg = array_sum($window) / count($window);
+            $variance = array_sum(array_map(function($x) use ($avg) {
+                return pow($x - $avg, 2);
+            }, $window)) / count($window);
+            $stdDev = sqrt($variance);
+            $coefficientOfVariation = ($avg > 0) ? ($stdDev / $avg) * 100 : 0;
+
+            if ($coefficientOfVariation < $stabilityThreshold) {
+                $stabilityStartIndex = $i;
+                break;
+            }
+        }
+
+        if ($stabilityStartIndex && isset($timestamps[$stabilityStartIndex])) {
+            $stableStartTime = $timestamps[$stabilityStartIndex];
+            $stableDurationMinutes = $stableStartTime->diffInMinutes($endTime);
+            return round($stableDurationMinutes / 60, 2);
+        }
+
+        // If we can't detect stability, assume 70% of test is stable
+        $totalMinutes = $startTime->diffInMinutes($endTime);
+        return $totalMinutes ? round(($totalMinutes * 0.7) / 60, 2) : null;
     }
 
     /**

@@ -11,22 +11,26 @@ class TaskStateHistory extends Model
 {
     protected $table = 'task_state_histories';
 
+    // The table has no updated_at column — only created_at
     public $timestamps = false;
+    const CREATED_AT = 'created_at';
 
     protected $fillable = [
         'task_id',
+        'plan_task_id',
         'from_state',
         'to_state',
-        'changed_by_user_id',
+        'changed_by',
         'changed_by_role',
         'notes',
-        'changed_at',
+        'metadata',
+        'created_at',
     ];
 
     protected $casts = [
         'from_state' => TaskState::class,
         'to_state' => TaskState::class,
-        'changed_at' => 'datetime',
+        'created_at' => 'datetime',
     ];
 
     /**
@@ -38,9 +42,9 @@ class TaskStateHistory extends Model
         return $this->belongsTo(Task::class, 'task_id');
     }
 
-    public function changedBy(): BelongsTo
+    public function changedByUser(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'changed_by_user_id');
+        return $this->belongsTo(User::class, 'changed_by');
     }
 
     /**
@@ -64,16 +68,16 @@ class TaskStateHistory extends Model
     public function getDurationInState(): int
     {
         $nextHistory = TaskStateHistory::where('task_id', $this->task_id)
-            ->where('changed_at', '>', $this->changed_at)
-            ->orderBy('changed_at', 'asc')
+            ->where('created_at', '>', $this->created_at)
+            ->orderBy('created_at', 'asc')
             ->first();
 
         if ($nextHistory) {
-            return $this->changed_at->diffInMinutes($nextHistory->changed_at);
+            return $this->created_at->diffInMinutes($nextHistory->created_at);
         }
 
         // Still in this state
-        return $this->changed_at->diffInMinutes(now());
+        return $this->created_at->diffInMinutes(now());
     }
 
     public function isForwardTransition(): bool

@@ -14,34 +14,92 @@ class MPFMTestService
     {
         $kpis = [];
 
-        // GOR (Gas-Oil Ratio)
-        if ($test->oil_rate > 0) {
-            $kpis['gor'] = $test->gas_rate / $test->oil_rate;
+        // Use standard condition rates (SC) if available, fallback to liquid conditions (LC)
+        $oilRate = $test->qo_sc ?? $test->qo_lc ?? $test->oil_rate ?? 0;
+        $gasRate = $test->qg_sc ?? $test->qg_lc ?? $test->gas_rate ?? 0;
+        $waterRate = $test->qw_sc ?? $test->qw_lc ?? 0;
+
+        // Calculate water cut if not directly available
+        $waterCut = $test->water_cut ?? 0;
+        if ($waterCut == 0 && $oilRate > 0 && $waterRate > 0) {
+            $waterCut = ($waterRate / ($oilRate + $waterRate)) * 100;
+        }
+
+        // GOR (Gas-Oil Ratio): Gas Rate / Oil Rate
+        if (is_numeric($oilRate) && $oilRate > 0) {
+            $kpis['gor'] = round($gasRate / $oilRate, 4);
         } else {
             $kpis['gor'] = 0;
         }
 
-        // WLR (Water-Liquid Ratio) - if we have water rate
-        $totalLiquid = $test->oil_rate + ($test->water_cut ? ($test->oil_rate * $test->water_cut / 100) : 0);
-        if ($totalLiquid > 0) {
-            $waterRate = $test->oil_rate * ($test->water_cut / 100);
-            $kpis['wlr'] = $waterRate / $totalLiquid;
+        // WLR (Water-Liquid Ratio): Water Rate / (Oil Rate + Water Rate) * 100
+        $totalLiquid = $oilRate + $waterRate;
+        if (is_numeric($totalLiquid) && $totalLiquid > 0) {
+            $kpis['wlr'] = round(($waterRate / $totalLiquid) * 100, 2);
         } else {
             $kpis['wlr'] = 0;
         }
 
-        // BSW (Basic Sediment and Water) - same as water_cut percentage
-        $kpis['bsw'] = $test->water_cut ?? 0;
+        // BSW (Basic Sediment and Water) - percentage of water in total liquid
+        if (is_numeric($totalLiquid) && $totalLiquid > 0) {
+            $kpis['bsw'] = round(($waterRate / $totalLiquid) * 100, 2);
+        } else {
+            $kpis['bsw'] = $waterCut > 0 ? round($waterCut, 2) : 0;
+        }
 
-        // Total production rate
-        $kpis['total_production_rate'] = $test->oil_rate + $test->gas_rate + ($test->oil_rate * ($test->water_cut / 100));
+        // Total liquid rate (oil + water)
+        $kpis['total_liquid_rate'] = round($totalLiquid, 2);
 
-        // Efficiency metrics
-        if ($test->pressure && $test->oil_rate > 0) {
-            $kpis['productivity_index'] = $test->oil_rate / $test->pressure;
+        // Total production rate (oil + water + gas)
+        $kpis['total_production_rate'] = round($oilRate + $waterRate + $gasRate, 2);
+
+        // GVF (Gas Volume Fraction): Gas / (Oil + Water + Gas) * 100
+        $totalVolume = $oilRate + $waterRate + $gasRate;
+        if (is_numeric($totalVolume) && $totalVolume > 0) {
+            $kpis['gvf'] = round(($gasRate / $totalVolume) * 100, 2);
+        } else {
+            $kpis['gvf'] = 0;
+        }
+
+        // Productivity Index (PI): Oil Rate / Pressure differential
+        $pressure = $test->pressure_avg ?? $test->pressure ?? 0;
+        if (is_numeric($pressure) && $pressure > 0 && $oilRate > 0) {
+            $kpis['productivity_index'] = round($oilRate / $pressure, 6);
         } else {
             $kpis['productivity_index'] = 0;
         }
+
+        // Add density fields from database (Line Conditions - LC)
+        $kpis['po'] = $test->po_lc ?? 0;  // Oil density (kg/m³)
+        $kpis['pw'] = $test->pw_lc ?? 0;  // Water density (kg/m³)
+        $kpis['pg'] = $test->pg_lc ?? 0;  // Gas density (kg/m³)
+
+        // Add mass flow rates (kg/d)
+        $kpis['mo'] = $test->mo_lc ?? 0;  // Oil mass flow (kg/d)
+        $kpis['mw'] = $test->mw_lc ?? 0;  // Water mass flow (kg/d)
+        $kpis['mg'] = $test->mg_lc ?? 0;  // Gas mass flow (kg/d)
+
+        // Add formation volume factors (FVF)
+        $kpis['bo'] = $test->bo ?? 0;  // Oil FVF (Rm³/Sm³)
+        $kpis['bw'] = $test->bw ?? 0;  // Water FVF (Rm³/Sm³)
+        $kpis['bg'] = $test->bg ?? 0;  // Gas FVF (Rm³/Sm³)
+
+        // Add PVT properties
+        $kpis['z_factor'] = $test->z_factor ?? 0;  // Gas compressibility factor (dimensionless)
+        $kpis['rst'] = $test->rst ?? 0;  // Solution GOR (Scf/STB)
+
+        // Add water rate if available
+        $kpis['water_rate'] = $waterRate > 0 ? round($waterRate, 2) : 0;
+
+        // Add source field names for debugging
+        $kpis['source_fields'] = [
+            'oil_rate_source' => !empty($test->qo_sc) ? 'qo_sc' : (!empty($test->qo_lc) ? 'qo_lc' : (!empty($test->oil_rate) ? 'oil_rate' : 'missing')),
+            'gas_rate_source' => !empty($test->qg_sc) ? 'qg_sc' : (!empty($test->qg_lc) ? 'qg_lc' : (!empty($test->gas_rate) ? 'gas_rate' : 'missing')),
+            'water_rate_source' => !empty($test->qw_sc) ? 'qw_sc' : (!empty($test->qw_lc) ? 'qw_lc' : 'missing'),
+            'pressure_source' => !empty($test->pressure_avg) ? 'pressure_avg' : (!empty($test->pressure) ? 'pressure' : 'missing'),
+            'density_source' => 'database fields (po_lc, pw_lc, pg_lc)',
+            'mass_flow_source' => 'database fields (mo_lc, mw_lc, mg_lc)',
+        ];
 
         return $kpis;
     }
