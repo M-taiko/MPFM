@@ -59,6 +59,12 @@ class RolePermissionSeeder extends Seeder
             'assign_operators',
             'review_department_work',
             'view_all_departments',
+
+            // Test Vessel Permissions
+            'manage_test_vessels',
+            'view_test_vessels',
+            'create_tv_tests',
+            'compare_tv_tests',
         ];
 
         foreach ($permissions as $permission) {
@@ -119,6 +125,8 @@ class RolePermissionSeeder extends Seeder
             'view_well_tests',
             'view_job_officer_reports',
             'view_well_string_requirements',
+            'view_test_vessels',
+            'compare_tv_tests',
         ]);
 
         // Surveillance Supervisor permissions
@@ -131,6 +139,8 @@ class RolePermissionSeeder extends Seeder
         $mpfmOperatorRole->syncPermissions([
             'view_well_tests',
             'view_mpfm_operator_reports',
+            'view_test_vessels',
+            'create_tv_tests',
         ]);
 
         // Operator permissions (backward compatibility)
@@ -145,6 +155,8 @@ class RolePermissionSeeder extends Seeder
             'assign_operators',
             'review_department_work',
             'view_well_tests',
+            'view_test_vessels',
+            'create_tv_tests',
         ]);
 
         // Department Supervisor permissions (NEW: Manage users within department)
@@ -160,6 +172,9 @@ class RolePermissionSeeder extends Seeder
             'view_well_tests',
             'view_well_string_requirements',
             'view_all_departments', // Can see all departments (read-only)
+            'view_test_vessels',
+            'create_tv_tests',
+            'compare_tv_tests',
         ]);
     }
 }

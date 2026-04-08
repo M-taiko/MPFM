@@ -473,7 +473,7 @@
                     <div class="modern-form-group">
                         <label class="modern-form-label">Client</label>
                         <input type="text" name="client" class="modern-form-input @error('client') is-invalid @enderror"
-                               placeholder="e.g., ADNOC"
+                               placeholder="e.g., Client Name"
                                value="{{ old('client', $autoFillData['client'] ?? '') }}"
                                {{ $hasTask ? 'readonly' : '' }} required>
                         @error('client')

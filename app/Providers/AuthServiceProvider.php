@@ -6,10 +6,16 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use App\Models\WellStringRequirement;
 use App\Domains\Task\Models\Task;
+use App\Models\TestVessel;
+use App\Models\TestVesselTest;
+use App\Models\TVTestRequest;
 use App\Policies\WellStringRequirementPolicy;
 use App\Policies\TaskStatePolicy;
 use App\Policies\TaskPolicy;
 use App\Policies\AdminPolicy;
+use App\Policies\TestVesselPolicy;
+use App\Policies\TestVesselTestPolicy;
+use App\Policies\TVTestRequestPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -21,6 +27,9 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         WellStringRequirement::class => WellStringRequirementPolicy::class,
         Task::class => TaskPolicy::class,
+        TestVessel::class => TestVesselPolicy::class,
+        TestVesselTest::class => TestVesselTestPolicy::class,
+        TVTestRequest::class => TVTestRequestPolicy::class,
     ];
 
     /**

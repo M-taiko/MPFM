@@ -240,6 +240,43 @@ Route::get('/ajax/operational-plans/oil-strings/{towerId}', [MPFMOperationalPlan
 
 /*
 |--------------------------------------------------------------------------
+| Test Vessel Operations
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('test-vessels/{testVessel}/tests', [\App\Http\Controllers\TestVesselController::class, 'getTests'])
+        ->name('test_vessels.get_tests');
+    Route::get('/ajax/test-vessels/{testVessel}/info', [\App\Http\Controllers\TestVesselController::class, 'getInfo'])
+        ->name('ajax.test_vessels.info');
+    Route::resource('test-vessels', \App\Http\Controllers\TestVesselController::class)->names('test_vessels');
+
+    // TV Test Requests
+    Route::get('tv-test-requests/{tvTestRequest}/start/{well}', [\App\Http\Controllers\TVTestRequestController::class, 'startTest'])
+        ->name('tv_test_requests.start_test');
+    Route::resource('tv-test-requests', \App\Http\Controllers\TVTestRequestController::class)
+        ->only(['index', 'create', 'store', 'show'])
+        ->names('tv_test_requests')
+        ->parameters(['tv-test-requests' => 'tvTestRequest']);
+
+    // TV Tests - approval/rejection
+    Route::post('tv-tests/{tvTest}/approve', [\App\Http\Controllers\TVTestRequestController::class, 'approveTest'])
+        ->name('tv_tests.approve');
+    Route::post('tv-tests/{tvTest}/reject', [\App\Http\Controllers\TVTestRequestController::class, 'rejectTest'])
+        ->name('tv_tests.reject');
+    Route::post('tv-tests/{tvTest}/submit', [\App\Http\Controllers\TestVesselTestController::class, 'submit'])
+        ->name('tv_tests.submit');
+
+    Route::get('tv-tests/compare', [\App\Http\Controllers\TestVesselTestController::class, 'compare'])
+        ->name('tv_tests.compare');
+    Route::get('tv-tests/compare-result', [\App\Http\Controllers\TestVesselTestController::class, 'compareResult'])
+        ->name('tv_tests.compare_result');
+    Route::resource('tv-tests', \App\Http\Controllers\TestVesselTestController::class)
+        ->names('tv_tests')
+        ->parameters(['tv-tests' => 'tvTest']);
+});
+
+/*
+|--------------------------------------------------------------------------
 | Reports
 |--------------------------------------------------------------------------
 */

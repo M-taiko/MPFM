@@ -8,7 +8,7 @@
 							<a href="{{ url('/' . $page='index') }}"><img src="{{URL::asset('assets/img/brand/favicon.png')}}" class="logo-2" alt="logo"></a>
 							<a href="{{ url('/' . $page='index') }}"><img src="{{URL::asset('assets/img/brand/favicon.png')}}" class="dark-logo-2" alt="logo"></a>
 
-                         <h1 class="text-2xl font-bold text-indigo-600">MP<span class="text-gray-700">FM</span></h1>
+                         <h1 class="text-2xl font-bold text-indigo-600">OFMS</h1>
                         </div>
 						<div class="app-sidebar__toggle" data-toggle="sidebar">
 							<a class="open-toggle" href="#"><i class="header-icon fe fe-align-left" ></i></a>

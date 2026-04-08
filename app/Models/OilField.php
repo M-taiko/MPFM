@@ -48,6 +48,14 @@ class OilField extends Model
     }
 
     /**
+     * Get all test vessels for this oil field
+     */
+    public function testVessels(): HasMany
+    {
+        return $this->hasMany(TestVessel::class);
+    }
+
+    /**
      * Scope to filter active oil fields
      */
     public function scopeActive($query)

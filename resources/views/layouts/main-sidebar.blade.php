@@ -3,24 +3,16 @@
 <aside class="app-sidebar sidebar-scroll">
     <div class="main-sidebar-header active">
         <a class="desktop-logo logo-light active" href="{{ url('/dashboard') }}">
-            <h1 class="main-logo text-2xl font-bold" style="color: #667eea;">
-                <span style="color: #764ba2;">MP</span>FM
-            </h1>
+            <img src="{{ asset('assets/img/brand/logo.png') }}" alt="OFMS" style="height:40px;width:auto;">
         </a>
         <a class="desktop-logo logo-dark active" href="{{ url('/dashboard') }}">
-            <h1 class="main-logo dark-theme text-2xl font-bold text-white">
-                MP<span class="text-gray-300">FM</span>
-            </h1>
+            <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt="OFMS" style="height:40px;width:auto;">
         </a>
         <a class="logo-icon mobile-logo icon-light active" href="{{ url('/dashboard') }}">
-            <h1 class="logo-icon text-2xl font-bold" style="color: #667eea;">
-                <span style="color: #764ba2;">MP</span>FM
-            </h1>
+            <img src="{{ asset('assets/img/brand/favicon.png') }}" alt="OFMS" style="height:36px;width:auto;">
         </a>
         <a class="logo-icon mobile-logo icon-dark active" href="{{ url('/dashboard') }}">
-            <h1 class="logo-icon dark-theme text-2xl font-bold text-white">
-                MP<span class="text-gray-300">FM</span>
-            </h1>
+            <img src="{{ asset('assets/img/brand/favicon-white.png') }}" alt="OFMS" style="height:36px;width:auto;">
         </a>
     </div>
 
@@ -217,6 +209,39 @@
                 <ul class="slide-menu">
                     <li><a class="slide-item {{ request()->routeIs('surveillance.dashboard') ? 'active' : '' }}" href="{{ route('surveillance.dashboard') }}">Dashboard</a></li>
                     <li><a class="slide-item {{ request()->routeIs('surveillance.index') ? 'active' : '' }}" href="{{ route('surveillance.index') }}">Plans for Review</a></li>
+                </ul>
+            </li>
+            @endif
+
+            {{-- ══════════════════════════════════════
+                 Test Vessel
+            ══════════════════════════════════════ --}}
+            @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('job_officer') || $isOp)
+            <li class="side-item side-item-category">Test Vessel</li>
+            <li class="slide">
+                <a class="side-menu__item {{ request()->is('test-vessels*') || request()->is('tv-tests*') ? 'active' : '' }}"
+                   data-toggle="slide" href="javascript:void(0);">
+                    <i class="side-menu__icon fe fe-anchor"></i>
+                    <span class="side-menu__label">Test Vessel</span>
+                    <i class="angle fe fe-chevron-down"></i>
+                </a>
+                <ul class="slide-menu">
+                    <li><a class="slide-item {{ request()->is('test-vessels*') ? 'active' : '' }}"
+                           href="{{ route('test_vessels.index') }}">Vessels</a></li>
+                    @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('job_officer'))
+                    <li><a class="slide-item {{ request()->routeIs('test_vessels.create') ? 'active' : '' }}"
+                           href="{{ route('test_vessels.create') }}">Add Vessel</a></li>
+                    @endif
+                    @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('job_officer') || $isOp)
+                    <li><a class="slide-item {{ request()->is('tv-test-requests*') ? 'active' : '' }}"
+                           href="{{ route('tv_test_requests.index') }}">Test Requests</a></li>
+                    @endif
+                    <li><a class="slide-item {{ request()->is('tv-tests*') && !request()->routeIs('tv_tests.compare', 'tv_tests.compare_result') ? 'active' : '' }}"
+                           href="{{ route('tv_tests.index') }}">TV Tests</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('tv_tests.create') ? 'active' : '' }}"
+                           href="{{ route('tv_tests.create') }}">New TV Test</a></li>
+                    <li><a class="slide-item {{ request()->routeIs('tv_tests.compare') ? 'active' : '' }}"
+                           href="{{ route('tv_tests.compare') }}">Compare vs MPFM</a></li>
                 </ul>
             </li>
             @endif

@@ -31,7 +31,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Client</label>
-                                    <input type="text" name="client" class="form-control" placeholder="ADNOC" required>
+                                    <input type="text" name="client" class="form-control" placeholder="Client Name" required>
                                 </div>
                             </div>
 

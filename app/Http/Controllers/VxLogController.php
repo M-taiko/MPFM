@@ -75,7 +75,7 @@ class VxLogController extends Controller
                 }
 
                 $autoFillData = [
-                    'client'             => 'ADNOC',
+                    'client'             => config('app.name', 'Oil Field Management System'),
                     'field'              => $newTask->tower?->oilField?->name ?? 'N/A',
                     'well'               => $newTask->title ?? ('Task #' . $newTask->id),
                     'wellhead_tower'     => $newTask->tower?->name ?? 'N/A',
@@ -108,7 +108,7 @@ class VxLogController extends Controller
                 }
 
                 $autoFillData = [
-                    'client'             => 'ADNOC',
+                    'client'             => config('app.name', 'Oil Field Management System'),
                     'field'              => $task->towerModel?->oilField?->name ?? $task->tower ?? 'N/A',
                     'well'               => $task->well_full_name ?? $task->well_number ?? $task->towerModel?->well_name ?? 'N/A',
                     'wellhead_tower'     => $task->towerModel?->name ?? $task->tower ?? 'N/A',

@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 
-@section('title', 'Login - ADNOC MPFM')
+@section('title', 'Login - Oil Field Management System')
 
 @section('content')
 <style>
@@ -95,8 +95,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 20px;
-        margin-bottom: 50px;
         animation: slideInLeft 0.8s ease-out;
     }
 
@@ -105,22 +103,21 @@
     width: 100%;
     max-width: 280px;
     filter: brightness(0) invert(1);
-    margin-bottom: 30px;
     position: relative;
   }
 
     .brand-logo-text {
-        font-size: 36px;
+        font-size: 26px;
         font-weight: 900;
         letter-spacing: -1px;
         text-align: center;
     }
 
     .brand-title {
-        font-size: 52px;
+        font-size: 26px;
         font-weight: 900;
         line-height: 1.2;
-        margin-bottom: 25px;
+        /* margin-bottom: 25px; */
         animation: slideInLeft 0.8s ease-out 0.1s backwards;
     }
 
@@ -128,7 +125,6 @@
         font-size: 20px;
         opacity: 0.9;
         line-height: 1.7;
-        margin-bottom: 60px;
         animation: slideInLeft 0.8s ease-out 0.2s backwards;
     }
 
@@ -452,7 +448,7 @@
         }
 
         .brand-title {
-            font-size: 40px;
+            font-size: 426px;
         }
 
         .brand-subtitle {
@@ -664,14 +660,14 @@
     <!-- Left Brand Section -->
     <div class="login-brand">
         <div class="brand-logo">
-            <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt=" MPFM">
-            <div class="brand-logo-text">ADNOC MPFM</div>
+            <img src="{{ asset('assets/img/brand/logo-white.png') }}" alt="Oil Field Management System">
+            <div class="brand-logo-text">Oil Field Management System</div>
         </div>
 
-        <h1 class="brand-title">Offshore Operations, Perfected</h1>
+        <h1 class="brand-title">Field Operations, Unified</h1>
 
         <p class="brand-subtitle">
-            Precision multiphase flow meter testing with complete operational oversight and surveillance management.
+            Complete oil field operations management — multiphase flow testing, task workflows, and departmental oversight in one platform.
         </p>
 
         <div class="brand-features">
@@ -796,9 +792,7 @@
 </div>
 
  <div class="footer-bottom">
-                <p>&copy; {{ date('Y') }}  MPFM. All Rights Reserved. | Engineering Precision • Operational Excellence || this software is proprietary and confidential </p>
-                <br>
-                <p>Developed by <a href="https://www.facebook.com/m.tarek2014" target="_blank">Mohamed Tarek</a> with <a href="https://masarsoft.io">Masarsoft</a></p>
+                <p>&copy; {{ date('Y') }} Oil Field Management System. All Rights Reserved. | Engineering Precision &bull; Operational Excellence</p>
             </div>
 
 @endsection

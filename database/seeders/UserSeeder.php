@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * Creates ADNOC-grade users with proper roles and department assignments
+     * Creates system users with proper roles and department assignments.
      */
     public function run(): void
     {
@@ -21,27 +21,26 @@ class UserSeeder extends Seeder
 
         // Admin User (no department - global admin)
         $admin = User::firstOrCreate(
-            ['email' => 'donia.a5ra2019@gmail.com'],
+            ['email' => 'admin@oilfield.com'],
             [
-                'name' => 'Mohamed Tarek',
-                'password' => Hash::make('123456789'),
-                'department_id' => null, // Admin has no specific department
+                'name' => 'System Admin',
+                'password' => Hash::make('password'),
+                'department_id' => null,
             ]
         );
         if (!$admin->hasRole('admin')) {
             $admin->assignRole('admin');
         }
 
-        // MPFM Supervisor (migrate to Department Manager role, assigned to MPFM dept)
+        // Department Manager — assigned to MPFM dept
         $supervisor = User::firstOrCreate(
-            ['email' => 'supervisor@adnoc.ae'],
+            ['email' => 'manager@oilfield.com'],
             [
-                'name' => 'MPFM Supervisor',
+                'name' => 'MPFM Manager',
                 'password' => Hash::make('password'),
                 'department_id' => $mpfmDept?->id,
             ]
         );
-        // Update to new department_manager role if was mpfm_supervisor
         if ($supervisor->hasRole('mpfm_supervisor')) {
             $supervisor->removeRole('mpfm_supervisor');
         }
@@ -51,9 +50,9 @@ class UserSeeder extends Seeder
 
         // MPFM Operators (assigned to MPFM department)
         $operators = [
-            ['name' => 'Operator 1', 'email' => 'operator1@adnoc.ae'],
-            ['name' => 'Operator 2', 'email' => 'operator2@adnoc.ae'],
-            ['name' => 'Operator 3', 'email' => 'operator3@adnoc.ae'],
+            ['name' => 'Operator One',   'email' => 'operator1@oilfield.com'],
+            ['name' => 'Operator Two',   'email' => 'operator2@oilfield.com'],
+            ['name' => 'Operator Three', 'email' => 'operator3@oilfield.com'],
         ];
 
         foreach ($operators as $operatorData) {
@@ -70,9 +69,9 @@ class UserSeeder extends Seeder
             }
         }
 
-        // Production Supervisor (no specific department - global role)
+        // Production Supervisor (global role)
         $prodSupervisor = User::firstOrCreate(
-            ['email' => 'prod.supervisor@adnoc.ae'],
+            ['email' => 'production.supervisor@oilfield.com'],
             [
                 'name' => 'Production Supervisor',
                 'password' => Hash::make('password'),
@@ -83,9 +82,9 @@ class UserSeeder extends Seeder
             $prodSupervisor->assignRole('production_supervisor');
         }
 
-        // Reservoir Engineer (no specific department - global role)
+        // Reservoir Engineer (global role)
         $reservoirEngineer = User::firstOrCreate(
-            ['email' => 'reservoir.engineer@adnoc.ae'],
+            ['email' => 'reservoir.engineer@oilfield.com'],
             [
                 'name' => 'Reservoir Engineer',
                 'password' => Hash::make('password'),
@@ -96,9 +95,9 @@ class UserSeeder extends Seeder
             $reservoirEngineer->assignRole('reservoir_engineer');
         }
 
-        // Job Officer (no specific department - global role)
+        // Job Officer (global role)
         $jobOfficer = User::firstOrCreate(
-            ['email' => 'job.officer@adnoc.ae'],
+            ['email' => 'job.officer@oilfield.com'],
             [
                 'name' => 'Job Officer',
                 'password' => Hash::make('password'),
@@ -109,20 +108,19 @@ class UserSeeder extends Seeder
             $jobOfficer->assignRole('job_officer');
         }
 
-        // Surveillance Supervisor (no specific department - global monitoring)
+        // Surveillance Supervisor (global monitoring)
         $surveillanceSupervisor = User::firstOrCreate(
-            ['email' => 'surveillance@adnoc.ae'],
+            ['email' => 'surveillance@oilfield.com'],
             [
                 'name' => 'Surveillance Supervisor',
                 'password' => Hash::make('password'),
-                'department_id' => null, // Global monitoring role
+                'department_id' => null,
             ]
         );
         if (!$surveillanceSupervisor->hasRole('surveillance_supervisor')) {
             $surveillanceSupervisor->assignRole('surveillance_supervisor');
         }
 
-        $this->command->info('Users seeded successfully with department assignments!');
+        $this->command->info('Users seeded successfully!');
     }
 }
-

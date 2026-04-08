@@ -446,7 +446,7 @@ class MPFMTestController extends Controller
             $kpis['temperature'] = $mpfmTest->temperature_avg;
         }
 
-        return view('mpfm_tests.show', compact('mpfmTest', 'kpis'));
+        return view('mpfm_tests.show_modern', compact('mpfmTest', 'kpis'));
     }
 
     /**
@@ -644,18 +644,30 @@ class MPFMTestController extends Controller
      */
     public function stringAnalysis($oilStringId)
     {
-        $oilString = OilString::with('tower')->findOrFail($oilStringId);
+        $oilString = OilString::with('tower', 'tower.oilField')->findOrFail($oilStringId);
 
-        $tests = MPFMTest::whereHas('planTask', function($q) use ($oilStringId) {
-            $q->where('oil_string_id', $oilStringId);
-        })->with('latestValidation')
-          ->orderBy('test_date', 'desc')
-          ->paginate(20);
+        // Get MPFM Tests
+        $mpfmTests = MPFMTest::where('oil_string_id', $oilStringId)
+            ->with(['oilField', 'tower', 'user'])
+            ->orderBy('test_date', 'desc')
+            ->get();
+
+        // Get TV Tests
+        $tvTests = \App\Models\TestVesselTest::where('oil_string_id', $oilStringId)
+            ->with(['testVessel', 'oilField', 'tower', 'user'])
+            ->orderBy('test_date', 'desc')
+            ->get();
+
+        // Merge and sort by date
+        $allTests = collect()
+            ->merge($mpfmTests->map(fn($t) => ['type' => 'mpfm', 'test' => $t]))
+            ->merge($tvTests->map(fn($t) => ['type' => 'tv', 'test' => $t]))
+            ->sortByDesc(fn($item) => $item['test']->test_date);
 
         $comparisonService = app(MPFMHistoricalComparisonService::class);
         $trendingData = $comparisonService->getStringTrendingAnalysis($oilStringId);
 
-        return view('mpfm_tests.string_analysis', compact('oilString', 'tests', 'trendingData'));
+        return view('mpfm_tests.string_analysis', compact('oilString', 'allTests', 'mpfmTests', 'tvTests', 'trendingData'));
     }
 
     /**

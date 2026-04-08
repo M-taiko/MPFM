@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'MPFM') }}</title>
+    <title>{{ config('app.name', 'Oil Field Management System') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -77,7 +77,7 @@
                 <div class="container">
                     <div class="row align-items-center flex-row-reverse">
                         <div class="col-md-12 col-sm-12 text-center">
-                            Copyright © {{ date('Y') }} <a href="htps://www.facebook.com/m.tarek2014">MPFM</a>. Designed by <a href="#">Mohamed Tarek</a>
+                            Copyright © {{ date('Y') }} Oil Field Management System. All rights reserved.
                         </div>
                     </div>
                 </div>
