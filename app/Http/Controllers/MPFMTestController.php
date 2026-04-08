@@ -421,13 +421,45 @@ class MPFMTestController extends Controller
             'oilField',
             'tower',
             'oilString',
-            'mpfmOperationalPlan'
+            'mpfmOperationalPlan',
+            'wellTest'
         ]);
 
-        // Prepare KPIs for display
-        $kpis = [];
+        // Get well test data if available
+        $wellTest = $mpfmTest->wellTest;
+        $wellTestData = null;
+        $metrics = [];
+        $rows = [];
+        $columns = [];
+        $flowRatesChartData = null;
+        $gorChartData = null;
+        $pressureTempChartData = null;
 
-        // Extract production rates from calculated_kpis or raw fields
+        if ($wellTest) {
+            // Extract test data from well test
+            $rows = $wellTest->test_data['rows'] ?? [];
+            $columns = $wellTest->test_data['columns'] ?? [];
+
+            // Use calculated metrics from well test
+            if (!empty($wellTest->calculated_metrics)) {
+                $metrics = $wellTest->calculated_metrics;
+            } else {
+                // Fallback: calculate metrics if not stored
+                $metricsService = app(\App\Services\MetricsService::class);
+                $metrics = $metricsService->calculateMetrics($rows, $columns);
+            }
+
+            // Prepare chart data
+            $chartService = app(\App\Services\ChartService::class);
+            $flowRatesChartData = $chartService->prepareFlowRatesChartData($rows, $columns);
+            $gorChartData = $chartService->prepareGorChartData($rows, $columns);
+            $pressureTempChartData = $chartService->preparePressureTempChartData($rows, $columns);
+
+            $wellTestData = $wellTest;
+        }
+
+        // Fallback: Prepare KPIs from MPFM test if no well test
+        $kpis = [];
         if ($mpfmTest->calculated_kpis) {
             $kpis = $mpfmTest->calculated_kpis;
         }
@@ -446,7 +478,18 @@ class MPFMTestController extends Controller
             $kpis['temperature'] = $mpfmTest->temperature_avg;
         }
 
-        return view('mpfm_tests.show_modern', compact('mpfmTest', 'kpis'));
+        return view('mpfm_tests.show_modern', compact(
+            'mpfmTest',
+            'kpis',
+            'wellTest',
+            'wellTestData',
+            'metrics',
+            'rows',
+            'columns',
+            'flowRatesChartData',
+            'gorChartData',
+            'pressureTempChartData'
+        ));
     }
 
     /**
