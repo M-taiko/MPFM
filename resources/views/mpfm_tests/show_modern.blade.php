@@ -241,7 +241,20 @@
         </div>
     </div>
 
-    @if($wellTest && $metrics)
+    <!-- Debug: Display status -->
+    <div style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; margin: 1rem 0; border-radius: 0.5rem; font-size: 0.9rem; font-family: monospace;">
+        <strong>Debug Info:</strong><br>
+        wellTest: {{ $wellTest ? 'Yes (ID: ' . $wellTest->id . ')' : 'No (null)' }}<br>
+        metrics count: {{ count($metrics ?? []) }}<br>
+        metrics empty: {{ empty($metrics) ? 'true' : 'false' }}<br>
+        wellTest && !empty(metrics): {{ ($wellTest && !empty($metrics)) ? 'TRUE (show metrics)' : 'FALSE (hide metrics)' }}<br>
+        @if($wellTest)
+            wellTest->calculated_metrics exists: {{ isset($wellTest->calculated_metrics) ? 'Yes' : 'No' }}<br>
+            wellTest->calculated_metrics count: {{ count($wellTest->calculated_metrics ?? []) }}
+        @endif
+    </div>
+
+    @if($wellTest && !empty($metrics))
         <!-- Key Production Metrics -->
         <div class="row">
             <div class="col-lg-4 col-md-6">

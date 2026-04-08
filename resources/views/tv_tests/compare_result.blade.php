@@ -414,8 +414,22 @@
                 <span class="test-info-label">Status</span>
                 <span class="test-info-value">{{ ucfirst($mpfmTest->status) }}</span>
             </div>
+            @if($mpfmTest->wellTest)
+            <div class="test-info-row" style="background: rgba(255,255,255,0.2); padding: 0.75rem; margin-top: 1rem; border-radius: 0.3rem;">
+                <span class="test-info-label">Data Source</span>
+                <span class="test-info-value" style="font-size: 0.9rem;">✓ WellTest #{{ $mpfmTest->wellTest->id }}</span>
+            </div>
+            @endif
         </div>
     </div>
+</div>
+
+<!-- Debug Info -->
+<div style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem; font-size: 0.85rem; font-family: monospace;">
+    <strong>Debug - Metrics Used:</strong><br>
+    <strong>TV Test Metrics:</strong> {{ json_encode($tvMetrics) }}<br>
+    <strong>MPFM Metrics:</strong> {{ json_encode($mpfmMetrics) }}<br>
+    <strong>Metrics Count:</strong> {{ count($metrics) }}
 </div>
 
 <!-- Alert Banner -->

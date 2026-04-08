@@ -190,55 +190,57 @@ class TestVesselTestController extends Controller
                 ->with('error', 'Please select both tests to compare.');
         }
 
-        $tvTest = TestVesselTest::findOrFail($tvTestId);
-        $mpfmTest = MPFMTest::findOrFail($mpfmTestId);
+        $tvTest = TestVesselTest::with(['oilField', 'tower', 'oilString', 'user'])->findOrFail($tvTestId);
+        $mpfmTest = MPFMTest::with(['oilField', 'tower', 'oilString', 'user', 'wellTest'])->findOrFail($mpfmTestId);
 
-        // Calculate differences for key metrics
-        $metrics = [
-            'oil_rate' => [
-                'tv_value' => $tvTest->oil_rate,
-                'mpfm_value' => $mpfmTest->oil_rate,
-            ],
-            'gas_rate' => [
-                'tv_value' => $tvTest->gas_rate,
-                'mpfm_value' => $mpfmTest->gas_rate,
-            ],
-            'water_cut' => [
-                'tv_value' => $tvTest->water_cut,
-                'mpfm_value' => $mpfmTest->water_cut,
-            ],
-            'pressure' => [
-                'tv_value' => $tvTest->pressure,
-                'mpfm_value' => $mpfmTest->pressure,
-            ],
-            'temperature' => [
-                'tv_value' => $tvTest->temperature,
-                'mpfm_value' => $mpfmTest->temperature,
-            ],
-            'gor' => [
-                'tv_value' => $tvTest->gor ?? 0,
-                'mpfm_value' => $mpfmTest->gor ?? 0,
-            ],
+        // Get MPFM metrics - prefer wellTest data which is more accurate
+        $mpfmMetrics = [];
+        if ($mpfmTest->wellTest && $mpfmTest->wellTest->calculated_metrics) {
+            $mpfmMetrics = $mpfmTest->wellTest->calculated_metrics;
+        } elseif ($mpfmTest->calculated_kpis) {
+            $mpfmMetrics = $mpfmTest->calculated_kpis;
+        }
+
+        // Get TV metrics
+        $tvMetrics = [
+            'oil_rate' => $tvTest->oil_rate,
+            'gas_rate' => $tvTest->gas_rate,
+            'water_cut' => $tvTest->water_cut,
+            'pressure' => $tvTest->pressure,
+            'temperature' => $tvTest->temperature,
+            'gor' => $tvTest->gor,
         ];
 
-        // Calculate diffs
-        foreach ($metrics as &$metric) {
-            $metric['abs_diff'] = abs($metric['tv_value'] - $metric['mpfm_value']);
+        // Calculate differences for all metrics
+        $metrics = [];
+        $metricNames = ['oil_rate', 'gas_rate', 'water_cut', 'pressure', 'temperature', 'gor'];
 
-            // Calculate percentage difference
-            $base = max(abs($metric['mpfm_value']), 0.0001); // Avoid division by zero
-            $metric['pct_diff'] = ($metric['abs_diff'] / $base) * 100;
+        foreach ($metricNames as $name) {
+            $tvValue = $tvMetrics[$name] ?? null;
+            $mpfmValue = $mpfmMetrics[$name] ?? null;
 
-            // Determine direction
-            if ($metric['tv_value'] > $metric['mpfm_value']) {
-                $metric['direction'] = 'higher';
-            } elseif ($metric['tv_value'] < $metric['mpfm_value']) {
-                $metric['direction'] = 'lower';
-            } else {
-                $metric['direction'] = 'equal';
+            if ($tvValue !== null && $mpfmValue !== null) {
+                $metrics[$name] = [
+                    'tv_value' => $tvValue,
+                    'mpfm_value' => $mpfmValue,
+                    'abs_diff' => abs($tvValue - $mpfmValue),
+                ];
+
+                // Calculate percentage difference
+                $base = max(abs($mpfmValue), 0.0001);
+                $metrics[$name]['pct_diff'] = ($metrics[$name]['abs_diff'] / $base) * 100;
+
+                // Determine direction
+                if ($tvValue > $mpfmValue) {
+                    $metrics[$name]['direction'] = 'higher';
+                } elseif ($tvValue < $mpfmValue) {
+                    $metrics[$name]['direction'] = 'lower';
+                } else {
+                    $metrics[$name]['direction'] = 'equal';
+                }
             }
         }
 
-        return view('tv_tests.compare_result', compact('tvTest', 'mpfmTest', 'metrics'));
+        return view('tv_tests.compare_result', compact('tvTest', 'mpfmTest', 'metrics', 'tvMetrics', 'mpfmMetrics'));
     }
 }
