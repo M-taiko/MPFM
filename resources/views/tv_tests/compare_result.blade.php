@@ -425,16 +425,18 @@
 </div>
 
 <!-- Data Source Information -->
-<div class="card-modern">
+<div class="card-modern" style="border-top: 4px solid #667eea;">
     <div class="section-title">
-        <i class="fe fe-info"></i>
-        Data Sources & Raw Values
+        <i class="fe fe-activity"></i>
+        Measured Values Comparison
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
         <!-- TV Test Data -->
-        <div style="background: #f0f7ff; border: 1px solid #bee3f8; border-radius: 0.5rem; padding: 1rem;">
-            <h4 style="margin-top: 0; color: #2c5282;">Test Vessel Test #{{ $tvTest->id }}</h4>
+        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border: 2px solid #667eea; border-radius: 0.75rem; padding: 1.5rem;">
+            <h4 style="margin-top: 0; color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 0.75rem;">
+                <i class="fe fe-anchor"></i> Test Vessel Test #{{ $tvTest->id }}
+            </h4>
             <table style="width: 100%; font-size: 0.9rem;">
                 <tr>
                     <td style="padding: 0.5rem 0; border-bottom: 1px solid #bee3f8;"><strong>Oil Rate</strong></td>
@@ -464,10 +466,11 @@
         </div>
 
         <!-- MPFM Test Data -->
-        <div style="background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 0.5rem; padding: 1rem;">
-            <h4 style="margin-top: 0; color: #22543d;">MPFM Test #{{ $mpfmTest->id }}
+        <div style="background: linear-gradient(135deg, #48bb7815 0%, #38a16915 100%); border: 2px solid #48bb78; border-radius: 0.75rem; padding: 1.5rem;">
+            <h4 style="margin-top: 0; color: #22543d; border-bottom: 2px solid #48bb78; padding-bottom: 0.75rem;">
+                <i class="fe fe-bar-chart-2"></i> MPFM Test #{{ $mpfmTest->id }}
                 @if($mpfmTest->wellTest)
-                    <span style="font-size: 0.8rem; background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; margin-left: 0.5rem;">WellTest #{{ $mpfmTest->wellTest->id }}</span>
+                    <span style="font-size: 0.75rem; background: #48bb78; color: white; padding: 0.35rem 0.65rem; border-radius: 0.35rem; margin-left: 0.75rem;">✓ WellTest #{{ $mpfmTest->wellTest->id }}</span>
                 @endif
             </h4>
             <table style="width: 100%; font-size: 0.9rem;">
@@ -541,6 +544,135 @@
     </div>
 </div>
 @endif
+
+<!-- Analysis & Recommendations -->
+<div class="card-modern" style="border-left: 4px solid #667eea; background: #f8f9fa;">
+    <div class="section-title">
+        <i class="fe fe-lightbulb"></i>
+        Analysis & Recommendations
+    </div>
+
+    @php
+        // Analyze metrics for issues
+        $issues = [];
+        $warnings = [];
+        $recommendations = [];
+
+        foreach ($metrics as $key => $metric) {
+            $pct = $metric['pct_diff'];
+
+            if ($pct > 10) {
+                $issues[] = [
+                    'metric' => $key,
+                    'diff' => $pct,
+                    'direction' => $metric['direction'],
+                ];
+            } elseif ($pct > 5) {
+                $warnings[] = [
+                    'metric' => $key,
+                    'diff' => $pct,
+                ];
+            }
+        }
+
+        // Generate recommendations
+        if (!empty($issues)) {
+            $recommendations[] = "⚠️ <strong>Critical Issues Found:</strong> " . count($issues) . " metric(s) show differences > 10%. These require investigation.";
+        }
+
+        if (!empty($warnings)) {
+            $recommendations[] = "⚡ <strong>Check Warnings:</strong> " . count($warnings) . " metric(s) show differences 5-10%. Monitor these closely.";
+        }
+
+        $timeDiff = abs($tvTest->test_date->diffInDays($mpfmTest->test_date));
+        if ($timeDiff > 7) {
+            $recommendations[] = "📅 <strong>Time Gap:</strong> Tests are " . $timeDiff . " days apart. Well conditions may have changed.";
+        } elseif ($timeDiff > 0) {
+            $recommendations[] = "📅 <strong>Good Timing:</strong> Tests are only " . $timeDiff . " days apart - results are more comparable.";
+        }
+    @endphp
+
+    <!-- Issues Section -->
+    @if(!empty($issues))
+    <div style="background: #fff5f5; border: 1px solid #feb2b2; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem;">
+        <h5 style="margin-top: 0; color: #742a2a;">
+            <i class="fe fe-alert-circle"></i> Critical Issues (>10% Difference)
+        </h5>
+        @foreach($issues as $issue)
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #feb2b2;">
+                <strong>{{ ucfirst(str_replace('_', ' ', $issue['metric'])) }}</strong><br>
+                <small style="color: #742a2a;">
+                    Difference: <strong>{{ number_format($issue['diff'], 2) }}%</strong>
+                    @if($issue['direction'] == 'higher')
+                        (TV reading is <strong>HIGHER</strong> than MPFM)
+                    @elseif($issue['direction'] == 'lower')
+                        (TV reading is <strong>LOWER</strong> than MPFM)
+                    @endif
+                </small>
+            </div>
+        @endforeach
+    </div>
+    @endif
+
+    <!-- Warnings Section -->
+    @if(!empty($warnings))
+    <div style="background: #fffaf0; border: 1px solid #fbd38d; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem;">
+        <h5 style="margin-top: 0; color: #7c2d12;">
+            <i class="fe fe-alert-triangle"></i> Warnings (5-10% Difference)
+        </h5>
+        @foreach($warnings as $warning)
+            <div style="padding: 0.5rem 0; border-bottom: 1px solid #fbd38d;">
+                <strong>{{ ucfirst(str_replace('_', ' ', $warning['metric'])) }}</strong>
+                <strong style="float: right; color: #c05621;">{{ number_format($warning['diff'], 2) }}%</strong>
+            </div>
+        @endforeach
+    </div>
+    @endif
+
+    <!-- Root Cause Analysis -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem;">
+        <h5 style="margin-top: 0; color: #2d3748;">
+            <i class="fe fe-layers"></i> Possible Root Causes
+        </h5>
+        <ul style="margin: 0; padding-left: 1.5rem; color: #4a5568;">
+            <li><strong>Calibration Issues:</strong> Test Vessel sensors may need recalibration</li>
+            <li><strong>Equipment Malfunction:</strong> Sensors might be giving inaccurate readings</li>
+            <li><strong>Well Condition Changes:</strong> Production conditions changed between tests</li>
+            <li><strong>Measurement Timing:</strong> Tests conducted at different production stages</li>
+            <li><strong>Data Entry Errors:</strong> Manual data input mistakes in Test Vessel readings</li>
+        </ul>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div style="background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 0.5rem; padding: 1rem;">
+        <h5 style="margin-top: 0; color: #22543d;">
+            <i class="fe fe-check-circle"></i> Recommended Actions
+        </h5>
+        <ul style="margin: 0; padding-left: 1.5rem; color: #22543d;">
+            @if(!empty($issues))
+                <li><strong>High Priority:</strong> Review Test Vessel equipment for errors. Consider running a new test after calibration.</li>
+                <li>Check Test Vessel sensor connections and battery levels</li>
+                <li>Compare with recent MPFM baseline readings to identify trends</li>
+            @endif
+
+            @if(!empty($warnings))
+                <li><strong>Medium Priority:</strong> Monitor metrics closely in next test cycle</li>
+                <li>Document current well conditions and production parameters</li>
+            @endif
+
+            @if($timeDiff > 7)
+                <li><strong>Important:</strong> Re-run both tests under similar well conditions for accurate comparison</li>
+            @endif
+
+            @if(empty($issues) && empty($warnings))
+                <li><strong>✓ No Action Required:</strong> Test results are within acceptable limits</li>
+            @endif
+
+            <li>Schedule regular calibration checks for Test Vessel equipment</li>
+            <li>Maintain detailed logs of all test conditions and parameters</li>
+        </ul>
+    </div>
+</div>
 
 <!-- Summary Statistics -->
 <div class="card-modern">
