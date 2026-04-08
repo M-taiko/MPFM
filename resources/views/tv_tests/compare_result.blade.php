@@ -424,12 +424,80 @@
     </div>
 </div>
 
-<!-- Debug Info -->
-<div style="background: #f0f0f0; border: 1px solid #ddd; padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem; font-size: 0.85rem; font-family: monospace;">
-    <strong>Debug - Metrics Used:</strong><br>
-    <strong>TV Test Metrics:</strong> {{ json_encode($tvMetrics) }}<br>
-    <strong>MPFM Metrics:</strong> {{ json_encode($mpfmMetrics) }}<br>
-    <strong>Metrics Count:</strong> {{ count($metrics) }}
+<!-- Data Source Information -->
+<div class="card-modern">
+    <div class="section-title">
+        <i class="fe fe-info"></i>
+        Data Sources & Raw Values
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <!-- TV Test Data -->
+        <div style="background: #f0f7ff; border: 1px solid #bee3f8; border-radius: 0.5rem; padding: 1rem;">
+            <h4 style="margin-top: 0; color: #2c5282;">Test Vessel Test #{{ $tvTest->id }}</h4>
+            <table style="width: 100%; font-size: 0.9rem;">
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #bee3f8;"><strong>Oil Rate</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #bee3f8;">{{ number_format($tvMetrics['oil_rate'] ?? 0, 2) }} B/D</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #bee3f8;"><strong>Gas Rate</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #bee3f8;">{{ number_format($tvMetrics['gas_rate'] ?? 0, 2) }} MMscf/D</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #bee3f8;"><strong>Water Cut</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #bee3f8;">{{ number_format($tvMetrics['water_cut'] ?? 0, 2) }} %</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #bee3f8;"><strong>Pressure</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #bee3f8;">{{ number_format($tvMetrics['pressure'] ?? 0, 2) }} psia</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #bee3f8;"><strong>Temperature</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #bee3f8;">{{ number_format($tvMetrics['temperature'] ?? 0, 2) }} °F</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0;"><strong>GOR</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right;">{{ number_format($tvMetrics['gor'] ?? 0, 2) }} scf/stb</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- MPFM Test Data -->
+        <div style="background: #f0fff4; border: 1px solid #c6f6d5; border-radius: 0.5rem; padding: 1rem;">
+            <h4 style="margin-top: 0; color: #22543d;">MPFM Test #{{ $mpfmTest->id }}
+                @if($mpfmTest->wellTest)
+                    <span style="font-size: 0.8rem; background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 0.25rem; margin-left: 0.5rem;">WellTest #{{ $mpfmTest->wellTest->id }}</span>
+                @endif
+            </h4>
+            <table style="width: 100%; font-size: 0.9rem;">
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #c6f6d5;"><strong>Oil Rate</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #c6f6d5;">{{ number_format($mpfmMetrics['oil_rate'] ?? 0, 2) }} B/D</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #c6f6d5;"><strong>Gas Rate</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #c6f6d5;">{{ number_format($mpfmMetrics['gas_rate'] ?? 0, 2) }} MMscf/D</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #c6f6d5;"><strong>Water Cut</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #c6f6d5;">{{ number_format($mpfmMetrics['water_cut'] ?? 0, 2) }} %</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #c6f6d5;"><strong>Pressure</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #c6f6d5;">{{ number_format($mpfmMetrics['pressure'] ?? 0, 2) }} psia</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0; border-bottom: 1px solid #c6f6d5;"><strong>Temperature</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right; border-bottom: 1px solid #c6f6d5;">{{ number_format($mpfmMetrics['temperature'] ?? 0, 2) }} °F</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem 0;"><strong>GOR</strong></td>
+                    <td style="padding: 0.5rem 0; text-align: right;">{{ number_format($mpfmMetrics['gor'] ?? 0, 2) }} scf/stb</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Alert Banner -->
