@@ -241,6 +241,6 @@ class TestVesselTestController extends Controller
             }
         }
 
-        return view('tv_tests.compare_result', compact('tvTest', 'mpfmTest', 'metrics', 'tvMetrics', 'mpfmMetrics'));
+        return view('tv_tests.compare_result_modern', compact('tvTest', 'mpfmTest', 'metrics', 'tvMetrics', 'mpfmMetrics'));
     }
 }
