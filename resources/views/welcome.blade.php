@@ -1,1798 +1,775 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Oil Field Management System</title>
-    <link rel="icon" href="/assets/img/brand/favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oil Field Management System - Well surveillance, testing and intervention in one platform</title>
+<meta name="description" content="Enterprise platform for well testing (MPFM and test vessel), Wire Line memory-gauge surveys, reservoir pressure and well performance analysis.">
+<link rel="icon" href="{{ asset('assets/img/brand/favicon.png') }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════ RESET & VARIABLES ══════════════════ */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root { --bg:#060b18; --bg2:#0a1226; --card:#0d1730; --card2:#111d3a; --ink:#e8eefc; --sub:#9aaccb; --mute:#64748b; --line:rgba(120,150,210,.16);
+    --blue:#3b82f6; --cyan:#22d3ee; --green:#34d399; --amber:#fbbf24; --red:#f87171; --violet:#a78bfa; --orange:#fb923c; --ease:cubic-bezier(.22,1,.36,1); }
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; scroll-padding-top:76px; }
+body { background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+a { color:inherit; text-decoration:none; }
+.wrap { max-width:1200px; margin:0 auto; padding:0 24px; }
+h1,h2,h3,h4 { letter-spacing:-.02em; line-height:1.15; }
 
-:root {
-    --bg:       #050a15;
-    --bg2:      #080f20;
-    --bg3:      #0d1730;
-    --b900:     #0a1628;
-    --b800:     #0f2044;
-    --b700:     #1a3461;
-    --b600:     #1e4080;
-    --b500:     #2563EB;
-    --b400:     #3b82f6;
-    --b300:     #60a5fa;
-    --b200:     #93c5fd;
-    --b100:     #dbeafe;
-    --cyan:     #06b6d4;
-    --cyan-lt:  #67e8f9;
-    --amber:    #f59e0b;
-    --red:      #ef4444;
-    --green:    #22c55e;
-    --border:   rgba(37,99,235,.18);
-    --card:     rgba(255,255,255,.03);
-    --glass:    rgba(255,255,255,.04);
-    --muted:    #64748b;
-    --sub:      #94a3b8;
-    --glow:     0 0 30px rgba(37,99,235,.35);
-    --glow-c:   0 0 24px rgba(6,182,212,.4);
-}
+/* nav */
+.nav { position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(6,11,24,.82); backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
+.nav .wrap { display:flex; align-items:center; justify-content:space-between; height:64px; gap:20px; }
+.brand { display:flex; align-items:center; gap:12px; font-weight:800; font-size:15px; }
+.brand .lg { --h:38px; height:38px; aspect-ratio:600/940; border-radius:6px; background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:1px solid rgba(255,255,255,.9); box-shadow:0 0 18px rgba(34,211,238,.35); }
+.brand small { display:block; font-size:10px; font-weight:600; color:var(--sub); letter-spacing:.12em; text-transform:uppercase; }
+.links { display:flex; gap:26px; font-size:13.5px; font-weight:500; color:var(--sub); }
+.links a:hover { color:#fff; }
+.btn { display:inline-flex; align-items:center; gap:8px; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:700; border:1px solid var(--line); background:var(--card); color:#fff; transition:all .25s var(--ease); }
+.btn:hover { border-color:var(--cyan); transform:translateY(-2px); }
+.btn.p { background:linear-gradient(135deg,#2563eb,#0ea5e9); border:0; box-shadow:0 8px 26px rgba(14,165,233,.32); }
+.btn.sm { padding:8px 16px; font-size:13px; }
 
-/* Light mode overrides */
-[data-theme="light"] {
-    --bg:    #f0f4ff;
-    --bg2:   #e8eeff;
-    --bg3:   #dde5ff;
-    --glass: rgba(255,255,255,.7);
-    --card:  rgba(255,255,255,.6);
-    --border:rgba(37,99,235,.15);
-    --sub:   #475569;
-    --muted: #64748b;
-}
-[data-theme="light"] body { color:#0f172a; }
-[data-theme="light"] .grid-bg {
-    background-image:
-        linear-gradient(rgba(37,99,235,.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,99,235,.06) 1px, transparent 1px);
-}
+/* hero */
+.hero { position:relative; padding:150px 0 90px; background:radial-gradient(900px 500px at 78% 10%, rgba(37,99,235,.28), transparent 60%), radial-gradient(700px 400px at 5% 90%, rgba(14,165,233,.14), transparent 60%); overflow:hidden; }
+.hero::before { content:""; position:absolute; inset:0; background-image:linear-gradient(rgba(59,130,246,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.06) 1px,transparent 1px); background-size:56px 56px; mask-image:radial-gradient(ellipse at 60% 20%,#000 10%,transparent 70%); -webkit-mask-image:radial-gradient(ellipse at 60% 20%,#000 10%,transparent 70%); }
+.hero .wrap { position:relative; display:grid; grid-template-columns:1.05fr 1fr; gap:50px; align-items:center; }
+.eyebrow { display:inline-flex; align-items:center; gap:9px; font-size:11.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--cyan); padding:6px 14px; border:1px solid rgba(34,211,238,.3); border-radius:30px; background:rgba(34,211,238,.06); }
+.eyebrow i { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); }
+.hero h1 { font-size:clamp(34px,4.6vw,58px); font-weight:800; margin:20px 0 18px; }
+.hero h1 em { font-style:normal; background:linear-gradient(120deg,#60a5fa,#22d3ee,#a78bfa); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p.lead { font-size:18px; color:var(--sub); max-width:560px; }
+.hero .cta { display:flex; gap:14px; flex-wrap:wrap; margin-top:30px; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:44px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden; max-width:620px; }
+.stats div { background:var(--bg2); padding:14px 16px; }
+.stats b { display:block; font:700 24px 'Space Grotesk',sans-serif; color:#fff; } .stats span { font-size:11px; color:var(--mute); text-transform:uppercase; letter-spacing:.08em; font-weight:600; }
 
-html { scroll-behavior:smooth; }
-body {
-    font-family:'Inter',sans-serif;
-    background:var(--bg);
-    color:#e2e8f0;
-    line-height:1.65;
-    overflow-x:hidden;
-    transition:background .3s, color .3s;
-}
+/* console mock */
+.console { border-radius:18px; border:1px solid var(--line); background:linear-gradient(180deg,var(--card2),var(--card)); box-shadow:0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.03); overflow:hidden; transform:perspective(1200px) rotateY(-6deg) rotateX(2deg); }
+.console .bar { display:flex; gap:7px; padding:12px 16px; border-bottom:1px solid var(--line); align-items:center; }
+.console .bar i { width:10px; height:10px; border-radius:50%; background:#2a3858; } .console .bar span { margin-left:10px; font-size:11px; color:var(--mute); }
+.console svg { display:block; width:100%; height:auto; }
 
-::-webkit-scrollbar { width:4px; }
-::-webkit-scrollbar-track { background:var(--bg); }
-::-webkit-scrollbar-thumb { background:var(--b500); border-radius:4px; }
+/* sections */
+section { padding:92px 0; position:relative; }
+section.alt { background:var(--bg2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.kicker { font-size:12px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:var(--cyan); }
+.sh { font-size:clamp(26px,3.2vw,40px); font-weight:800; margin:12px 0 14px; }
+.sp { color:var(--sub); font-size:16.5px; max-width:700px; }
+.center { text-align:center; } .center .sp { margin:0 auto; }
 
-img { display:block; max-width:100%; }
-a  { text-decoration:none; }
+.mod { display:grid; grid-template-columns:1fr 1.1fr; gap:56px; align-items:center; }
+.mod.rev .txt { order:2; }
+.num { font:700 13px 'Space Grotesk',sans-serif; color:var(--cyan); letter-spacing:.14em; }
+.mod h3 { font-size:clamp(24px,2.6vw,34px); font-weight:800; margin:10px 0 14px; }
+.mod p { color:var(--sub); }
+.ticks { list-style:none; margin-top:20px; display:grid; gap:11px; }
+.ticks li { display:flex; gap:12px; font-size:14.5px; color:var(--ink); }
+.ticks li::before { content:""; flex:none; width:20px; height:20px; border-radius:50%; margin-top:2px; background:rgba(52,211,153,.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-6.5' fill='none' stroke='%2334d399' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+.chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:20px; }
+.chip { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:5px 12px; border-radius:20px; border:1px solid var(--line); color:var(--sub); background:rgba(255,255,255,.03); }
+.fig { border-radius:18px; border:1px solid var(--line); background:linear-gradient(180deg,var(--card2),var(--card)); padding:18px; box-shadow:0 24px 60px rgba(0,0,0,.4); }
+.fig svg { display:block; width:100%; height:auto; }
+.fig figcaption { font-size:12px; color:var(--mute); margin-top:10px; text-align:center; }
+.fig text { font-family:'Inter',sans-serif; }
 
-/* ══ ANIMATED GRID BACKGROUND ══ */
-.grid-bg {
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    background-image:
-        linear-gradient(rgba(37,99,235,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,99,235,.04) 1px, transparent 1px);
-    background-size:60px 60px;
-    animation:gridDrift 40s linear infinite;
-}
-@keyframes gridDrift {
-    0%   { background-position:0 0, 0 0; }
-    100% { background-position:60px 60px, 60px 60px; }
-}
-.blob {
-    position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; z-index:0;
-    animation:blobFloat 12s ease-in-out infinite alternate;
-}
-.blob-1 { width:500px; height:500px; background:rgba(37,99,235,.09); top:-100px; left:-100px; }
-.blob-2 { width:400px; height:400px; background:rgba(6,182,212,.07); bottom:-80px; right:-80px; animation-delay:-6s; }
-@keyframes blobFloat {
-    0%   { transform:translate(0,0) scale(1); }
-    100% { transform:translate(30px,30px) scale(1.08); }
-}
+/* grids */
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:44px; }
+.c { padding:24px; border-radius:16px; border:1px solid var(--line); background:var(--card); transition:all .3s var(--ease); }
+.c:hover { transform:translateY(-5px); border-color:var(--cc,var(--cyan)); background:var(--card2); }
+.c .ic { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; background:color-mix(in srgb, var(--cc,var(--cyan)) 16%, transparent); color:var(--cc,var(--cyan)); margin-bottom:16px; }
+.c .ic svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.c h4 { font-size:17px; font-weight:700; margin-bottom:6px; } .c p { font-size:14px; color:var(--sub); }
+.c .soon { display:inline-block; margin-top:12px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:3px 10px; border-radius:20px; background:rgba(251,191,36,.12); color:var(--amber); }
+.c .live { display:inline-block; margin-top:12px; font-size:10px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; padding:3px 10px; border-radius:20px; background:rgba(52,211,153,.12); color:var(--green); }
 
-/* ══ NAV ══ */
-nav {
-    position:fixed; top:0; left:0; right:0; z-index:300;
-    height:68px;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0 5%;
-    background:rgba(5,10,21,.92);
-    backdrop-filter:blur(22px);
-    border-bottom:1px solid var(--border);
-}
-[data-theme="light"] nav { background:rgba(240,244,255,.92); }
-.nav-logo img { height:52px; width:auto; object-fit:contain; }
-.nav-links { display:flex; gap:28px; list-style:none; }
-.nav-links a { color:#94a3b8; font-size:.85rem; font-weight:500; transition:color .2s; }
-.nav-links a:hover { color:#fff; }
-[data-theme="light"] .nav-links a { color:#475569; }
-[data-theme="light"] .nav-links a:hover { color:#0f172a; }
-.nav-right { display:flex; align-items:center; gap:14px; }
-.nav-cta {
-    display:inline-flex; align-items:center; gap:6px;
-    background:var(--b500); color:#fff;
-    padding:9px 22px; border-radius:8px;
-    font-size:.85rem; font-weight:700;
-    transition:all .2s;
-    box-shadow:0 4px 20px rgba(37,99,235,.4);
-}
-.nav-cta:hover { background:var(--b400); transform:translateY(-1px); box-shadow:var(--glow); }
-.dm-toggle {
-    width:42px; height:24px; border-radius:12px;
-    background:var(--bg3); border:1px solid var(--border);
-    cursor:pointer; position:relative; transition:background .3s;
-    flex-shrink:0;
-}
-.dm-toggle::after {
-    content:''; position:absolute;
-    width:16px; height:16px; border-radius:50%;
-    background:var(--b400); top:3px; left:3px;
-    transition:transform .3s, background .3s;
-    box-shadow:0 0 8px rgba(59,130,246,.6);
-}
-[data-theme="light"] .dm-toggle::after { transform:translateX(18px); background:var(--amber); }
-.nav-burger {
-    display:none; flex-direction:column; gap:5px;
-    background:none; border:none; cursor:pointer; padding:4px;
-}
-.nav-burger span { display:block; width:24px; height:2px; background:#e2e8f0; border-radius:2px; transition:all .3s; }
-.nav-drawer {
-    display:none; position:fixed; top:68px; left:0; right:0; z-index:299;
-    background:rgba(5,10,21,.97);
-    border-bottom:1px solid var(--border);
-    padding:20px 5%;
-}
-.nav-drawer.open { display:block; }
-.nav-drawer ul { list-style:none; display:flex; flex-direction:column; gap:16px; }
-.nav-drawer a { color:#94a3b8; font-size:.9rem; font-weight:500; }
+.cta-s { text-align:center; background:radial-gradient(ellipse at 50% 100%, rgba(37,99,235,.35), transparent 65%), var(--bg); }
+.cta-s .cta { justify-content:center; display:flex; gap:14px; margin-top:30px; flex-wrap:wrap; }
+footer { border-top:1px solid var(--line); padding:28px 0; color:var(--mute); font-size:12.5px; }
+footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
 
-/* ══ HERO ══ */
-.hero {
-    position:relative; z-index:1;
-    min-height:100vh;
-    display:flex; align-items:center; justify-content:center;
-    text-align:center;
-    padding:100px 5% 80px;
-    overflow:hidden;
-}
-.hero-bg {
-    position:absolute; inset:0;
-    background:url('/assets/img/brand/oilfield oprations.webp') center/cover no-repeat;
-    opacity:.12;
-}
-.hero-overlay {
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, rgba(5,10,21,.7) 0%, rgba(5,10,21,.4) 50%, rgba(5,10,21,.9) 100%);
-}
-.hero-content { position:relative; z-index:2; max-width:860px; margin:0 auto; }
-.hero-logo {
-    height:120px; width:auto; margin:0 auto 32px;
-    filter:drop-shadow(0 0 20px rgba(37,99,235,.5));
-}
-.hero-badge {
-    display:inline-flex; align-items:center; gap:8px;
-    background:rgba(37,99,235,.15); border:1px solid rgba(37,99,235,.3);
-    color:var(--b300); padding:6px 18px; border-radius:20px;
-    font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
-    margin-bottom:24px;
-}
-.hero-badge::before {
-    content:''; width:7px; height:7px; border-radius:50%;
-    background:var(--cyan); box-shadow:0 0 8px var(--cyan);
-    animation:pulse 1.5s ease-in-out infinite;
-}
-@keyframes pulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50%      { opacity:.5; transform:scale(.8); }
-}
-.hero h1 {
-    font-size:clamp(2rem,5.5vw,4rem);
-    font-weight:900; line-height:1.12;
-    letter-spacing:-.02em; margin-bottom:20px;
-    background:linear-gradient(135deg,#fff 30%,var(--b300) 70%,var(--cyan-lt) 100%);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-}
-.hero-sub {
-    font-size:clamp(1rem,2vw,1.2rem);
-    color:var(--sub); max-width:640px; margin:0 auto 40px;
-}
-.hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-.btn-primary {
-    display:inline-flex; align-items:center; gap:8px;
-    background:var(--b500); color:#fff;
-    padding:14px 34px; border-radius:10px;
-    font-size:1rem; font-weight:700;
-    box-shadow:0 6px 30px rgba(37,99,235,.5);
-    transition:all .2s;
-}
-.btn-primary:hover { background:var(--b400); transform:translateY(-2px); box-shadow:var(--glow); }
-.btn-secondary {
-    display:inline-flex; align-items:center; gap:8px;
-    background:transparent; color:#fff;
-    padding:13px 34px; border-radius:10px;
-    border:1.5px solid rgba(255,255,255,.2);
-    font-size:1rem; font-weight:600;
-    backdrop-filter:blur(8px); transition:all .2s;
-}
-.btn-secondary:hover { border-color:var(--b400); color:var(--b300); transform:translateY(-2px); }
-.hero-stats {
-    display:flex; gap:32px; justify-content:center; flex-wrap:wrap;
-    margin-top:56px; padding-top:40px;
-    border-top:1px solid rgba(255,255,255,.07);
-}
-.hstat { text-align:center; }
-.hstat-val { font-size:1.8rem; font-weight:800; color:#fff; line-height:1; }
-.hstat-val span { color:var(--cyan); }
-.hstat-lbl { font-size:.73rem; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; margin-top:4px; }
+/* company logo badge */
+.lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:600/940; border-radius:calc(var(--h) * .14); background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
+.lg::after { content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(34,211,238,.45),transparent); transform:skewX(-20deg); animation:shine 4.5s infinite; }
+@keyframes shine { 60%,100% { left:160%; } }
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes glowlg { 50% { box-shadow:0 0 0 1px rgba(59,130,246,.6),0 10px 40px rgba(0,0,0,.5),0 0 60px rgba(34,211,238,.7); transform:translateY(-4px); } }
+.hero-logo { display:flex; align-items:center; gap:20px; margin-bottom:26px; }
+.hero-logo .lg { --h:112px; animation:glowlg 3.2s ease-in-out infinite; }
+.hero-logo .nm { font:800 clamp(16px,1.8vw,22px) 'Space Grotesk',sans-serif; letter-spacing:.1em; text-transform:uppercase; line-height:1.25; }
+.hero-logo .nm small { display:block; color:var(--cyan); font-size:11px; letter-spacing:.24em; margin-top:4px; }
+.cta-s .lg { --h:130px; margin-bottom:22px; animation:glowlg 3.2s ease-in-out infinite; }
+/* production-flow drawings (MPFM + test separator) and readings */
+.flow-box { margin-top:22px; padding:16px 14px 12px; border-radius:22px; border:1px solid var(--line); background:linear-gradient(180deg,rgba(15,32,68,.55),rgba(5,10,21,.65)); }
+.flow-box svg { width:100%; height:auto; max-height:56vh; display:block; }
+.blink { animation:blink 1.4s infinite; } @keyframes blink { 50% { opacity:.25; } }
+.legend { display:flex; gap:22px; justify-content:center; margin-top:14px; font-size:12px; color:var(--sub); flex-wrap:wrap; }
+.legend i { display:inline-block; width:18px; height:4px; border-radius:2px; margin-right:7px; vertical-align:middle; }
+.fx .po { fill:none; stroke:#3d6fc4; stroke-width:16; }
+.fx .pi { fill:none; stroke:#081226; stroke-width:11; }
+.fx .fl { fill:none; stroke-linecap:round; animation:fxf var(--t,1s) linear infinite; }
+@keyframes fxf { to { stroke-dashoffset:calc(var(--p) * -1); } }
+.fx .fo { stroke:#d97706; stroke-width:3; stroke-dasharray:14 9; --p:23px; --t:1.2s; }
+.fx .fw { stroke:#38bdf8; stroke-width:2.2; stroke-dasharray:6 16; --p:22px; --t:1.5s; }
+.fx .fg { stroke:#e2e8f0; stroke-width:3.2; stroke-dasharray:.1 12; --p:12.1px; --t:.8s; }
+.fx .fs { stroke:#22d3ee; stroke-width:1.6; stroke-dasharray:2 5; --p:7px; --t:.7s; opacity:.8; }
+.fx .tx { font:600 11px Inter,sans-serif; fill:#cfe0ff; }
+.fx .tx.s { font-size:9.5px; fill:#9fb0cf; font-weight:500; }
+.fx .tx.m { font:600 9px 'Space Grotesk',monospace; fill:#34d399; }
+.fx .cap { fill:#0b1a3a; stroke-width:1.2; }
+.fx .eqp { fill:#0d1b3a; stroke:#3b82f6; stroke-width:1.6; }
+.fx .spin { transform-box:fill-box; transform-origin:center; animation:spin 2.4s linear infinite; }
+.fx .beam { animation:beam 1.4s ease-in-out infinite; }
+@keyframes beam { 0%,100% { opacity:.25; } 50% { opacity:1; } }
+.fx .wave { animation:wvx 3s linear infinite; }
+@keyframes wvx { to { transform:translateX(-50px); } }
+.fx .wave.r { animation-direction:reverse; animation-duration:4.2s; }
+.fx .bub { transform-box:fill-box; transform-origin:center; animation:rise 3.2s ease-in infinite; }
+@keyframes rise { 0% { transform:translateY(0) scale(.6); opacity:0; } 15% { opacity:.9; } 100% { transform:translateY(-34px) scale(1.2); opacity:0; } }
+.fx .drp { animation:fall 2.2s ease-in infinite; }
+@keyframes fall { 0% { transform:translateY(0); opacity:0; } 15% { opacity:.9; } 100% { transform:translateY(32px); opacity:0; } }
+.fx .needle { transform-origin:350px 226px; animation:needle 2.6s ease-in-out infinite; }
+@keyframes needle { 0%,100% { transform:rotate(-16deg); } 40% { transform:rotate(10deg); } 70% { transform:rotate(-4deg); } }
+.fx .vent { animation:vent 2.4s ease-out infinite; transform-box:fill-box; transform-origin:center bottom; }
+@keyframes vent { 0% { transform:translateY(0) scale(.5); opacity:.7; } 100% { transform:translateY(-16px) scale(1.4); opacity:0; } }
+.fx .chk { stroke-dasharray:30; stroke-dashoffset:30; animation:chk 4s ease-out infinite; }
+@keyframes chk { 0%,10% { stroke-dashoffset:30; } 35%,90% { stroke-dashoffset:0; } 100% { stroke-dashoffset:30; } }
+.fx .ln-d { animation:blink 1s infinite; }
 
-/* ══ PHOTO STRIP ══ */
-.photo-strip {
-    position:relative; z-index:1;
-    display:grid; grid-template-columns:repeat(4,1fr); height:220px; overflow:hidden;
-}
-.photo-strip img {
-    width:100%; height:100%; object-fit:cover;
-    filter:grayscale(60%); transition:filter .5s, transform .5s;
-}
-.photo-strip img:hover { filter:grayscale(0%); transform:scale(1.04); }
+/* ── 4b READINGS ── */
+.rd { margin-top:28px; display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.rcard { padding:20px 20px 16px; border-radius:20px; background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid var(--line); border-top:3px solid var(--ac); position:relative; overflow:hidden; }
+.rcard.m { --ac:var(--cyan); } .rcard.s { --ac:#f59e0b; } .rcard.r { --ac:var(--green); }
+.rcard::after { content:""; position:absolute; left:-30%; top:0; width:30%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent); transform:skewX(-20deg); animation:shine 6s infinite; }
+.rcard header { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.rcard h4 { font-size:17px; } .rcard header p { font-size:12px; color:var(--sub); margin-top:2px; max-width:240px; }
+.live-b { flex:none; font:700 10px 'Space Grotesk'; letter-spacing:.16em; color:var(--green); display:flex; align-items:center; gap:6px; padding:4px 10px; border-radius:50px; background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3); }
+.live-b i { width:7px; height:7px; border-radius:50%; background:var(--green); animation:blink 1.1s infinite; }
+.rrow { display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:7px 0; border-bottom:1px dashed rgba(96,165,250,.14); font-size:13px; color:var(--sub); }
+.rrow:last-of-type { border:0; }
+.rrow b { font:700 19px 'Space Grotesk',sans-serif; color:#fff; font-variant-numeric:tabular-nums; margin-left:auto; }
+.rrow u { text-decoration:none; font-size:11px; color:var(--mute); width:60px; }
+.rcard.m .rrow b.k { color:var(--cyan); } .rcard.s .rrow b.k { color:#fbbf24; }
+.rcard footer { margin-top:10px; font-size:11px; color:var(--mute); line-height:1.5; }
+.dvr { padding:9px 0; }
+.dvr > div:first-child { display:flex; justify-content:space-between; font-size:13px; color:var(--sub); }
+.dvr b { font:700 15px 'Space Grotesk'; color:#fff; font-variant-numeric:tabular-nums; }
+.dvt { position:relative; height:8px; margin-top:7px; border-radius:6px; background:linear-gradient(90deg,rgba(248,113,113,.22) 0 10%,rgba(251,191,36,.14) 10% 30%,rgba(52,211,153,.16) 30% 70%,rgba(251,191,36,.14) 70% 90%,rgba(248,113,113,.22) 90%); }
+.dvt::before { content:""; position:absolute; left:50%; top:-3px; bottom:-3px; width:1px; background:var(--sub); }
+.dvt i { position:absolute; top:0; height:100%; border-radius:6px; background:var(--green); transition:left .8s var(--ease), width .8s var(--ease), background .4s; }
+.verdict { margin:12px 0 10px; padding:10px 14px; border-radius:12px; font-weight:700; font-size:13px; text-align:center; color:var(--green); background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.35); }
+.verdict.bad { color:var(--red); background:rgba(248,113,113,.1); border-color:rgba(248,113,113,.35); }
+.meta { display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; font-size:12px; color:var(--sub); }
+.meta b { color:#fff; font-weight:600; }
+@media (max-width:1100px) { .rd { grid-template-columns:1fr; } }
 
-/* ══ KPI CARDS ══ */
-.kpi-section {
-    position:relative; z-index:1;
-    padding:80px 5%;
-}
-.section-label {
-    display:inline-flex; align-items:center; gap:8px;
-    color:var(--cyan); font-size:.72rem; font-weight:700;
-    letter-spacing:.12em; text-transform:uppercase; margin-bottom:14px;
-}
-.section-label::before { content:''; width:24px; height:2px; background:var(--cyan); }
-.section-title { font-size:clamp(1.6rem,3.5vw,2.4rem); font-weight:800; margin-bottom:10px; line-height:1.2; }
-.section-sub { color:var(--sub); font-size:.95rem; max-width:520px; margin-bottom:48px; }
-.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
-.kpi-card {
-    background:var(--glass);
-    border:1px solid var(--border);
-    border-radius:16px; padding:28px 24px;
-    backdrop-filter:blur(12px);
-    position:relative; overflow:hidden;
-    transition:transform .3s, box-shadow .3s, border-color .3s;
-}
-.kpi-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:3px;
-    background:linear-gradient(90deg,var(--b500),var(--cyan)); opacity:.7;
-}
-.kpi-card:hover {
-    transform:translateY(-6px);
-    box-shadow:0 20px 50px rgba(37,99,235,.2), var(--glow);
-    border-color:rgba(37,99,235,.35);
-}
-.kpi-icon {
-    width:48px; height:48px; border-radius:12px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.4rem; margin-bottom:16px;
-    background:rgba(37,99,235,.12); border:1px solid rgba(37,99,235,.2);
-}
-.kpi-icon.cyan  { background:rgba(6,182,212,.12); border-color:rgba(6,182,212,.2); }
-.kpi-icon.amber { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.2); }
-.kpi-icon.green { background:rgba(34,197,94,.12);  border-color:rgba(34,197,94,.2); }
-.kpi-icon.red   { background:rgba(239,68,68,.12);  border-color:rgba(239,68,68,.2); }
-.kpi-val { font-size:2.2rem; font-weight:800; line-height:1; margin-bottom:6px; }
-.kpi-val.blue  { color:var(--b400); }
-.kpi-val.cyan  { color:var(--cyan); }
-.kpi-val.amber { color:var(--amber); }
-.kpi-val.green { color:var(--green); }
-.kpi-val.red   { color:var(--red); }
-.kpi-lbl { font-size:.82rem; color:var(--sub); font-weight:500; }
-.kpi-trend {
-    position:absolute; top:20px; right:20px;
-    font-size:.72rem; font-weight:700; padding:3px 8px; border-radius:6px;
-}
-.trend-up   { background:rgba(34,197,94,.12); color:var(--green); }
-.trend-down { background:rgba(239,68,68,.12);  color:var(--red); }
-.trend-ok   { background:rgba(6,182,212,.12);  color:var(--cyan); }
+.fx .v { fill:#fff; font-weight:800; }
+/* reveal + svg draw */
+.rv { opacity:0; transform:translateY(28px); transition:opacity .9s var(--ease), transform .9s var(--ease); }
+.rv.in { opacity:1; transform:none; }
+.draw { stroke-dasharray:var(--len,1400); stroke-dashoffset:var(--len,1400); transition:stroke-dashoffset 2.4s var(--ease) .2s; }
+.in .draw, .draw.in { stroke-dashoffset:0; }
+.pulse { animation:pulse 2.4s ease-in-out infinite; } @keyframes pulse { 50% { opacity:.35; } }
+.flowd { stroke-dasharray:4 8; animation:flowd 1.2s linear infinite; } @keyframes flowd { to { stroke-dashoffset:-24; } }
+@media (prefers-reduced-motion: reduce) { .rv { opacity:1; transform:none; transition:none; } .draw { stroke-dashoffset:0; transition:none; } .flowd,.pulse { animation:none; } html { scroll-behavior:auto; } }
 
-/* ══ INTERACTIVE PRODUCTION DIAGRAM ══ */
-.diagram-section {
-    position:relative; z-index:1;
-    padding:90px 5%;
-    background:linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%);
+@media (max-width:980px) {
+  .hero .wrap, .mod { grid-template-columns:1fr; } .mod.rev .txt { order:0; } .console { transform:none; }
+  .links { display:none; } .cards { grid-template-columns:1fr 1fr; } .stats { grid-template-columns:repeat(2,1fr); }
 }
-.diagram-wrap {
-    max-width:100%;
-    margin:0 auto;
-    background:var(--glass);
-    border:1px solid var(--border);
-    border-radius:24px;
-    padding:10px;
-    backdrop-filter:blur(16px);
-    box-shadow:0 30px 80px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
-    position:relative; overflow:hidden;
-}
-.diagram-wrap::before {
-    content:''; position:absolute; top:-1px; left:10%; right:10%; height:2px;
-    background:linear-gradient(90deg,transparent,var(--b500),var(--cyan),transparent);
-}
-.diagram-title {
-    text-align:center; font-size:1rem; font-weight:700;
-    color:var(--b300); letter-spacing:.06em; text-transform:uppercase;
-    margin-bottom:32px; display:flex; align-items:center; justify-content:center; gap:10px;
-}
-.diagram-title::before,.diagram-title::after {
-    content:''; flex:1; height:1px; background:var(--border);
-}
-
-/* SVG diagram */
-.prod-svg { width:100%; height:auto; display:block; }
-
-/* Tooltip */
-.diag-tooltip {
-    position:absolute; z-index:50;
-    background:rgba(5,10,21,.95);
-    border:1px solid var(--b500);
-    border-radius:10px; padding:12px 16px;
-    font-size:.78rem; line-height:1.6;
-    pointer-events:none; opacity:0; transform:translateY(6px);
-    transition:opacity .2s, transform .2s;
-    min-width:160px;
-    box-shadow:var(--glow);
-}
-.diag-tooltip.show { opacity:1; transform:translateY(0); }
-.tt-title { font-weight:700; color:var(--b300); margin-bottom:6px; font-size:.85rem; }
-.tt-row { display:flex; justify-content:space-between; gap:16px; color:var(--sub); }
-.tt-row span:last-child { color:#e2e8f0; font-weight:600; }
-
-/* Node groups */
-.diag-node {
-    cursor:pointer;
-    transition:filter .2s;
-}
-.diag-node:hover rect, .diag-node:hover circle {
-    filter:drop-shadow(0 0 8px rgba(37,99,235,.8));
-}
-.diag-node:hover { filter:brightness(1.2); }
-
-/* Flow animation along paths */
-.flow-dot {
-    animation:flowAlong 3s linear infinite;
-}
-@keyframes flowAlong {
-    0%   { offset-distance:0%; }
-    100% { offset-distance:100%; }
-}
-
-/* ══ DEPARTMENTS ══ */
-.dept-section {
-    position:relative; z-index:1;
-    padding:90px 5%;
-}
-.dept-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; }
-.dept-card {
-    border-radius:20px; overflow:hidden;
-    border:1px solid var(--border);
-    background:var(--glass);
-    backdrop-filter:blur(12px);
-    transition:transform .3s, box-shadow .3s;
-    position:relative;
-}
-.dept-card:hover {
-    transform:translateY(-8px);
-    box-shadow:0 24px 60px rgba(37,99,235,.18), var(--glow);
-}
-.dept-img {
-    height:160px; overflow:hidden; position:relative;
-}
-.dept-img img { width:100%; height:100%; object-fit:cover; transition:transform .5s; }
-.dept-card:hover .dept-img img { transform:scale(1.08); }
-.dept-img::after {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(180deg,transparent 40%, rgba(5,10,21,.85) 100%);
-}
-.dept-tag {
-    position:absolute; bottom:12px; left:16px; z-index:2;
-    background:var(--b500); color:#fff;
-    font-size:.65rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
-    padding:3px 10px; border-radius:6px;
-    box-shadow:0 2px 12px rgba(37,99,235,.5);
-}
-.dept-body { padding:22px; }
-.dept-name { font-size:1.05rem; font-weight:700; margin-bottom:8px; }
-.dept-desc { font-size:.83rem; color:var(--sub); line-height:1.65; margin-bottom:16px; }
-.dept-kpis { display:flex; gap:12px; flex-wrap:wrap; }
-.dept-kpi {
-    font-size:.72rem; font-weight:600;
-    padding:4px 10px; border-radius:6px;
-    background:rgba(37,99,235,.1); border:1px solid rgba(37,99,235,.2);
-    color:var(--b300);
-}
-
-/* ══ WELL ARCHITECTURE DIAGRAM ══ */
-.arch-section {
-    position:relative; z-index:1;
-    padding:90px 5%;
-    background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);
-}
-.arch-wrap { max-width:1100px; margin:0 auto; }
-
-/* Layer styling */
-.arch-layer { margin-bottom:0; }
-.arch-layer-label {
-    font-size:.68rem; font-weight:700; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--muted);
-    margin-bottom:14px; padding-left:4px;
-}
-.arch-depts { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:0; }
-.arch-dept-box {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:12px; padding:14px 10px; text-align:center;
-    backdrop-filter:blur(8px);
-    border-top:3px solid var(--b500);
-    font-size:.75rem; font-weight:600;
-    transition:transform .2s;
-}
-.arch-dept-box:hover { transform:translateY(-3px); }
-.arch-dept-box .di { font-size:1.3rem; margin-bottom:6px; }
-
-/* SVG connector */
-.arch-connector { width:100%; overflow:visible; display:block; }
-
-/* Platform Core */
-.platform-core {
-    background:linear-gradient(135deg,rgba(37,99,235,.15),rgba(6,182,212,.08));
-    border:1px solid rgba(37,99,235,.35);
-    border-radius:16px; padding:24px 32px;
-    text-align:center; margin:0 auto;
-    max-width:500px;
-    position:relative;
-    box-shadow:var(--glow);
-}
-.platform-core::before {
-    content:''; position:absolute; inset:-1px;
-    border-radius:17px;
-    background:linear-gradient(135deg,rgba(37,99,235,.3),rgba(6,182,212,.2));
-    z-index:-1;
-}
-.platform-title { font-size:1rem; font-weight:800; color:var(--b300); margin-bottom:10px; }
-.platform-sub { font-size:.78rem; color:var(--sub); margin-bottom:16px; }
-.platform-chips { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
-.pchip {
-    font-size:.68rem; font-weight:700; padding:4px 10px; border-radius:8px;
-    background:rgba(37,99,235,.15); border:1px solid rgba(37,99,235,.25); color:var(--b300);
-}
-
-/* Well cards */
-.arch-wells { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
-.well-card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:14px; padding:18px;
-    backdrop-filter:blur(8px);
-    border-top:3px solid var(--cyan);
-    transition:transform .2s, box-shadow .2s;
-}
-.well-card:hover { transform:translateY(-4px); box-shadow:var(--glow-c); }
-.well-name { font-size:.9rem; font-weight:700; color:var(--cyan-lt); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-.well-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); animation:pulse 2s infinite; }
-.well-kpis { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.wkpi { background:rgba(255,255,255,.03); border-radius:8px; padding:8px; text-align:center; }
-.wkpi-val { font-size:.95rem; font-weight:700; color:#fff; }
-.wkpi-lbl { font-size:.62rem; color:var(--muted); }
-.well-badges { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
-.wbadge { font-size:.6rem; padding:2px 8px; border-radius:4px; font-weight:600; }
-.wbadge.mpfm     { background:rgba(6,182,212,.15); color:var(--cyan); }
-.wbadge.wl       { background:rgba(37,99,235,.15); color:var(--b300); }
-.wbadge.prod     { background:rgba(34,197,94,.15);  color:var(--green); }
-.wbadge.drillng  { background:rgba(245,158,11,.15); color:var(--amber); }
-
-/* Field output */
-.field-output {
-    background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(6,182,212,.06));
-    border:1px solid rgba(37,99,235,.3);
-    border-radius:16px; padding:28px 32px;
-    margin-top:0;
-    display:grid; grid-template-columns:repeat(6,1fr); gap:16px;
-    box-shadow:var(--glow);
-}
-.fo-stat { text-align:center; }
-.fo-val { font-size:1.5rem; font-weight:800; color:var(--cyan); line-height:1; }
-.fo-badge { font-size:.65rem; font-weight:700; color:var(--green); margin:2px 0; }
-.fo-lbl { font-size:.65rem; color:var(--muted); }
-
-/* Legend */
-.arch-legend {
-    display:flex; gap:20px; flex-wrap:wrap; margin-top:24px;
-    padding-top:20px; border-top:1px solid var(--border);
-}
-.leg-item { display:flex; align-items:center; gap:8px; font-size:.72rem; color:var(--sub); }
-.leg-dot { width:10px; height:10px; border-radius:50%; }
-
-/* ══ IMAGE BANNER ══ */
-.img-banner {
-    position:relative; z-index:1;
-    height:320px; overflow:hidden;
-}
-.img-banner img { width:100%; height:100%; object-fit:cover; }
-.img-banner::after {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(90deg,rgba(5,10,21,.8) 0%,rgba(5,10,21,.3) 50%,rgba(5,10,21,.7) 100%);
-}
-.banner-text {
-    position:absolute; z-index:2; top:50%; left:5%; transform:translateY(-50%);
-}
-.banner-text h3 { font-size:clamp(1.4rem,3vw,2.2rem); font-weight:800; margin-bottom:10px; }
-.banner-text p { color:var(--sub); max-width:420px; font-size:.92rem; }
-
-/* ══ WORKFLOW ══ */
-.workflow-section {
-    position:relative; z-index:1;
-    padding:90px 5%;
-    background:var(--bg2);
-}
-.workflow-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; }
-.step-card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:16px; padding:28px;
-    backdrop-filter:blur(12px);
-    position:relative; transition:transform .3s, box-shadow .3s;
-}
-.step-card:hover { transform:translateY(-5px); box-shadow:var(--glow); }
-.step-num {
-    width:40px; height:40px; border-radius:10px;
-    background:linear-gradient(135deg,var(--b500),var(--cyan));
-    color:#fff; font-size:.9rem; font-weight:800;
-    display:flex; align-items:center; justify-content:center;
-    margin-bottom:16px;
-    box-shadow:0 4px 16px rgba(37,99,235,.4);
-}
-.step-icon { font-size:1.5rem; margin-bottom:10px; }
-.step-title { font-size:1rem; font-weight:700; margin-bottom:8px; }
-.step-desc { font-size:.83rem; color:var(--sub); line-height:1.65; }
-
-/* ══ ROLES ══ */
-.roles-section { position:relative; z-index:1; padding:90px 5%; }
-.roles-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
-.role-card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:14px; padding:24px;
-    backdrop-filter:blur(10px);
-    transition:transform .2s, box-shadow .2s;
-}
-.role-card:hover { transform:translateY(-4px); box-shadow:var(--glow); }
-.role-icon { font-size:2rem; margin-bottom:12px; }
-.role-name { font-size:1rem; font-weight:700; margin-bottom:6px; color:var(--b300); }
-.role-desc { font-size:.82rem; color:var(--sub); line-height:1.6; margin-bottom:14px; }
-.role-perms { display:flex; gap:6px; flex-wrap:wrap; }
-.rperm {
-    font-size:.65rem; padding:3px 8px; border-radius:5px; font-weight:600;
-    background:rgba(37,99,235,.1); border:1px solid rgba(37,99,235,.2); color:var(--b300);
-}
-
-/* ══ BENEFITS ══ */
-.benefits-section { position:relative; z-index:1; padding:90px 5%; background:var(--bg2); }
-.cost-strip {
-    background:linear-gradient(135deg,var(--b500),var(--b700));
-    border-radius:16px; padding:32px; margin-bottom:48px;
-    display:flex; gap:32px; align-items:center; flex-wrap:wrap;
-    box-shadow:var(--glow);
-}
-.cost-strip-main { flex:1; min-width:220px; }
-.cost-pct { font-size:3rem; font-weight:900; color:#fff; line-height:1; }
-.cost-lbl { font-size:1rem; color:rgba(255,255,255,.8); margin-top:4px; }
-.cost-metrics { display:flex; gap:24px; flex-wrap:wrap; }
-.cost-m { text-align:center; }
-.cost-m-val { font-size:1.4rem; font-weight:800; color:#fff; }
-.cost-m-lbl { font-size:.72rem; color:rgba(255,255,255,.7); }
-
-.benefits-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-bottom:48px; }
-.benefit-card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:14px; padding:24px;
-    backdrop-filter:blur(10px);
-    transition:transform .2s, box-shadow .2s;
-}
-.benefit-card:hover { transform:translateY(-4px); box-shadow:var(--glow); }
-.benefit-icon { font-size:1.8rem; margin-bottom:12px; }
-.benefit-title { font-size:.95rem; font-weight:700; margin-bottom:8px; color:var(--b300); }
-.benefit-desc { font-size:.82rem; color:var(--sub); line-height:1.6; }
-
-/* Before/after table */
-.compare-table {
-    width:100%; border-collapse:collapse;
-    background:var(--glass); border-radius:14px; overflow:hidden;
-    border:1px solid var(--border);
-    backdrop-filter:blur(10px);
-}
-.compare-table th {
-    padding:14px 18px; text-align:left;
-    font-size:.78rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
-    background:rgba(37,99,235,.12); color:var(--b300);
-    border-bottom:1px solid var(--border);
-}
-.compare-table td {
-    padding:13px 18px; font-size:.83rem;
-    border-bottom:1px solid rgba(255,255,255,.04); color:var(--sub);
-}
-.compare-table tr:last-child td { border-bottom:none; }
-.compare-table td:first-child { color:#e2e8f0; font-weight:500; }
-.td-before { color:var(--red) !important; }
-.td-after  { color:var(--green) !important; font-weight:600 !important; }
-
-/* ══ SECURITY ══ */
-.security-section { position:relative; z-index:1; padding:90px 5%; }
-.sec-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
-.sec-card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:14px; padding:24px;
-    backdrop-filter:blur(10px);
-    border-left:3px solid var(--b500);
-    transition:transform .2s, box-shadow .2s;
-}
-.sec-card:hover { transform:translateY(-4px); box-shadow:var(--glow); }
-.sec-icon { font-size:1.6rem; margin-bottom:12px; }
-.sec-title { font-size:.95rem; font-weight:700; margin-bottom:8px; color:var(--b300); }
-.sec-desc { font-size:.82rem; color:var(--sub); line-height:1.6; }
-
-/* ══ CAPABILITIES ══ */
-.caps-section { position:relative; z-index:1; padding:90px 5%; background:var(--bg2); }
-.caps-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; }
-.cap-card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:12px; padding:20px;
-    backdrop-filter:blur(10px);
-    transition:transform .2s;
-}
-.cap-card:hover { transform:translateY(-3px); }
-.cap-icon { font-size:1.5rem; margin-bottom:10px; }
-.cap-title { font-size:.9rem; font-weight:700; color:var(--b300); margin-bottom:6px; }
-.cap-desc { font-size:.78rem; color:var(--sub); line-height:1.55; }
-
-/* ══ CTA ══ */
-.cta-section {
-    position:relative; z-index:1; padding:90px 5%; text-align:center;
-    background:linear-gradient(135deg, rgba(37,99,235,.1) 0%, rgba(6,182,212,.06) 100%);
-    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-}
-.cta-title { font-size:clamp(1.6rem,3.5vw,2.8rem); font-weight:800; margin-bottom:14px; }
-.cta-sub { color:var(--sub); max-width:520px; margin:0 auto 36px; font-size:.95rem; }
-.cta-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-
-/* ══ FOOTER ══ */
-footer {
-    position:relative; z-index:1;
-    padding:48px 5% 32px;
-    background:rgba(5,10,21,.95);
-    border-top:1px solid var(--border);
-}
-.footer-top { display:flex; gap:40px; flex-wrap:wrap; justify-content:space-between; margin-bottom:32px; }
-.footer-brand img { height:44px; margin-bottom:14px; }
-.footer-brand p { font-size:.8rem; color:var(--muted); max-width:260px; line-height:1.6; }
-.footer-col h5 { font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--b300); margin-bottom:14px; }
-.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
-.footer-col a { font-size:.8rem; color:var(--muted); transition:color .2s; }
-.footer-col a:hover { color:var(--b300); }
-.footer-bottom {
-    border-top:1px solid var(--border); padding-top:24px;
-    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
-    font-size:.75rem; color:var(--muted);
-}
-.footer-badge {
-    display:flex; align-items:center; gap:6px;
-    background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2);
-    color:var(--green); padding:4px 12px; border-radius:8px; font-size:.7rem; font-weight:600;
-}
-
-/* ══ REVEAL ANIMATION ══ */
-.reveal { opacity:0; transform:translateY(24px); transition:opacity .6s, transform .6s; }
-.reveal.visible { opacity:1; transform:translateY(0); }
-
-/* ══ RESPONSIVE ══ */
-@media (max-width:1024px) {
-    .arch-depts { grid-template-columns:repeat(3,1fr); }
-    .field-output { grid-template-columns:repeat(3,1fr); }
-}
-@media (max-width:860px) {
-    .nav-links { display:none; }
-    .nav-burger { display:flex; }
-    .photo-strip { grid-template-columns:repeat(2,1fr); height:160px; }
-    .arch-wells { grid-template-columns:1fr 1fr; }
-    .arch-depts { grid-template-columns:repeat(2,1fr); }
-}
-@media (max-width:600px) {
-    .hero h1 { font-size:1.9rem; }
-    .photo-strip { grid-template-columns:1fr 1fr; height:130px; }
-    .arch-wells { grid-template-columns:1fr; }
-    .arch-depts { grid-template-columns:1fr 1fr; }
-    .field-output { grid-template-columns:repeat(2,1fr); }
-    .cost-strip { flex-direction:column; }
-    .footer-top { flex-direction:column; }
-}
+@media (max-width:620px) { .cards { grid-template-columns:1fr; } section { padding:64px 0; } .hero { padding-top:120px; } .brand small { display:none; } }
 </style>
 </head>
 <body>
 
-<!-- Animated background -->
-<div class="grid-bg"></div>
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-
-<!-- ══ NAV ══ -->
-<nav>
-    <a href="/" class="nav-logo"><img src="/assets/img/brand/logo-white.png" alt="Oil Field Management System"></a>
-    <ul class="nav-links">
-        <li><a href="#overview">Overview</a></li>
-        <li><a href="#diagram">Production Flow</a></li>
-        <li><a href="#departments">Departments</a></li>
-        <li><a href="#workflow">Workflow</a></li>
-        <li><a href="#benefits">ROI</a></li>
-    </ul>
-    <div class="nav-right">
-        <div class="dm-toggle" id="dmToggle" title="Toggle dark/light mode"></div>
-        @auth
-        <a href="{{ url('/dashboard') }}" class="nav-cta">&#9654; Dashboard</a>
-        @else
-        <a href="{{ route('login') }}" class="nav-cta">&#9654; Sign In</a>
-        @endauth
-        <button class="nav-burger" id="burger" aria-label="Menu">
-            <span></span><span></span><span></span>
-        </button>
+<header class="nav">
+    <div class="wrap">
+        <a class="brand" href="#top"><span class="lg" role="img" aria-label="Logo"></span><span>Oil Field<small>Management System</small></span></a>
+        <nav class="links" aria-label="Sections">
+            <a href="#platform">Platform</a><a href="#flow">Production flow</a><a href="#mpfm">MPFM</a><a href="#vessel">Test Vessel</a><a href="#wireline">Wire Line</a><a href="#analysis">Well Analysis</a><a href="#governance">Governance</a><a href="#roadmap">Roadmap</a>
+        </nav>
+        @auth<a href="{{ url('/dashboard') }}" class="btn p sm">Open dashboard</a>@else<a href="{{ route('login') }}" class="btn p sm">Sign in</a>@endauth
     </div>
-</nav>
-<div class="nav-drawer" id="drawer">
-    <ul>
-        <li><a href="#overview">Overview</a></li>
-        <li><a href="#diagram">Production Flow</a></li>
-        <li><a href="#departments">Departments</a></li>
-        <li><a href="#workflow">Workflow</a></li>
-        <li><a href="#benefits">ROI</a></li>
-        @auth
-        <li><a href="{{ url('/dashboard') }}" style="color:var(--b400);font-weight:700;">Open Dashboard</a></li>
-        @else
-        <li><a href="{{ route('login') }}" style="color:var(--b400);font-weight:700;">Sign In</a></li>
-        @endauth
-    </ul>
+</header>
+
+<main id="top">
+{{-- ═════════ HERO ═════════ --}}
+<div class="hero">
+    <div class="wrap">
+        <div>
+            <div class="hero-logo"><span class="lg" role="img" aria-label="Company logo"></span><span class="nm">Oil Field<br>Management System<small>Well operations platform</small></span></div>
+            <span class="eyebrow"><i></i> Integrated well operations platform</span>
+            <h1>One system for <em>well testing, intervention</em> and reservoir insight.</h1>
+            <p class="lead">Bring MPFM and test-vessel results, Wire Line memory-gauge surveys and well performance analysis into a single, governed source of truth - from the wellhead to the reservoir.</p>
+            <div class="cta">
+                @auth<a href="{{ url('/dashboard') }}" class="btn p">Open dashboard</a>@else<a href="{{ route('login') }}" class="btn p">Access the system</a>@endauth
+                <a href="#platform" class="btn">Explore the platform</a>
+            </div>
+            <div class="stats">
+                <div><b>4</b><span>Live modules</span></div><div><b>8</b><span>Role profiles</span></div><div><b>2</b><span>Gauge formats</span></div><div><b>180 d</b><span>Survey policy</span></div>
+            </div>
+        </div>
+
+        <div class="console rv" aria-hidden="true">
+            <div class="bar"><i></i><i></i><i></i><span>Operations command center</span></div>
+            <svg viewBox="0 0 560 360">
+                <defs>
+                    <linearGradient id="hArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".35"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>
+                </defs>
+                <g font-size="9" fill="#64748b" font-weight="700" letter-spacing="1">
+                    <rect x="20" y="18" width="122" height="62" rx="10" fill="#0a1226" stroke="#1d2b4d"/><text x="32" y="38">OIL B/D</text><text x="32" y="64" font-size="22" fill="#fff" font-family="Space Grotesk" letter-spacing="0">4,820</text>
+                    <rect x="150" y="18" width="122" height="62" rx="10" fill="#0a1226" stroke="#1d2b4d"/><text x="162" y="38">WATER CUT</text><text x="162" y="64" font-size="22" fill="#38bdf8" font-family="Space Grotesk" letter-spacing="0">18.4%</text>
+                    <rect x="280" y="18" width="122" height="62" rx="10" fill="#0a1226" stroke="#1d2b4d"/><text x="292" y="38">BHP PSI</text><text x="292" y="64" font-size="22" fill="#a78bfa" font-family="Space Grotesk" letter-spacing="0">2,497</text>
+                    <rect x="410" y="18" width="130" height="62" rx="10" fill="#0a1226" stroke="#1d2b4d"/><text x="422" y="38">WELL HEALTH</text><text x="422" y="64" font-size="22" fill="#34d399" font-family="Space Grotesk" letter-spacing="0">82 / 100</text>
+                </g>
+                <rect x="20" y="94" width="350" height="190" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
+                <g stroke="#1b2847"><path d="M36 130H354M36 168H354M36 206H354M36 244H354"/></g>
+                <path d="M36 236 C80 220 110 190 150 196 S220 150 262 160 S320 120 354 112 V262 H36Z" fill="url(#hArea)"/>
+                <path class="draw" style="--len:520" d="M36 236 C80 220 110 190 150 196 S220 150 262 160 S320 120 354 112" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round"/>
+                <path class="draw" style="--len:520" d="M36 252 C90 250 130 244 180 236 S280 226 354 208" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="4 4" opacity=".8"/>
+                <text x="36" y="112" font-size="10" fill="#9aaccb" font-weight="600">Production trend</text>
+                <rect x="382" y="94" width="158" height="190" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
+                <text x="394" y="112" font-size="10" fill="#9aaccb" font-weight="600">Needs attention</text>
+                <g font-size="9.5" fill="#c9d6ef">
+                    <circle cx="396" cy="136" r="4" fill="#f87171"/><text x="408" y="139">2 surveys overdue</text>
+                    <circle cx="396" cy="162" r="4" fill="#fbbf24"/><text x="408" y="165">3 tests in review</text>
+                    <circle cx="396" cy="188" r="4" fill="#a78bfa"/><text x="408" y="191">1 open Wire Line job</text>
+                    <circle cx="396" cy="214" r="4" fill="#34d399"/><text x="408" y="217">Meters within ±10%</text>
+                </g>
+                <g>
+                    <rect x="20" y="298" width="520" height="44" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
+                    <g fill="#22d3ee" opacity=".9"><rect x="40" y="322" width="10" height="8" rx="2"/><rect x="58" y="316" width="10" height="14" rx="2"/><rect x="76" y="319" width="10" height="11" rx="2"/><rect x="94" y="310" width="10" height="20" rx="2"/><rect x="112" y="314" width="10" height="16" rx="2"/></g>
+                    <text x="140" y="318" font-size="10" fill="#9aaccb" font-weight="600">MPFM · Test Vessel · Wire Line</text><text x="140" y="332" font-size="9" fill="#64748b">Unified activity across every well</text>
+                </g>
+            </svg>
+        </div>
+    </div>
 </div>
 
-<!-- ══ HERO ══ -->
-<section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-content reveal">
-        <img src="/assets/img/brand/logo-white.png" alt="Oil Field Management System" class="hero-logo">
-        <div class="hero-badge">&#11044; Live Operations System</div>
-        <h1>Advanced Petroleum Wells<br>Management System</h1>
-        <p class="hero-sub">Enterprise-grade field operations platform — unifying all departments, wells, and production workflows on a single intelligent dashboard.</p>
-        <div class="hero-btns">
-            @auth
-            <a href="{{ url('/dashboard') }}" class="btn-primary">&#9193; View Dashboard</a>
-            @else
-            <a href="{{ route('login') }}" class="btn-primary">&#9193; Access System</a>
-            @endauth
-            <a href="#diagram" class="btn-secondary">&#11153; System Overview</a>
-        </div>
-        <div class="hero-stats">
-            <div class="hstat"><div class="hstat-val">6<span>+</span></div><div class="hstat-lbl">Departments</div></div>
-            <div class="hstat"><div class="hstat-val">24<span>/7</span></div><div class="hstat-lbl">Monitoring</div></div>
-            <div class="hstat"><div class="hstat-val">8</div><div class="hstat-lbl">Task States</div></div>
-            <div class="hstat"><div class="hstat-val">100<span>%</span></div><div class="hstat-lbl">Audit Trail</div></div>
-            <div class="hstat"><div class="hstat-val">60<span>%</span></div><div class="hstat-lbl">Faster Reports</div></div>
+{{-- ═════════ PLATFORM OVERVIEW ═════════ --}}
+<section id="platform" class="alt">
+    <div class="wrap">
+        <div class="center rv"><div class="kicker">Platform</div><h2 class="sh">Everything starts at the well</h2>
+            <p class="sp">Every test, survey and intervention is tied to a well in the field hierarchy, so a single page can tell its full story.</p></div>
+        <figure class="fig rv" style="margin-top:44px">
+            <svg viewBox="0 0 1000 420" role="img" aria-label="Platform diagram: modules connected around the well record">
+                <defs><radialGradient id="hubg" cx=".5" cy=".4"><stop offset="0" stop-color="#1d4ed8"/><stop offset="1" stop-color="#0b1a3a"/></radialGradient></defs>
+                <g fill="none" stroke-width="1.6" stroke-linecap="round" class="flowd">
+                    <path d="M500 210 L170 90" stroke="#22d3ee"/><path d="M500 210 L170 330" stroke="#fbbf24"/><path d="M500 210 L500 62" stroke="#a78bfa"/>
+                    <path d="M500 210 L830 90" stroke="#34d399"/><path d="M500 210 L830 330" stroke="#38bdf8"/><path d="M500 210 L500 358" stroke="#f87171"/>
+                </g>
+                <circle cx="500" cy="210" r="62" fill="url(#hubg)" stroke="#3b82f6" stroke-width="2"/><circle cx="500" cy="210" r="76" fill="none" stroke="#3b82f6" stroke-opacity=".3" class="pulse"/>
+                <text x="500" y="204" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">WELL</text><text x="500" y="224" text-anchor="middle" font-size="10" fill="#9aaccb">single record</text>
+                <g font-size="12" font-weight="700" fill="#fff" text-anchor="middle">
+                    <g transform="translate(90,70)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#22d3ee"/><text x="80" y="28">MPFM</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Log upload &amp; validation</text></g>
+                    <g transform="translate(90,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#fbbf24"/><text x="80" y="28">Test Vessel</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Separator tests &amp; requests</text></g>
+                    <g transform="translate(420,-2)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#a78bfa"/><text x="80" y="28">Wire Line</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Memory-gauge surveys</text></g>
+                    <g transform="translate(750,70)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#34d399"/><text x="80" y="28">Well Analysis</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Health &amp; recommendations</text></g>
+                    <g transform="translate(750,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#38bdf8"/><text x="80" y="28">Field Setup</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Field → Tower → Well</text></g>
+                    <g transform="translate(420,356)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#f87171"/><text x="80" y="28">Governance</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Roles, review, audit trail</text></g>
+                </g>
+            </svg>
+            <figcaption>Modules share one well record - no re-keying, no spreadsheets passed between teams.</figcaption>
+        </figure>
+        <div class="cards">
+            <div class="c rv" style="--cc:#22d3ee"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h4>Measure</h4><p>Ingest MPFM logs and vessel results with automatic validation against configurable rules.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#a78bfa"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h4>Intervene</h4><p>Record Wire Line operations and analyse memory-gauge pressure and temperature recordings.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#34d399"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/></svg></div><h4>Decide</h4><p>Health scores, decline forecasts and prioritised recommendations built from every data source.</p><span class="live">Live</span></div>
         </div>
     </div>
 </section>
 
-<!-- ══ PHOTO STRIP ══ -->
-<div class="photo-strip">
-    <img src="/assets/img/brand/oilfield oprations.webp" alt="Oilfield" loading="lazy">
-    <img src="/assets/img/brand/Offshore.jpg" alt="Offshore Platform" loading="lazy">
-    <img src="/assets/img/brand/offshore oilfield.jpg" alt="Offshore Oilfield" loading="lazy">
-    <img src="/assets/img/brand/production background.jpg" alt="Production" loading="lazy">
-</div>
-
-<!-- ══ KPI CARDS ══ -->
-<section class="kpi-section" id="overview">
-    <div class="section-label">Live Metrics</div>
-    <h2 class="section-title">Field Operations at a Glance</h2>
-    <p class="section-sub">Real-time visibility across all wells, platforms, and departments from a unified control view.</p>
-    <div class="kpi-grid">
-        <div class="kpi-card reveal">
-            <div class="kpi-trend trend-up">&#8679; Active</div>
-            <div class="kpi-icon">🛢️</div>
-            <div class="kpi-val blue">47</div>
-            <div class="kpi-lbl">Active Wells</div>
-        </div>
-        <div class="kpi-card reveal">
-            <div class="kpi-trend trend-up">&#8679; +12%</div>
-            <div class="kpi-icon cyan">📈</div>
-            <div class="kpi-val cyan">4,215</div>
-            <div class="kpi-lbl">BOPD Production Today</div>
-        </div>
-        <div class="kpi-card reveal">
-            <div class="kpi-trend trend-down">3 New</div>
-            <div class="kpi-icon red">⚠️</div>
-            <div class="kpi-val red">3</div>
-            <div class="kpi-lbl">Active Alerts</div>
-        </div>
-        <div class="kpi-card reveal">
-            <div class="kpi-trend trend-ok">Online</div>
-            <div class="kpi-icon">📡</div>
-            <div class="kpi-val blue">12</div>
-            <div class="kpi-lbl">MPFM Devices Online</div>
-        </div>
-        <div class="kpi-card reveal">
-            <div class="kpi-trend trend-up">&#8679; 2%</div>
-            <div class="kpi-icon green">✅</div>
-            <div class="kpi-val green">96%</div>
-            <div class="kpi-lbl">Separator Efficiency</div>
-        </div>
-    </div>
-</section>
-
-<!-- ══ INTERACTIVE PRODUCTION DIAGRAM ══ -->
-<section class="diagram-section" id="diagram">
-    <div class="section-label">Production Flow</div>
-    <h2 class="section-title">Interactive Oil Production Diagram</h2>
-    <p class="section-sub">Hover over any component to view live operational data. Click to explore details.</p>
-
-    <div class="diagram-wrap reveal">
-        <div class="diagram-title">Full Production Pipeline — Wellhead to Storage</div>
-        <div style="position:relative;">
-        <svg class="prod-svg" viewBox="0 0 1020 420" xmlns="http://www.w3.org/2000/svg" id="prodSvg">
+{{-- ═════════ PRODUCTION FLOW (MPFM + TEST SEPARATOR drawings) ═════════ --}}
+<section id="flow">
+    <div class="wrap">
+        <div class="center rv"><div class="kicker">Production flow</div><h2 class="sh">One well. Two independent measurements.</h2>
+            <p class="sp">The MPFM and the test separator sit on <b>separate parallel lines</b> - each measures the same well stream its own way, then both flows rejoin the production header.</p></div>
+        <div class="flow-box rv" style="margin-top:40px">
+        <svg class="fx" viewBox="0 0 1000 420" role="img" aria-label="Wells feed a manifold that splits into a parallel MPFM line and a test separator line, then rejoin to the production header and storage">
             <defs>
-                <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                    <path d="M0,0 L0,6 L8,3 z" fill="#3b82f6"/>
-                </marker>
-                <marker id="arr-c" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                    <path d="M0,0 L0,6 L8,3 z" fill="#06b6d4"/>
-                </marker>
-                <!-- Animated gradient flow -->
-                <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#2563EB" stop-opacity="0"/>
-                    <stop offset="50%" stop-color="#06b6d4" stop-opacity="1"/>
-                    <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
-                    <animateTransform attributeName="gradientTransform" type="translate" from="-1 0" to="1 0" dur="2s" repeatCount="indefinite"/>
-                </linearGradient>
-                <filter id="glow">
-                    <feGaussianBlur stdDeviation="2" result="blur"/>
-                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
+                <path id="W1" d="M70 110 H190" fill="none"/><path id="W2" d="M70 200 H190" fill="none"/><path id="W3" d="M70 290 H190" fill="none"/>
+                <path id="MAN" d="M190 90 V300" fill="none"/>
+                <path id="P1" d="M190 90 H700" fill="none"/>
+                <path id="P1v" d="M340 90 H460" fill="none"/>
+                <path id="P2" d="M190 300 H318" fill="none"/>
+                <path id="P3" d="M520 250 V226 H700" fill="none"/>
+                <path id="P4" d="M543 330 H700" fill="none"/>
+                <path id="P5" d="M430 350 V374 H700" fill="none"/>
+                <path id="P6" d="M700 90 V374" fill="none"/>
+                <path id="P6a" d="M700 90 V233" fill="none"/>
+                <path id="P6b" d="M700 374 V233" fill="none"/>
+                <path id="P7" d="M700 233 H810" fill="none"/>
+                <g id="vlv"><path d="M-8 -6 L8 6 V-6 L-8 6Z" fill="#0d1b3a" stroke="#22d3ee" stroke-width="1.4" stroke-linejoin="round"/><path d="M0 0 V-11 M-5 -11 H5" stroke="#22d3ee" stroke-width="1.6"/></g>
+                <linearGradient id="fxOil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b45f0a"/><stop offset="1" stop-color="#5c3205"/></linearGradient>
+                <linearGradient id="fxWat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f8fd0"/><stop offset="1" stop-color="#12466f"/></linearGradient>
+                <linearGradient id="fxSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a7bd0"/><stop offset=".5" stop-color="#1b3a78"/><stop offset="1" stop-color="#3a66b8"/></linearGradient>
+                <clipPath id="fxVes"><rect x="303" y="253" width="244" height="94" rx="39"/></clipPath>
+                <clipPath id="fxTank"><rect x="810" y="190" width="130" height="206"/></clipPath>
             </defs>
 
-            <!-- Background grid -->
-            <rect width="1020" height="420" fill="rgba(5,10,21,0)" rx="12"/>
+            <path d="M0 398 H1000" stroke="#16305f" stroke-width="2"/>
 
-            <!-- WELLHEAD -->
-            <g class="diag-node" data-node="wellhead" transform="translate(30,170)">
-                <rect width="110" height="80" rx="10" fill="rgba(37,99,235,.15)" stroke="#3b82f6" stroke-width="1.5"/>
-                <text x="55" y="22" text-anchor="middle" fill="#93c5fd" font-size="18">🏗️</text>
-                <text x="55" y="42" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">WELLHEAD</text>
-                <text x="55" y="56" text-anchor="middle" fill="#64748b" font-size="8">Surface Control</text>
-                <!-- Live indicator -->
-                <circle cx="95" cy="10" r="5" fill="#22c55e">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
-                </circle>
+            <!-- pipes -->
+            <g>
+                <use href="#W1" class="po"/><use href="#W2" class="po"/><use href="#W3" class="po"/><use href="#MAN" class="po"/><use href="#P1" class="po"/><use href="#P2" class="po"/>
+                <use href="#P3" class="po"/><use href="#P4" class="po"/><use href="#P5" class="po"/><use href="#P6" class="po"/><use href="#P7" class="po"/>
+                <use href="#W1" class="pi"/><use href="#W2" class="pi"/><use href="#W3" class="pi"/><use href="#MAN" class="pi"/><use href="#P1" class="pi"/><use href="#P2" class="pi"/>
+                <use href="#P3" class="pi"/><use href="#P4" class="pi"/><use href="#P5" class="pi"/><use href="#P6" class="pi"/><use href="#P7" class="pi"/>
+            </g>
+            <!-- multiphase flow (oil + water + gas bubbles) -->
+            <g>
+                <use href="#W1" class="fl fo" transform="translate(0,-2.6)"/><use href="#W1" class="fl fw" transform="translate(0,2.6)"/><use href="#W1" class="fl fg"/>
+                <use href="#W2" class="fl fo" transform="translate(0,-2.6)"/><use href="#W2" class="fl fw" transform="translate(0,2.6)"/><use href="#W2" class="fl fg"/>
+                <use href="#W3" class="fl fo" transform="translate(0,-2.6)"/><use href="#W3" class="fl fw" transform="translate(0,2.6)"/><use href="#W3" class="fl fg"/>
+                <use href="#MAN" class="fl fo" transform="translate(-2.6,0)"/><use href="#MAN" class="fl fw" transform="translate(2.6,0)"/><use href="#MAN" class="fl fg"/>
+                <use href="#P1" class="fl fo" transform="translate(0,-2.6)"/><use href="#P1" class="fl fw" transform="translate(0,2.6)"/><use href="#P1" class="fl fg"/>
+                <use href="#P2" class="fl fo" transform="translate(0,-2.6)"/><use href="#P2" class="fl fw" transform="translate(0,2.6)"/><use href="#P2" class="fl fg"/>
+                <use href="#P6a" class="fl fo" transform="translate(-2.6,0)"/><use href="#P6a" class="fl fw" transform="translate(2.6,0)"/><use href="#P6a" class="fl fg"/>
+                <use href="#P6b" class="fl fo" transform="translate(-2.6,0)"/><use href="#P6b" class="fl fw" transform="translate(2.6,0)"/>
+                <use href="#P7" class="fl fo" transform="translate(0,-2.6)"/><use href="#P7" class="fl fw" transform="translate(0,2.6)"/><use href="#P7" class="fl fg" style="--t:.6s"/>
+            </g>
+            <!-- single-phase outlets of the separator -->
+            <use href="#P3" class="fl fg" style="--t:.7s"/>
+            <use href="#P4" class="fl fo" style="--t:1.5s"/>
+            <use href="#P5" class="fl fw" style="--t:1.8s"/>
+
+            <!-- WELLS -->
+            <g>
+                <rect x="61" y="141" width="6" height="257" fill="#10234a" stroke="#1e3a6e"/>
+                <rect x="61" y="231" width="6" height="167" fill="#10234a" stroke="#1e3a6e"/>
+                <rect x="61" y="321" width="6" height="77" fill="#10234a" stroke="#1e3a6e"/>
+                <g id="tr1"><rect x="58" y="88" width="12" height="48" fill="#12306a" stroke="#60a5fa"/><rect x="55" y="118" width="18" height="7" fill="#0d1b3a" stroke="#22d3ee"/><rect x="50" y="136" width="28" height="5" rx="1" fill="#1e3a6e" stroke="#60a5fa"/><circle cx="64" cy="82" r="5" fill="#0d1b3a" stroke="#22d3ee"/></g>
+                <use href="#tr1" y="90"/><use href="#tr1" y="180"/>
+                <circle class="blink" cx="64" cy="82" r="2" fill="#34d399"/><circle class="blink" style="animation-delay:.4s" cx="64" cy="172" r="2" fill="#34d399"/><circle class="blink" style="animation-delay:.8s" cx="64" cy="262" r="2" fill="#34d399"/>
+                <text class="tx" x="64" y="72" text-anchor="middle">W-01</text><text class="tx" x="64" y="162" text-anchor="middle">W-02</text><text class="tx" x="64" y="252" text-anchor="middle">W-03</text>
+                <use href="#vlv" x="140" y="110"/><use href="#vlv" x="140" y="200"/><use href="#vlv" x="140" y="290"/>
+            </g>
+            <text class="tx s" x="176" y="72">TEST MANIFOLD</text>
+            <text class="tx s" x="214" y="176">SAME WELL STREAM</text>
+            <text class="tx s" x="214" y="189">split into two parallel</text>
+            <text class="tx s" x="214" y="202">measurement paths</text>
+            <path d="M206 168 L206 210" stroke="#22d3ee" stroke-width="1.5" opacity=".5"/>
+            <use href="#vlv" x="250" y="90"/><use href="#vlv" x="250" y="300"/>
+
+            <!-- ============ MPFM (top branch, inline) ============ -->
+            <path d="M340 82 H365 L392 86 H408 L435 82 H460 V98 H435 L408 94 H392 L365 98 H340Z" fill="#2a55a4" stroke="#7fb4ff" stroke-width="1.4"/>
+            <path d="M340 84.5 H365 L392 87.5 H408 L435 84.5 H460 V95.5 H435 L408 92.5 H392 L365 95.5 H340Z" fill="#081226"/>
+            <use href="#P1v" class="fl fo" transform="translate(0,-2)" style="--t:.8s"/><use href="#P1v" class="fl fw" transform="translate(0,2)" style="--t:1s"/>
+            <circle r="2.4" fill="#e2e8f0"><animateMotion dur="2.2s" repeatCount="indefinite" keyPoints="0;.38;.62;1" keyTimes="0;.5;.6;1" path="M340 88 H460"/></circle>
+            <circle r="2" fill="#e2e8f0"><animateMotion dur="2.2s" begin="-.7s" repeatCount="indefinite" keyPoints="0;.38;.62;1" keyTimes="0;.5;.6;1" path="M340 91.5 H460"/></circle>
+            <circle r="2.6" fill="#e2e8f0"><animateMotion dur="2.2s" begin="-1.4s" repeatCount="indefinite" keyPoints="0;.38;.62;1" keyTimes="0;.5;.6;1" path="M340 90 H460"/></circle>
+            <rect x="336" y="128" width="128" height="6" rx="2" fill="#12306a" stroke="#60a5fa"/>
+            <path d="M350 98 V128 M450 98 V128" stroke="#3d6fc4" stroke-width="3"/>
+            <!-- gamma source / detector -->
+            <polygon class="beam" points="394,62 406,62 412,104 388,104" fill="#fbbf24" opacity=".16"/>
+            <path class="beam" d="M400 62 V104" stroke="#fbbf24" stroke-width="2" stroke-dasharray="3 3"/>
+            <rect class="eqp" x="388" y="40" width="24" height="22" rx="3" style="stroke:#fbbf24"/><circle class="spin" cx="400" cy="51" r="5" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-dasharray="3 2.2"/>
+            <rect class="eqp" x="388" y="104" width="24" height="18" rx="3" style="stroke:#fbbf24"/><path d="M394 113 H406" stroke="#fbbf24" stroke-width="2" class="beam"/>
+            <!-- DP + P/T transmitters -->
+            <rect class="eqp" x="345" y="44" width="30" height="20" rx="3" style="stroke:#22d3ee"/><circle class="blink" cx="352" cy="54" r="2" fill="#34d399"/><text class="tx s" x="368" y="57" text-anchor="middle" style="font-size:8px">DP</text>
+            <path d="M352 64 V82 M368 64 V72 H392 V86" stroke="#94a3b8" stroke-width="1.4" fill="none"/>
+            <rect class="eqp" x="422" y="56" width="22" height="14" rx="3" style="stroke:#22d3ee"/><text class="tx s" x="433" y="66" text-anchor="middle" style="font-size:8px">P/T</text>
+            <path d="M433 70 V82" stroke="#94a3b8" stroke-width="1.4"/>
+            <!-- flow computer -->
+            <path d="M360 44 V32 H470 M412 51 H470 M444 63 H470" stroke="#22d3ee" stroke-width="1" stroke-dasharray="2 3" opacity=".5" fill="none"/>
+            <rect x="470" y="24" width="74" height="54" rx="5" fill="#0b1a3a" stroke="#22d3ee" stroke-width="1.4"/>
+            <rect x="476" y="30" width="62" height="30" rx="2" fill="#021016" stroke="#134e4a"/>
+            <text class="tx m" x="480" y="40">OIL <tspan data-v="mo" data-nc="1">1248</tspan></text>
+            <text class="tx m" x="480" y="49">GAS <tspan data-v="mg">2.31</tspan></text>
+            <text class="tx m" x="480" y="58">WC&#160; <tspan data-v="mwc">24.8</tspan>%</text>
+            <circle class="blink" cx="482" cy="69" r="2" fill="#34d399"/><circle class="blink" style="animation-delay:.3s" cx="492" cy="69" r="2" fill="#fbbf24"/><circle class="blink" style="animation-delay:.6s" cx="502" cy="69" r="2" fill="#22d3ee"/>
+            <!-- MPFM readouts -->
+            <rect class="cap" x="330" y="146" width="132" height="22" rx="11" style="stroke:#22d3ee"/>
+            <circle class="blink" cx="345" cy="157" r="3.5" fill="#34d399"/><text class="tx" x="354" y="161">MPFM · M-01</text>
+            <text class="tx s" x="396" y="182" text-anchor="middle">inline · no separation</text>
+            <g>
+                <text class="tx s" x="500" y="116">MPFM OUTPUT</text>
+                <circle cx="504" cy="127" r="3" fill="#d97706"/><text class="tx" x="512" y="130">OIL <tspan class="v" data-v="mo">1,248</tspan> <tspan class="tx s">bbl/d</tspan></text>
+                <circle cx="504" cy="141" r="3" fill="#e2e8f0"/><text class="tx" x="512" y="144">GAS <tspan class="v" data-v="mg">2.31</tspan> <tspan class="tx s">MMscf/d</tspan></text>
+                <circle cx="504" cy="155" r="3" fill="#38bdf8"/><text class="tx" x="512" y="158">WATER <tspan class="v" data-v="mw">412</tspan> <tspan class="tx s">bbl/d</tspan></text>
             </g>
 
-            <!-- Arrow Wellhead → Tubing -->
-            <line x1="140" y1="210" x2="175" y2="210" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
-            <!-- Flow animation -->
-            <line x1="140" y1="210" x2="175" y2="210" stroke="url(#flowGrad)" stroke-width="4" opacity="0.6"/>
-
-            <!-- TUBING / DOWNHOLE -->
-            <g class="diag-node" data-node="tubing" transform="translate(175,170)">
-                <rect width="110" height="80" rx="10" fill="rgba(37,99,235,.12)" stroke="#3b82f6" stroke-width="1.5"/>
-                <text x="55" y="22" text-anchor="middle" fill="#93c5fd" font-size="18">🔩</text>
-                <text x="55" y="42" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">TUBING</text>
-                <text x="55" y="56" text-anchor="middle" fill="#64748b" font-size="8">Downhole String</text>
-                <circle cx="95" cy="10" r="5" fill="#22c55e">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="1.8s" repeatCount="indefinite"/>
-                </circle>
+            <!-- ============ TEST SEPARATOR (bottom branch) ============ -->
+            <path d="M335 350 L329 362 H371 L365 350Z M485 350 L479 362 H521 L515 350Z" fill="#12306a" stroke="#60a5fa" stroke-width="1.4"/>
+            <rect x="300" y="250" width="250" height="100" rx="42" fill="url(#fxSteel)" stroke="#7fb4ff" stroke-width="2.5"/>
+            <g clip-path="url(#fxVes)">
+                <rect x="300" y="250" width="250" height="38" fill="#0c1a38"/>
+                <rect x="300" y="288" width="208" height="40" fill="url(#fxOil)"/>
+                <rect x="300" y="326" width="208" height="24" fill="url(#fxWat)"/>
+                <rect x="508" y="312" width="42" height="38" fill="url(#fxOil)"/>
+                <rect x="505" y="292" width="3.5" height="58" fill="#cbd5e1"/>
+                <g class="wave"><path d="M290 288 q12.5 -4 25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0" fill="none" stroke="#fcd34d" stroke-width="1.8"/></g>
+                <g class="wave r"><path d="M290 326 q12.5 -2.5 25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0" fill="none" stroke="#7dd3fc" stroke-width="1.6"/></g>
+                <path d="M508 312 q10 -2 20 0 t20 0" fill="none" stroke="#fcd34d" stroke-width="1.5"/>
+                <path d="M316 286 L330 300 L316 314" fill="none" stroke="#cbd5e1" stroke-width="2.5"/>
+                <use href="#P2" class="fl fo" transform="translate(0,-2.6)" style="--t:.5s"/><use href="#P2" class="fl fw" transform="translate(0,2.6)" style="--t:.6s"/>
+                <path d="M334 270 H520" fill="none" class="fl fg" style="--t:.9s"/>
+                <rect x="478" y="253" width="34" height="14" fill="none" stroke="#94a3b8" stroke-dasharray="2 2"/>
+                <circle class="bub" cx="345" cy="318" r="2.2" fill="#fde68a"/><circle class="bub" style="animation-delay:.8s" cx="380" cy="320" r="1.8" fill="#fde68a"/><circle class="bub" style="animation-delay:1.6s" cx="415" cy="319" r="2.4" fill="#fde68a"/>
+                <circle class="bub" style="animation-delay:.4s" cx="450" cy="321" r="2" fill="#fde68a"/><circle class="bub" style="animation-delay:1.2s" cx="485" cy="320" r="2.2" fill="#fde68a"/>
+                <circle class="drp" cx="350" cy="292" r="1.8" fill="#7dd3fc"/><circle class="drp" style="animation-delay:.7s" cx="395" cy="293" r="1.6" fill="#7dd3fc"/><circle class="drp" style="animation-delay:1.4s" cx="445" cy="292" r="1.8" fill="#7dd3fc"/>
+                <circle r="1.8" fill="#e2e8f0"><animateMotion dur="1.4s" repeatCount="indefinite" path="M326 296 Q346 274 374 288"/></circle>
+                <circle r="1.6" fill="#d97706"><animateMotion dur="1.4s" begin="-.5s" repeatCount="indefinite" path="M326 304 Q346 322 372 322"/></circle>
+                <circle r="1.6" fill="#38bdf8"><animateMotion dur="1.4s" begin="-.9s" repeatCount="indefinite" path="M326 300 Q352 300 380 310"/></circle>
             </g>
+            <path d="M340 258 H500" stroke="#fff" stroke-width="1.5" opacity=".12"/>
+            <!-- gauge, RTU, PSV -->
+            <path d="M350 239 V250" stroke="#94a3b8" stroke-width="3"/>
+            <circle cx="350" cy="226" r="13" fill="#0a1630" stroke="#94a3b8" stroke-width="2"/>
+            <path d="M341 232 A11 11 0 1 1 359 232" fill="none" stroke="#475a85" stroke-width="2" stroke-dasharray="2 2.4"/>
+            <path class="needle" d="M350 226 V216" stroke="#f87171" stroke-width="2" stroke-linecap="round"/><circle cx="350" cy="226" r="2" fill="#cbd5e1"/>
+            <path d="M422 238 V250" stroke="#94a3b8" stroke-width="2" stroke-dasharray="2 2"/>
+            <rect x="392" y="196" width="60" height="42" rx="4" fill="#0b1a3a" stroke="#f59e0b" stroke-width="1.4"/>
+            <rect x="397" y="201" width="50" height="24" rx="2" fill="#150e02" stroke="#78450a"/>
+            <text class="tx m" x="400" y="211" style="fill:#fbbf24">OIL <tspan data-v="so" data-nc="1">1271</tspan></text>
+            <text class="tx m" x="400" y="221" style="fill:#fbbf24">GAS <tspan data-v="sg">2.26</tspan></text>
+            <circle class="blink" cx="402" cy="232" r="2" fill="#34d399"/><circle class="blink" style="animation-delay:.5s" cx="412" cy="232" r="2" fill="#f59e0b"/>
+            <path d="M475 250 V236" stroke="#94a3b8" stroke-width="3"/><path d="M467 236 H483 L475 222Z" fill="#7f1d1d" stroke="#f87171" stroke-width="1.2"/>
+            <circle class="vent" cx="475" cy="216" r="3" fill="#cbd5e1"/><circle class="vent" style="animation-delay:1.2s" cx="475" cy="216" r="3" fill="#cbd5e1"/>
+            <!-- separator label -->
+            <rect class="cap" x="160" y="326" width="136" height="22" rx="11" style="stroke:#f59e0b"/>
+            <circle class="blink" cx="175" cy="337" r="3.5" fill="#34d399"/><text class="tx" x="184" y="341">Test Separator V-101</text>
+            <text class="tx s" x="228" y="362" text-anchor="middle">3-phase · each phase metered</text>
+            <!-- outlet meters + readouts -->
+            <rect x="556" y="214" width="3" height="24" fill="#94a3b8"/><rect x="564" y="214" width="3" height="24" fill="#94a3b8"/>
+            <path d="M558 214 V208 M565 214 V208" stroke="#94a3b8" stroke-width="1.4"/><circle cx="562" cy="202" r="6" fill="#0d1b3a" stroke="#22d3ee"/><circle class="blink" cx="562" cy="202" r="1.8" fill="#34d399"/>
+            <text class="tx s" x="580" y="195">GAS · orifice meter</text>
+            <text class="tx" x="580" y="208"><tspan class="v" data-v="sg">2.26</tspan> <tspan class="tx s">MMscf/d</tspan></text>
+            <circle cx="590" cy="330" r="11" fill="#0d1b3a" stroke="#f59e0b" stroke-width="1.6"/><path d="M584 325 q6 11 12 0" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
+            <text class="tx s" x="610" y="299">OIL · Coriolis meter</text>
+            <text class="tx" x="610" y="311"><tspan class="v" data-v="so">1,271</tspan> <tspan class="tx s">bbl/d</tspan></text>
+            <circle cx="560" cy="374" r="10" fill="#0d1b3a" stroke="#38bdf8" stroke-width="1.6"/><path class="spin" d="M555 374 H565 M560 369 V379" stroke="#38bdf8" stroke-width="1.6" style="transform-origin:560px 374px;transform-box:view-box"/>
+            <text class="tx s" x="580" y="346">WATER · meter</text>
+            <text class="tx" x="580" y="359"><tspan class="v" data-v="sw">405</tspan> <tspan class="tx s">bbl/d</tspan></text>
+            <text class="tx s" x="500" y="388">SEPARATOR OUTPUT</text>
+            <use href="#vlv" x="640" y="374"/>
 
-            <!-- Arrow → MPFM -->
-            <line x1="285" y1="210" x2="320" y2="210" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
-            <line x1="285" y1="210" x2="320" y2="210" stroke="url(#flowGrad)" stroke-width="4" opacity="0.6"/>
-
-            <!-- MPFM METER -->
-            <g class="diag-node" data-node="mpfm" transform="translate(320,155)">
-                <rect width="120" height="110" rx="10" fill="rgba(6,182,212,.15)" stroke="#06b6d4" stroke-width="2"/>
-                <text x="60" y="24" text-anchor="middle" fill="#67e8f9" font-size="18">📊</text>
-                <text x="60" y="46" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">MPFM METER</text>
-                <text x="60" y="60" text-anchor="middle" fill="#64748b" font-size="8">Multi-Phase Flow</text>
-                <text x="60" y="76" text-anchor="middle" fill="#06b6d4" font-size="9" font-weight="600">Oil: 87 BOPD</text>
-                <text x="60" y="90" text-anchor="middle" fill="#06b6d4" font-size="9">Gas: 12 MMSCFD</text>
-                <circle cx="108" cy="12" r="5" fill="#f59e0b">
-                    <animate attributeName="opacity" values="1;0.2;1" dur="1s" repeatCount="indefinite"/>
-                </circle>
+            <!-- header, export, storage -->
+            <text class="tx s" x="716" y="216">PRODUCTION HEADER</text>
+            <text class="tx s" x="716" y="258">to export</text>
+            <rect x="810" y="190" width="130" height="206" fill="#0a1630" stroke="#3b82f6" stroke-width="1.6"/>
+            <g clip-path="url(#fxTank)">
+                <rect x="810" y="300" width="130" height="96" fill="url(#fxOil)"><animate attributeName="y" values="300;286;300" dur="14s" repeatCount="indefinite"/><animate attributeName="height" values="96;110;96" dur="14s" repeatCount="indefinite"/></rect>
+                <g class="wave r"><path d="M800 300 q12.5 -3 25 0 t25 0 t25 0 t25 0 t25 0 t25 0 t25 0" fill="none" stroke="#fcd34d" stroke-width="1.6"><animateTransform attributeName="transform" type="translate" values="0 0;0 -14;0 0" dur="14s" repeatCount="indefinite"/></path></g>
             </g>
+            <ellipse cx="875" cy="190" rx="65" ry="9" fill="#12306a" stroke="#60a5fa" stroke-width="1.6"/>
+            <path d="M810 396 a65 9 0 0 0 130 0" fill="#0a1630" stroke="#3b82f6" stroke-width="1.4"/>
+            <path d="M946 394 V196 M946 394 H952" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text class="tx" x="875" y="218" text-anchor="middle">STORAGE</text><text class="tx s" x="875" y="231" text-anchor="middle">export tank</text>
 
-            <!-- Pressure sensor on MPFM -->
-            <g class="diag-node" data-node="pressure" transform="translate(340,80)">
-                <rect width="80" height="55" rx="8" fill="rgba(245,158,11,.12)" stroke="#f59e0b" stroke-width="1.5"/>
-                <text x="40" y="20" text-anchor="middle" fill="#fcd34d" font-size="14">⏱️</text>
-                <text x="40" y="34" text-anchor="middle" fill="#e2e8f0" font-size="8" font-weight="700">PRESSURE</text>
-                <text x="40" y="46" text-anchor="middle" fill="#f59e0b" font-size="9">1,840 PSI</text>
-            </g>
-            <line x1="380" y1="135" x2="380" y2="155" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
-
-            <!-- Temperature sensor -->
-            <g class="diag-node" data-node="temp" transform="translate(430,80)">
-                <rect width="80" height="55" rx="8" fill="rgba(239,68,68,.12)" stroke="#ef4444" stroke-width="1.5"/>
-                <text x="40" y="20" text-anchor="middle" fill="#fca5a5" font-size="14">🌡️</text>
-                <text x="40" y="34" text-anchor="middle" fill="#e2e8f0" font-size="8" font-weight="700">TEMPERATURE</text>
-                <text x="40" y="46" text-anchor="middle" fill="#ef4444" font-size="9">78°C</text>
-            </g>
-            <line x1="470" y1="135" x2="420" y2="155" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
-
-            <!-- Arrow MPFM → Separator -->
-            <line x1="440" y1="210" x2="480" y2="210" stroke="#06b6d4" stroke-width="2" marker-end="url(#arr-c)"/>
-            <line x1="440" y1="210" x2="480" y2="210" stroke="url(#flowGrad)" stroke-width="4" opacity="0.6"/>
-
-            <!-- SEPARATOR -->
-            <g class="diag-node" data-node="separator" transform="translate(480,165)">
-                <rect width="120" height="90" rx="10" fill="rgba(37,99,235,.15)" stroke="#3b82f6" stroke-width="1.5"/>
-                <text x="60" y="24" text-anchor="middle" fill="#93c5fd" font-size="18">⚗️</text>
-                <text x="60" y="46" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">SEPARATOR</text>
-                <text x="60" y="60" text-anchor="middle" fill="#64748b" font-size="8">3-Phase Sep.</text>
-                <text x="60" y="75" text-anchor="middle" fill="#22c55e" font-size="9">Efficiency: 96%</text>
-                <circle cx="108" cy="12" r="5" fill="#22c55e">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
-                </circle>
-            </g>
-
-            <!-- Gas outlet from Separator (up) -->
-            <line x1="540" y1="165" x2="540" y2="120" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-            <text x="548" y="145" fill="#64748b" font-size="8">Gas</text>
-
-            <!-- Arrow Separator → Flowline -->
-            <line x1="600" y1="210" x2="640" y2="210" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
-            <line x1="600" y1="210" x2="640" y2="210" stroke="url(#flowGrad)" stroke-width="4" opacity="0.6"/>
-
-            <!-- FLOWLINE -->
-            <g class="diag-node" data-node="flowline" transform="translate(640,170)">
-                <rect width="110" height="80" rx="10" fill="rgba(37,99,235,.12)" stroke="#3b82f6" stroke-width="1.5"/>
-                <text x="55" y="22" text-anchor="middle" fill="#93c5fd" font-size="18">🌊</text>
-                <text x="55" y="42" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">FLOWLINE</text>
-                <text x="55" y="56" text-anchor="middle" fill="#64748b" font-size="8">Transfer Line</text>
-                <circle cx="95" cy="10" r="5" fill="#06b6d4">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="1.3s" repeatCount="indefinite"/>
-                </circle>
-            </g>
-
-            <!-- Arrow → Storage Tank -->
-            <line x1="750" y1="210" x2="790" y2="210" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
-            <line x1="750" y1="210" x2="790" y2="210" stroke="url(#flowGrad)" stroke-width="4" opacity="0.6"/>
-
-            <!-- STORAGE TANK -->
-            <g class="diag-node" data-node="storage" transform="translate(790,155)">
-                <rect width="110" height="110" rx="10" fill="rgba(37,99,235,.15)" stroke="#3b82f6" stroke-width="1.5"/>
-                <!-- Tank visual -->
-                <rect x="20" y="30" width="70" height="50" rx="4" fill="rgba(37,99,235,.2)" stroke="#3b82f6" stroke-width="1"/>
-                <!-- Fill level -->
-                <rect x="20" y="58" width="70" height="22" rx="0" fill="rgba(37,99,235,.5)"/>
-                <text x="55" y="100" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">STORAGE TANK</text>
-                <text x="55" y="20" text-anchor="middle" fill="#93c5fd" font-size="8">Cap: 5,000 bbl</text>
-                <circle cx="98" cy="12" r="5" fill="#22c55e">
-                    <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
-                </circle>
-            </g>
-
-            <!-- CONTROL PANEL (top center) -->
-            <g class="diag-node" data-node="control" transform="translate(430,300)">
-                <rect width="160" height="70" rx="10" fill="rgba(37,99,235,.18)" stroke="#60a5fa" stroke-width="2"/>
-                <text x="80" y="22" text-anchor="middle" fill="#bfdbfe" font-size="18">🖥️</text>
-                <text x="80" y="42" text-anchor="middle" fill="#e2e8f0" font-size="10" font-weight="700">CONTROL PANEL</text>
-                <text x="80" y="57" text-anchor="middle" fill="#64748b" font-size="8">SCADA Interface — 24/7</text>
-                <circle cx="148" cy="12" r="5" fill="#22c55e">
-                    <animate attributeName="opacity" values="1;0.2;1" dur="0.8s" repeatCount="indefinite"/>
-                </circle>
-            </g>
-            <!-- Control lines -->
-            <line x1="510" y1="300" x2="510" y2="265" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,4"/>
-            <line x1="380" y1="300" x2="380" y2="265" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,4"/>
-
-            <!-- Flow status labels -->
-            <text x="155" y="204" fill="#3b82f6" font-size="8" opacity="0.7">Flow</text>
-            <text x="300" y="204" fill="#3b82f6" font-size="8" opacity="0.7">Flow</text>
-            <text x="455" y="204" fill="#06b6d4" font-size="8" opacity="0.7">Flow</text>
-            <text x="614" y="204" fill="#3b82f6" font-size="8" opacity="0.7">Flow</text>
-            <text x="758" y="204" fill="#3b82f6" font-size="8" opacity="0.7">Flow</text>
-
-            <!-- Legend -->
-            <g transform="translate(30,370)">
-                <circle cx="6" cy="6" r="5" fill="#22c55e"/>
-                <text x="16" y="10" fill="#64748b" font-size="8">Online</text>
-                <circle cx="70" cy="6" r="5" fill="#f59e0b"/>
-                <text x="80" y="10" fill="#64748b" font-size="8">Monitoring</text>
-                <line x1="140" y1="6" x2="165" y2="6" stroke="#64748b" stroke-dasharray="4,3" stroke-width="1.5"/>
-                <text x="170" y="10" fill="#64748b" font-size="8">Signal Line</text>
-                <line x1="240" y1="6" x2="265" y2="6" stroke="#3b82f6" stroke-width="2"/>
-                <text x="270" y="10" fill="#64748b" font-size="8">Flow Path</text>
-            </g>
+            <!-- report + data links -->
+            <path d="M544 50 H800" stroke="#22d3ee" stroke-width="1.2" stroke-dasharray="2 4" fill="none" opacity=".7"/>
+            <path d="M452 217 H462 V176 H770 V98 H800" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="2 4" fill="none" opacity=".7"/>
+            <circle r="3.2" fill="#22d3ee"><animateMotion dur="2.4s" repeatCount="indefinite" path="M544 50 H800"/></circle>
+            <circle r="3.2" fill="#22d3ee"><animateMotion dur="2.4s" begin="-1.2s" repeatCount="indefinite" path="M544 50 H800"/></circle>
+            <circle r="3.2" fill="#f59e0b"><animateMotion dur="4.4s" repeatCount="indefinite" path="M452 217 H462 V176 H770 V98 H800"/></circle>
+            <circle r="3.2" fill="#f59e0b"><animateMotion dur="4.4s" begin="-2.2s" repeatCount="indefinite" path="M452 217 H462 V176 H770 V98 H800"/></circle>
+            <rect x="800" y="26" width="140" height="92" rx="8" fill="#0d1b3a" stroke="#22d3ee" stroke-width="1.6"/>
+            <rect x="800" y="26" width="140" height="20" rx="8" fill="#12306a"/><text class="tx" x="870" y="40" text-anchor="middle" style="fill:#67e8f9">TEST REPORT · W-02</text>
+            <rect x="810" y="55" width="70" height="5" rx="2" fill="#22d3ee" opacity=".7"/><rect x="810" y="66" width="104" height="5" rx="2" fill="#1e3a6e"/><rect x="810" y="77" width="88" height="5" rx="2" fill="#f59e0b" opacity=".7"/><rect x="810" y="88" width="60" height="5" rx="2" fill="#1e3a6e"/>
+            <text class="tx s" x="810" y="110">Δ oil <tspan data-v="do" style="fill:#34d399">-1.8</tspan>% · gas <tspan data-v="dg" style="fill:#34d399">+2.2</tspan>%</text>
+            <circle cx="916" cy="84" r="13" fill="#34d399"/><path class="chk" d="M909 84 l5 5 l9 -10" fill="none" stroke="#04111f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-
-        <!-- Tooltip -->
-        <div class="diag-tooltip" id="diagTooltip">
-            <div class="tt-title" id="ttTitle">Component</div>
-            <div id="ttBody"></div>
         </div>
-        </div>
+        <div class="center rv" style="margin-top:56px"><div class="kicker">Readings &amp; reports</div><h2 class="sh" style="font-size:clamp(22px,2.6vw,32px)">What each system measures - and what the report says</h2></div>
+    <div class="rd">
+        <article class="rcard m" style="--d:2">
+            <header><div><h4>MPFM · M-01</h4><p>Multiphase flow meter — reads the full stream inline, no separation</p></div><span class="live-b"><i></i>LIVE</span></header>
+            <div class="rrow">Oil rate<b class="k" data-v="mo">1,248</b><u>bbl/d</u></div>
+            <div class="rrow">Gas rate<b class="k" data-v="mg">2.31</b><u>MMscf/d</u></div>
+            <div class="rrow">Water rate<b class="k" data-v="mw">412</b><u>bbl/d</u></div>
+            <div class="rrow">Water cut (WC)<b data-v="mwc">24.8</b><u>%</u></div>
+            <div class="rrow">Gas-oil ratio (GOR)<b data-v="mgor">1,851</b><u>scf/bbl</u></div>
+            <div class="rrow">Gas volume fraction<b data-v="mgvf">71.4</b><u>%</u></div>
+            <div class="rrow">Line pressure<b data-v="mp">310</b><u>psi</u></div>
+            <div class="rrow">Temperature<b data-v="mt">78</b><u>°C</u></div>
+            <footer>How: Venturi differential pressure + gamma-ray fraction meter, calculated by the flow computer.</footer>
+        </article>
+        <article class="rcard s" style="--d:3">
+            <header><div><h4>Test Separator · V-101</h4><p>Separates oil, gas and water — each phase measured on its own line</p></div><span class="live-b"><i></i>LIVE</span></header>
+            <div class="rrow">Oil rate<b class="k" data-v="so">1,271</b><u>bbl/d</u></div>
+            <div class="rrow">Gas rate<b class="k" data-v="sg">2.26</b><u>MMscf/d</u></div>
+            <div class="rrow">Water rate<b class="k" data-v="sw">405</b><u>bbl/d</u></div>
+            <div class="rrow">Water cut (BS&amp;W)<b data-v="swc">24.2</b><u>%</u></div>
+            <div class="rrow">Gas-oil ratio (GOR)<b data-v="sgor">1,778</b><u>scf/bbl</u></div>
+            <div class="rrow">Separator pressure<b data-v="sp">185</b><u>psi</u></div>
+            <div class="rrow">Temperature<b data-v="st">74</b><u>°C</u></div>
+            <div class="rrow">Oil / water interface<b>54</b><u>% level</u></div>
+            <footer>How: Coriolis meter (oil), orifice plate (gas), water meter — after physical separation.</footer>
+        </article>
+        <article class="rcard r" style="--d:4">
+            <header><div><h4>Test report · W-02</h4><p>MPFM compared with the separator for the same well</p></div><span class="live-b"><i></i>LIVE</span></header>
+            <div class="dvr"><div><span>Oil deviation</span><b><span data-v="do">-1.8</span>%</b></div><div class="dvt"><i style="left:42.8%;width:7.2%"></i></div></div>
+            <div class="dvr"><div><span>Gas deviation</span><b><span data-v="dg">+2.2</span>%</b></div><div class="dvt"><i style="left:50%;width:8.8%"></i></div></div>
+            <div class="dvr"><div><span>Water deviation</span><b><span data-v="dw">+1.7</span>%</b></div><div class="dvt"><i style="left:50%;width:6.8%"></i></div></div>
+            <div class="verdict" id="verdict">✓ Within ±5% tolerance — test validated</div>
+            <div class="meta">
+                <span>Test no. <b>T-0142</b></span><span>Duration <b>6 h</b></span>
+                <span>Samples <b>360</b></span><span>Date <b id="rdate">02 Nov 2026</b></span>
+                <span>Field oil today <b>4,215 BOPD</b></span><span>Wells tested <b>12 / 14</b></span>
+            </div>
+        </article>
+    </div>
+        <p class="sp center" style="font-size:12px;margin:14px auto 0;color:var(--mute)">Sample values shown for illustration.</p>
     </div>
 </section>
 
-<!-- ══ DEPARTMENTS ══ -->
-<section class="dept-section" id="departments">
-    <div class="section-label">Our Departments</div>
-    <h2 class="section-title">Six Departments. One Unified Platform.</h2>
-    <p class="section-sub">Each department contributes specialized expertise that feeds directly into well performance and production output.</p>
-    <div class="dept-grid">
-        <div class="dept-card reveal">
-            <div class="dept-img">
-                <img src="/assets/img/brand/mpfm monitoing.jpg" alt="MPFM" loading="lazy">
-                <div class="dept-tag">MPFM</div>
-            </div>
-            <div class="dept-body">
-                <div class="dept-name">MPFM Monitoring</div>
-                <p class="dept-desc">Multi-Phase Flow Measurement — real-time oil, gas, and water flow rates for each well, enabling precise production accounting without test separators.</p>
-                <div class="dept-kpis">
-                    <span class="dept-kpi">Flow Accuracy</span>
-                    <span class="dept-kpi">Real-time Data</span>
-                    <span class="dept-kpi">12 Devices</span>
-                </div>
-            </div>
-        </div>
-        <div class="dept-card reveal">
-            <div class="dept-img">
-                <img src="/assets/img/brand/wire Line lubricator .jpg" alt="Wire Line" loading="lazy">
-                <div class="dept-tag">Wire Line</div>
-            </div>
-            <div class="dept-body">
-                <div class="dept-name">Wire Line Operations</div>
-                <p class="dept-desc">Downhole logging, perforation, and plug operations using wireline tools — providing critical subsurface data for reservoir management decisions.</p>
-                <div class="dept-kpis">
-                    <span class="dept-kpi">Downhole Logging</span>
-                    <span class="dept-kpi">Perforation</span>
-                    <span class="dept-kpi">Well Integrity</span>
-                </div>
-            </div>
-        </div>
-        <div class="dept-card reveal">
-            <div class="dept-img">
-                <img src="/assets/img/brand/production background.jpg" alt="Production" loading="lazy">
-                <div class="dept-tag">Production</div>
-            </div>
-            <div class="dept-body">
-                <div class="dept-name">Production Operations</div>
-                <p class="dept-desc">Daily well monitoring, production optimization, and facility management ensuring maximum hydrocarbon recovery at minimum operating cost.</p>
-                <div class="dept-kpis">
-                    <span class="dept-kpi">4,215 BOPD</span>
-                    <span class="dept-kpi">Optimization</span>
-                    <span class="dept-kpi">SLA Tracking</span>
-                </div>
-            </div>
-        </div>
-        <div class="dept-card reveal">
-            <div class="dept-img">
-                <img src="/assets/img/brand/drilling background .png" alt="Drilling" loading="lazy">
-                <div class="dept-tag">Drilling</div>
-            </div>
-            <div class="dept-body">
-                <div class="dept-name">Drilling Operations</div>
-                <p class="dept-desc">Well construction from surface to reservoir — planning, execution, and documentation of all drilling activities with full audit trail and safety compliance.</p>
-                <div class="dept-kpis">
-                    <span class="dept-kpi">Well Planning</span>
-                    <span class="dept-kpi">Safety Audit</span>
-                    <span class="dept-kpi">NPT Tracking</span>
-                </div>
-            </div>
-        </div>
-        <div class="dept-card reveal">
-            <div class="dept-img">
-                <img src="/assets/img/brand/complation.jpg" alt="Completion" loading="lazy">
-                <div class="dept-tag">Completion</div>
-            </div>
-            <div class="dept-body">
-                <div class="dept-name">Well Completion</div>
-                <p class="dept-desc">Installation of downhole equipment (tubing, packers, valves) that prepares drilled wells for production — bridging drilling and production phases.</p>
-                <div class="dept-kpis">
-                    <span class="dept-kpi">Tubing Design</span>
-                    <span class="dept-kpi">Packer Setting</span>
-                    <span class="dept-kpi">Flow Assurance</span>
-                </div>
-            </div>
-        </div>
-        <div class="dept-card reveal">
-            <div class="dept-img">
-                <img src="/assets/img/brand/work over .jpg" alt="Workover" loading="lazy">
-                <div class="dept-tag">Workover</div>
-            </div>
-            <div class="dept-body">
-                <div class="dept-name">Workover Operations</div>
-                <p class="dept-desc">Well intervention and remediation — restoring underperforming wells to full production potential through mechanical repairs and stimulation treatments.</p>
-                <div class="dept-kpis">
-                    <span class="dept-kpi">Well Intervention</span>
-                    <span class="dept-kpi">Stimulation</span>
-                    <span class="dept-kpi">Cost Reduction</span>
-                </div>
-            </div>
+{{-- ═════════ WIRE LINE OPERATION drawing ═════════ --}}
+<section id="wl-op" class="alt">
+    <div class="wrap">
+        <div class="center rv"><div class="kicker">Wire Line operation</div><h2 class="sh">From the lubricator to the reservoir - and back as data</h2>
+            <p class="sp">A slickline unit runs the memory gauge through the lubricator and wellhead, parks it opposite the reservoir, then pulls it out. The recording is uploaded and analysed automatically.</p></div>
+        <div class="flow-box rv" style="margin-top:40px">
+            @include('partials.wireline_rig')
         </div>
     </div>
 </section>
-
-<!-- ══ WELL ARCHITECTURE DIAGRAM ══ -->
-<section class="arch-section" id="architecture">
-    <div style="max-width:1100px;margin:0 auto;">
-        <div class="section-label">System Architecture</div>
-        <h2 class="section-title">How Departments Drive Well Output</h2>
-        <p class="section-sub">Four integrated layers — from departmental inputs to measurable field output.</p>
-
-        <div class="arch-wrap reveal">
-            <!-- Layer 1: Departments -->
-            <div class="arch-layer-label">&#9312; Department Inputs</div>
-            <div class="arch-depts">
-                <div class="arch-dept-box" style="border-top-color:#06b6d4;">
-                    <div class="di">📊</div>MPFM
-                </div>
-                <div class="arch-dept-box" style="border-top-color:#3b82f6;">
-                    <div class="di">🔩</div>Wire Line
-                </div>
-                <div class="arch-dept-box" style="border-top-color:#22c55e;">
-                    <div class="di">⚙️</div>Production
-                </div>
-                <div class="arch-dept-box" style="border-top-color:#f59e0b;">
-                    <div class="di">🏗️</div>Drilling
-                </div>
-                <div class="arch-dept-box" style="border-top-color:#a855f7;">
-                    <div class="di">🔧</div>Completion
-                </div>
-                <div class="arch-dept-box" style="border-top-color:#ef4444;">
-                    <div class="di">⛏️</div>Workover
-                </div>
-            </div>
-
-            <!-- SVG connector 1 -->
-            <svg class="arch-connector" height="60" viewBox="0 0 1100 60">
-                <line x1="91"  y1="0" x2="91"  y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="274" y1="0" x2="274" y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="457" y1="0" x2="457" y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="640" y1="0" x2="640" y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="823" y1="0" x2="823" y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="1006" y1="0" x2="1006" y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="91" y1="30" x2="1006" y2="30" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="548" y1="30" x2="548" y2="60" stroke="#3b82f6" stroke-width="2" marker-end="url(#arr)"/>
+{{-- ═════════ MPFM ═════════ --}}
+<section id="mpfm">
+    <div class="wrap mod">
+        <div class="txt rv">
+            <div class="num">01 · MPFM MONITORING</div>
+            <h3>From raw flow-computer log to an approved well test</h3>
+            <p>Operators upload the Vx log; the platform parses it, calculates flow, water cut and GOR, scores data quality and routes the test through review - all traceable to the person who touched it.</p>
+            <ul class="ticks">
+                <li>Automatic extraction of oil, gas, water, pressure and temperature</li>
+                <li>Rule-based validation with data-quality scoring</li>
+                <li>Draft → Submitted → Approved / Rejected review workflow</li>
+                <li>Per-well history, trending dashboard and alerts</li>
+            </ul>
+            <div class="chips"><span class="chip">Vx logs</span><span class="chip">Validation rules</span><span class="chip">Trending</span></div>
+        </div>
+        <figure class="fig rv">
+            <svg viewBox="0 0 560 300">
+                <g font-size="11" font-weight="700" text-anchor="middle" fill="#fff">
+                    <g transform="translate(14,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#22d3ee"/><path d="M30 18h22l10 10v22H30z" fill="none" stroke="#22d3ee" stroke-width="1.8"/><text x="46" y="58" font-size="9.5" fill="#9aaccb">Vx log</text></g>
+                    <g transform="translate(130,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#3b82f6"/><text x="46" y="28" font-size="18" fill="#60a5fa">{ }</text><text x="46" y="52" font-size="9.5" fill="#9aaccb">Parse</text></g>
+                    <g transform="translate(246,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#fbbf24"/><path d="M34 32l8 8 16-18" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round"/><text x="46" y="58" font-size="9.5" fill="#9aaccb">Validate</text></g>
+                    <g transform="translate(362,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#a78bfa"/><circle cx="46" cy="28" r="10" fill="none" stroke="#a78bfa" stroke-width="1.8"/><text x="46" y="58" font-size="9.5" fill="#9aaccb">Review</text></g>
+                    <g transform="translate(470,30)"><rect width="78" height="62" rx="10" fill="#0d2a22" stroke="#34d399"/><text x="39" y="36" font-size="11" fill="#34d399">Approved</text></g>
+                </g>
+                <g stroke="#2e4170" stroke-width="1.6" fill="none" class="flowd"><path d="M106 61H130M222 61H246M338 61H362M454 61H470"/></g>
+                <rect x="14" y="116" width="534" height="170" rx="12" fill="#0a1226" stroke="#1d2b4d"/>
+                <text x="30" y="140" font-size="11" fill="#9aaccb" font-weight="700">Oil · gas · water per test</text>
+                <g stroke="#1b2847"><path d="M30 170H530M30 210H530M30 250H530"/></g>
+                <path class="draw" style="--len:560" d="M30 232 C90 224 130 200 180 204 S270 176 330 184 S430 150 530 144" fill="none" stroke="#22d3ee" stroke-width="2.4"/>
+                <path class="draw" style="--len:560" d="M30 252 C100 250 160 246 220 240 S360 232 530 214" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="5 4"/>
+                <path class="draw" style="--len:560" d="M30 266 C120 262 200 258 280 256 S420 250 530 244" fill="none" stroke="#fbbf24" stroke-width="1.8"/>
+                <g font-size="10" fill="#9aaccb"><circle cx="360" cy="136" r="4" fill="#22d3ee"/><text x="370" y="140">Oil</text><circle cx="404" cy="136" r="4" fill="#38bdf8"/><text x="414" y="140">Water cut</text><circle cx="478" cy="136" r="4" fill="#fbbf24"/><text x="488" y="140">Gas</text></g>
             </svg>
+            <figcaption>Pipeline: upload → parse → validate → review → approved, feeding well trends.</figcaption>
+        </figure>
+    </div>
+</section>
 
-            <!-- Layer 2: Platform Core -->
-            <div style="display:flex;justify-content:center;margin-bottom:0;">
-                <div class="platform-core">
-                    <div class="platform-title">🖥️ Live Platform Core</div>
-                    <div class="platform-sub">Unified task management, state tracking &amp; SLA engine</div>
-                    <div class="platform-chips">
-                        <span class="pchip">8 Task States</span>
-                        <span class="pchip">6 Roles</span>
-                        <span class="pchip">24/7 Active</span>
-                        <span class="pchip">100% Audit</span>
-                        <span class="pchip">SLA Engine</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SVG connector 2 -->
-            <svg class="arch-connector" height="60" viewBox="0 0 1100 60">
-                <line x1="548" y1="0" x2="548" y2="20" stroke="#06b6d4" stroke-width="2"/>
-                <line x1="200" y1="20" x2="900" y2="20" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="5,3"/>
-                <line x1="200" y1="20" x2="200" y2="60" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#arr-c)"/>
-                <line x1="548" y1="20" x2="548" y2="60" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#arr-c)"/>
-                <line x1="900" y1="20" x2="900" y2="60" stroke="#06b6d4" stroke-width="1.5" marker-end="url(#arr-c)"/>
+{{-- ═════════ TEST VESSEL ═════════ --}}
+<section id="vessel" class="alt">
+    <div class="wrap mod rev">
+        <div class="txt rv">
+            <div class="num">02 · TEST VESSEL</div>
+            <h3>Cross-check every meter against the separator</h3>
+            <p>Plan vessel tests with requests, record results and compare them with MPFM readings for the same well. Deviations beyond tolerance are surfaced automatically so meter issues are caught early.</p>
+            <ul class="ticks">
+                <li>Fleet register with status (active, maintenance, inactive)</li>
+                <li>Test requests with multi-well scheduling and tracking</li>
+                <li>Side-by-side MPFM vs vessel comparison with ±10% band</li>
+                <li>Approval workflow and shift / operator reporting</li>
+            </ul>
+            <div class="chips"><span class="chip">Requests</span><span class="chip">Comparison</span><span class="chip">Fleet status</span></div>
+        </div>
+        <figure class="fig rv">
+            <svg viewBox="0 0 560 320">
+                <g transform="translate(0,6)">
+                    <rect x="22" y="40" width="150" height="70" rx="34" fill="#16233f" stroke="#7fb4ff" stroke-width="2"/>
+                    <clipPath id="vc"><rect x="22" y="40" width="150" height="70" rx="34"/></clipPath>
+                    <g clip-path="url(#vc)"><rect x="22" y="72" width="150" height="20" fill="#b45309"/><rect x="22" y="90" width="150" height="22" fill="#0369a1"/><rect x="22" y="40" width="150" height="32" fill="#1e3a5f" opacity=".5"/></g>
+                    <path d="M172 75H215" stroke="#fbbf24" stroke-width="3" class="flowd"/><path d="M50 40V18M150 40V18" stroke="#7fb4ff" stroke-width="3"/>
+                    <text x="97" y="136" text-anchor="middle" font-size="10" fill="#9aaccb" font-weight="700">TEST SEPARATOR</text>
+                </g>
+                <rect x="240" y="20" width="300" height="270" rx="12" fill="#0a1226" stroke="#1d2b4d"/>
+                <text x="256" y="44" font-size="11" fill="#9aaccb" font-weight="700">MPFM vs vessel · oil rate</text>
+                <path d="M280 262L520 52" stroke="#34d399" stroke-width="1.6" stroke-dasharray="6 4"/>
+                <path d="M280 262L520 28" stroke="#f87171" stroke-opacity=".5"/><path d="M280 262L520 78" stroke="#f87171" stroke-opacity=".5"/>
+                <path d="M280 262H524M280 262V50" stroke="#2e4170"/>
+                <g fill="#22d3ee"><circle cx="318" cy="228" r="5"/><circle cx="352" cy="205" r="5"/><circle cx="388" cy="170" r="5"/><circle cx="420" cy="150" r="5"/><circle cx="452" cy="116" r="5"/><circle cx="486" cy="88" r="5"/></g>
+                <circle cx="404" cy="172" r="6" fill="#f87171" class="pulse"/>
+                <g font-size="9.5" fill="#9aaccb"><text x="450" y="274">Vessel B/D</text><text x="250" y="150" transform="rotate(-90 250 150)">MPFM B/D</text><text x="470" y="46" fill="#f87171">±10%</text></g>
             </svg>
+            <figcaption>Points on the dashed line mean the meters agree; outliers outside the red band are flagged.</figcaption>
+        </figure>
+    </div>
+</section>
 
-            <!-- Layer 3: Wells -->
-            <div class="arch-wells" style="margin-bottom:0;">
-                <div class="well-card">
-                    <div class="well-name"><div class="well-dot"></div>Well A-14</div>
-                    <div class="well-kpis">
-                        <div class="wkpi"><div class="wkpi-val">312</div><div class="wkpi-lbl">BOPD</div></div>
-                        <div class="wkpi"><div class="wkpi-val">18%</div><div class="wkpi-lbl">BSW</div></div>
-                        <div class="wkpi"><div class="wkpi-val">820</div><div class="wkpi-lbl">GOR</div></div>
-                        <div class="wkpi"><div class="wkpi-val">98%</div><div class="wkpi-lbl">Uptime</div></div>
-                    </div>
-                    <div class="well-badges">
-                        <span class="wbadge mpfm">MPFM</span>
-                        <span class="wbadge prod">Production</span>
-                    </div>
-                </div>
-                <div class="well-card">
-                    <div class="well-name"><div class="well-dot"></div>Well B-07</div>
-                    <div class="well-kpis">
-                        <div class="wkpi"><div class="wkpi-val">198</div><div class="wkpi-lbl">BOPD</div></div>
-                        <div class="wkpi"><div class="wkpi-val">24%</div><div class="wkpi-lbl">BSW</div></div>
-                        <div class="wkpi"><div class="wkpi-val">1140</div><div class="wkpi-lbl">GOR</div></div>
-                        <div class="wkpi"><div class="wkpi-val">94%</div><div class="wkpi-lbl">Uptime</div></div>
-                    </div>
-                    <div class="well-badges">
-                        <span class="wbadge wl">Wire Line</span>
-                        <span class="wbadge drillng">Workover</span>
-                    </div>
-                </div>
-                <div class="well-card">
-                    <div class="well-name"><div class="well-dot"></div>Well C-22</div>
-                    <div class="well-kpis">
-                        <div class="wkpi"><div class="wkpi-val">445</div><div class="wkpi-lbl">BOPD</div></div>
-                        <div class="wkpi"><div class="wkpi-val">11%</div><div class="wkpi-lbl">BSW</div></div>
-                        <div class="wkpi"><div class="wkpi-val">680</div><div class="wkpi-lbl">GOR</div></div>
-                        <div class="wkpi"><div class="wkpi-val">99%</div><div class="wkpi-lbl">Uptime</div></div>
-                    </div>
-                    <div class="well-badges">
-                        <span class="wbadge mpfm">MPFM</span>
-                        <span class="wbadge prod">Production</span>
-                        <span class="wbadge drillng">Drilling</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SVG connector 3 -->
-            <svg class="arch-connector" height="50" viewBox="0 0 1100 50">
-                <line x1="200" y1="0" x2="200" y2="20" stroke="#22c55e" stroke-width="1.5"/>
-                <line x1="548" y1="0" x2="548" y2="20" stroke="#22c55e" stroke-width="1.5"/>
-                <line x1="900" y1="0" x2="900" y2="20" stroke="#22c55e" stroke-width="1.5"/>
-                <line x1="200" y1="20" x2="900" y2="20" stroke="#22c55e" stroke-width="1.5"/>
-                <line x1="548" y1="20" x2="548" y2="50" stroke="#22c55e" stroke-width="2" marker-end="url(#arr)"/>
+{{-- ═════════ WIRE LINE ═════════ --}}
+<section id="wireline">
+    <div class="wrap mod">
+        <div class="txt rv">
+            <div class="num">03 · WIRE LINE</div>
+            <h3>Memory-gauge surveys rendered into reservoir answers</h3>
+            <p>Upload the gauge export and the platform detects the run phases, extracts final bottom-hole pressure and temperature, finds pressure events and gauge stops, computes fluid gradients and checks data quality.</p>
+            <ul class="ticks">
+                <li>Kuster / Quantum <b>.log</b> and <b>.csv</b> recordings supported</li>
+                <li>Run-in, on-bottom, pull-out phases and stabilisation check</li>
+                <li>Build-up detection, gradient survey and fluid typing</li>
+                <li>Operation history per well: surveys, fishing, plugs, perforating</li>
+            </ul>
+            <div class="chips"><span class="chip">BHCIP</span><span class="chip">Gradient survey</span><span class="chip">Build-up</span><span class="chip">Interventions</span></div>
+        </div>
+        <figure class="fig rv">
+            <svg viewBox="0 0 560 330">
+                <rect x="14" y="14" width="532" height="262" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
+                <g opacity=".9">
+                    <rect x="90" y="24" width="110" height="238" fill="#3b82f6" opacity=".10"/><rect x="200" y="24" width="190" height="238" fill="#34d399" opacity=".10"/><rect x="390" y="24" width="100" height="238" fill="#fbbf24" opacity=".10"/>
+                </g>
+                <g font-size="9.5" font-weight="700" text-anchor="middle"><text x="145" y="40" fill="#60a5fa">RUN IN HOLE</text><text x="295" y="40" fill="#34d399">ON BOTTOM</text><text x="440" y="40" fill="#fbbf24">PULL OUT</text></g>
+                <g stroke="#1b2847"><path d="M30 80H530M30 130H530M30 180H530M30 230H530"/></g>
+                <path class="draw" style="--len:900" d="M30 238 L90 238 C110 238 120 110 200 96 L232 92 L244 70 L252 134 L266 90 L300 104 C340 98 372 92 392 98 C430 108 442 200 490 238 L530 238" fill="none" stroke="#22d3ee" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path class="draw" style="--len:900" d="M30 240 L90 240 C120 240 130 150 200 130 C260 118 360 118 392 124 C440 130 450 200 490 240 L530 240" fill="none" stroke="#f87171" stroke-width="1.8" stroke-dasharray="5 4"/>
+                <g fill="#fff" stroke="#0a1226" stroke-width="2"><circle cx="418" cy="144" r="4.5"/><circle cx="430" cy="166" r="4.5"/><circle cx="448" cy="196" r="4.5"/></g>
+                <g><line x1="330" y1="104" x2="330" y2="62" stroke="#a78bfa" stroke-dasharray="3 3"/><rect x="288" y="48" width="84" height="22" rx="6" fill="#1e1b3a" stroke="#a78bfa"/><text x="330" y="63" text-anchor="middle" font-size="10" fill="#c4b5fd" font-weight="700">BHP 2,497 psi</text></g>
+                <g font-size="9.5" fill="#9aaccb"><circle cx="40" cy="298" r="4" fill="#22d3ee"/><text x="50" y="302">Pressure</text><circle cx="116" cy="298" r="4" fill="#f87171"/><text x="126" y="302">Temperature</text><circle cx="212" cy="298" r="4" fill="#fff"/><text x="222" y="302">Gauge stops (gradient points)</text></g>
+                <g font-size="9.5" fill="#64748b"><text x="30" y="294" opacity="0">.</text><text x="478" y="302">time →</text></g>
             </svg>
-
-            <!-- Layer 4: Field Output -->
-            <div class="arch-layer-label">&#9315; Field Output &amp; Business Impact</div>
-            <div class="field-output">
-                <div class="fo-stat">
-                    <div class="fo-val">4,215</div>
-                    <div class="fo-badge">&#8679; +12%</div>
-                    <div class="fo-lbl">BOPD Total</div>
-                </div>
-                <div class="fo-stat">
-                    <div class="fo-val">↓18%</div>
-                    <div class="fo-badge" style="color:var(--cyan);">Reduced</div>
-                    <div class="fo-lbl">Opex Cost</div>
-                </div>
-                <div class="fo-stat">
-                    <div class="fo-val">60%</div>
-                    <div class="fo-badge">Faster</div>
-                    <div class="fo-lbl">Report Time</div>
-                </div>
-                <div class="fo-stat">
-                    <div class="fo-val">↓70%</div>
-                    <div class="fo-badge">Fewer</div>
-                    <div class="fo-lbl">Overdue Tasks</div>
-                </div>
-                <div class="fo-stat">
-                    <div class="fo-val">100%</div>
-                    <div class="fo-badge" style="color:var(--cyan);">Complete</div>
-                    <div class="fo-lbl">Audit Trail</div>
-                </div>
-                <div class="fo-stat">
-                    <div class="fo-val">3min</div>
-                    <div class="fo-badge">Avg</div>
-                    <div class="fo-lbl">Alert Response</div>
-                </div>
-            </div>
-
-            <!-- Legend -->
-            <div class="arch-legend">
-                <div class="leg-item"><div class="leg-dot" style="background:var(--b500);"></div>Data Flow</div>
-                <div class="leg-item"><div class="leg-dot" style="background:var(--cyan);"></div>Control Signal</div>
-                <div class="leg-item"><div class="leg-dot" style="background:var(--green);"></div>Active Well</div>
-                <div class="leg-item"><div class="leg-dot" style="background:var(--amber);"></div>Monitoring</div>
-            </div>
-        </div>
+            <figcaption>A real BHCIP recording, interpreted: phases shaded, BHP / BHT extracted, stops marked for gradients.</figcaption>
+        </figure>
     </div>
 </section>
 
-<!-- ══ IMAGE BANNER 1 ══ -->
-<div class="img-banner">
-    <img src="/assets/img/brand/Offshore.jpg" alt="Offshore Platform" loading="lazy">
-    <div class="banner-text">
-        <h3>Platform-wide Visibility</h3>
-        <p>Monitor every well, department, and task from a single unified dashboard — available 24/7 from any device.</p>
-    </div>
-</div>
-
-<!-- ══ WORKFLOW ══ -->
-<section class="workflow-section" id="workflow">
-    <div class="section-label">How It Works</div>
-    <h2 class="section-title">Task Lifecycle in 6 Steps</h2>
-    <p class="section-sub">From task creation to completion — every step tracked, time-stamped, and fully auditable.</p>
-    <div class="workflow-grid">
-        <div class="step-card reveal">
-            <div class="step-num">01</div>
-            <div class="step-icon">📋</div>
-            <div class="step-title">Monthly Plan Creation</div>
-            <p class="step-desc">Supervisors create monthly operational plans, assigning tasks to departments with deadlines, priorities, and resource requirements.</p>
+{{-- ═════════ WELL ANALYSIS ═════════ --}}
+<section id="analysis" class="alt">
+    <div class="wrap mod rev">
+        <div class="txt rv">
+            <div class="num">04 · WELL ANALYSIS</div>
+            <h3>Production and reservoir condition, with clear next steps</h3>
+            <p>For every well the platform combines MPFM, vessel and Wire Line data into a health score, decline forecast, reservoir depletion view and a ranked list of recommendations.</p>
+            <ul class="ticks">
+                <li>Health score with transparent contributing factors</li>
+                <li>Oil decline fit and 90 / 180-day forecast</li>
+                <li>Reservoir pressure depletion and projected pressure</li>
+                <li>Prioritised actions: re-test, survey, water control, calibration</li>
+            </ul>
+            <div class="chips"><span class="chip">Health score</span><span class="chip">Decline</span><span class="chip">Recommendations</span></div>
         </div>
-        <div class="step-card reveal">
-            <div class="step-num">02</div>
-            <div class="step-icon">🎯</div>
-            <div class="step-title">Task Assignment</div>
-            <p class="step-desc">Tasks are distributed to field operators with clear objectives, required tools, and SLA timelines automatically enforced by the system.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">03</div>
-            <div class="step-icon">⚙️</div>
-            <div class="step-title">Field Execution</div>
-            <p class="step-desc">Operators log real-time progress, upload MPFM test data, and update task states as work progresses on the platform or well site.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">04</div>
-            <div class="step-icon">🔍</div>
-            <div class="step-title">Surveillance Review</div>
-            <p class="step-desc">Surveillance supervisors review completed work, validate technical accuracy, and either approve or request corrections with detailed notes.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">05</div>
-            <div class="step-icon">✅</div>
-            <div class="step-title">Job Officer Approval</div>
-            <p class="step-desc">Senior job officers provide final approval, ensuring all safety, compliance, and production targets have been met before task closure.</p>
-        </div>
-        <div class="step-card reveal">
-            <div class="step-num">06</div>
-            <div class="step-icon">📊</div>
-            <div class="step-title">Analytics &amp; Reporting</div>
-            <p class="step-desc">Automated reports on KPIs, SLA compliance, department performance, and production impact — available instantly without manual compilation.</p>
-        </div>
+        <figure class="fig rv">
+            <svg viewBox="0 0 560 330">
+                <g transform="translate(18,18)">
+                    <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/>
+                    <circle cx="70" cy="70" r="52" fill="none" stroke="#34d399" stroke-width="12" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="59" transform="rotate(-90 70 70)"/>
+                    <text x="70" y="78" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Space Grotesk">82</text><text x="70" y="96" text-anchor="middle" font-size="9" fill="#64748b" font-weight="700">HEALTH</text>
+                </g>
+                <rect x="170" y="18" width="372" height="148" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
+                <text x="184" y="38" font-size="10.5" fill="#9aaccb" font-weight="700">Oil rate · decline &amp; forecast</text>
+                <path class="draw" style="--len:300" d="M186 62 C220 70 250 84 290 96 S350 118 372 124" fill="none" stroke="#22d3ee" stroke-width="2.4"/>
+                <path d="M372 124 C410 134 450 146 524 156" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-dasharray="6 5"/>
+                <line x1="372" y1="50" x2="372" y2="156" stroke="#2e4170" stroke-dasharray="3 3"/><text x="380" y="62" font-size="9" fill="#64748b">forecast →</text>
+                <g transform="translate(18,186)" font-size="12">
+                    <g><rect width="524" height="40" rx="10" fill="#1b1015" stroke="#f87171" stroke-opacity=".5"/><rect width="4" height="40" rx="2" fill="#f87171"/><text x="18" y="25" fill="#fff" font-weight="700">Investigate oil-rate decline</text><text x="506" y="25" text-anchor="end" fill="#f87171" font-size="10" font-weight="800">HIGH</text></g>
+                    <g transform="translate(0,48)"><rect width="524" height="40" rx="10" fill="#1b1a10" stroke="#fbbf24" stroke-opacity=".5"/><rect width="4" height="40" rx="2" fill="#fbbf24"/><text x="18" y="25" fill="#fff" font-weight="700">Pressure survey overdue</text><text x="506" y="25" text-anchor="end" fill="#fbbf24" font-size="10" font-weight="800">MEDIUM</text></g>
+                    <g transform="translate(0,96)"><rect width="524" height="40" rx="10" fill="#0e1b2a" stroke="#60a5fa" stroke-opacity=".5"/><rect width="4" height="40" rx="2" fill="#60a5fa"/><text x="18" y="25" fill="#fff" font-weight="700">Gauge calibration older than 12 months</text><text x="506" y="25" text-anchor="end" fill="#60a5fa" font-size="10" font-weight="800">LOW</text></g>
+                </g>
+            </svg>
+            <figcaption>Illustrative well analysis: score, forecast and ranked recommendations.</figcaption>
+        </figure>
     </div>
 </section>
 
-<!-- ══ ROLES ══ -->
-<section class="roles-section" id="roles">
-    <div class="section-label">Access Control</div>
-    <h2 class="section-title">Role-Based Access for Every Team Member</h2>
-    <p class="section-sub">Six distinct roles with precise permissions — ensuring the right people see and do the right things.</p>
-    <div class="roles-grid">
-        <div class="role-card reveal">
-            <div class="role-icon">👑</div>
-            <div class="role-name">System Admin</div>
-            <p class="role-desc">Full platform control — user management, system configuration, audit access, and cross-department visibility.</p>
-            <div class="role-perms"><span class="rperm">All Access</span><span class="rperm">User Mgmt</span><span class="rperm">Config</span></div>
-        </div>
-        <div class="role-card reveal">
-            <div class="role-icon">🏢</div>
-            <div class="role-name">Department Head</div>
-            <p class="role-desc">Oversees department tasks, monitors team performance, and manages monthly planning for their operational unit.</p>
-            <div class="role-perms"><span class="rperm">Dept Tasks</span><span class="rperm">Reports</span><span class="rperm">Planning</span></div>
-        </div>
-        <div class="role-card reveal">
-            <div class="role-icon">📡</div>
-            <div class="role-name">Surveillance Supervisor</div>
-            <p class="role-desc">Reviews and approves field operations, validates MPFM data, monitors SLA compliance across all departments.</p>
-            <div class="role-perms"><span class="rperm">Review</span><span class="rperm">Approve</span><span class="rperm">Monitor</span></div>
-        </div>
-        <div class="role-card reveal">
-            <div class="role-icon">✍️</div>
-            <div class="role-name">Job Officer</div>
-            <p class="role-desc">Final approval authority for completed tasks — ensures all technical and safety standards are met before sign-off.</p>
-            <div class="role-perms"><span class="rperm">Final Approval</span><span class="rperm">Compliance</span></div>
-        </div>
-        <div class="role-card reveal">
-            <div class="role-icon">🔧</div>
-            <div class="role-name">Field Operator</div>
-            <p class="role-desc">Executes assigned field tasks, logs MPFM tests, uploads evidence, and updates real-time status from the field.</p>
-            <div class="role-perms"><span class="rperm">Execute</span><span class="rperm">Upload</span><span class="rperm">Log</span></div>
-        </div>
-        <div class="role-card reveal">
-            <div class="role-icon">👁️</div>
-            <div class="role-name">Read-Only Viewer</div>
-            <p class="role-desc">Management and stakeholder access — view dashboards, reports, and KPIs without modification privileges.</p>
-            <div class="role-perms"><span class="rperm">View Only</span><span class="rperm">Reports</span></div>
-        </div>
-    </div>
-</section>
-
-<!-- ══ BENEFITS ══ -->
-<section class="benefits-section" id="benefits">
-    <div class="section-label">Business Impact</div>
-    <h2 class="section-title">Measurable ROI — Cost &amp; Time Savings</h2>
-    <p class="section-sub">Real operational improvements measured across field sites after system deployment.</p>
-
-    <div class="cost-strip">
-        <div class="cost-strip-main">
-            <div class="cost-pct">↓18%</div>
-            <div class="cost-lbl">Total Operational Cost Reduction</div>
-        </div>
-        <div class="cost-metrics">
-            <div class="cost-m"><div class="cost-m-val">60%</div><div class="cost-m-lbl">Faster Reporting</div></div>
-            <div class="cost-m"><div class="cost-m-val">↓70%</div><div class="cost-m-lbl">Overdue Tasks</div></div>
-            <div class="cost-m"><div class="cost-m-val">3min</div><div class="cost-m-lbl">Alert Response</div></div>
-            <div class="cost-m"><div class="cost-m-val">100%</div><div class="cost-m-lbl">Audit Coverage</div></div>
-        </div>
-    </div>
-
-    <div class="benefits-grid">
-        <div class="benefit-card reveal">
-            <div class="benefit-icon">⏱️</div>
-            <div class="benefit-title">60% Faster Reporting</div>
-            <p class="benefit-desc">Automated data aggregation eliminates manual report compilation — from 4+ hours to under 20 minutes per daily production report.</p>
-        </div>
-        <div class="benefit-card reveal">
-            <div class="benefit-icon">📉</div>
-            <div class="benefit-title">↓18% Operational Cost</div>
-            <p class="benefit-desc">Fewer redundant site visits, optimized resource allocation, and proactive maintenance scheduling reduce total opex significantly.</p>
-        </div>
-        <div class="benefit-card reveal">
-            <div class="benefit-icon">🎯</div>
-            <div class="benefit-title">↓70% Overdue Tasks</div>
-            <p class="benefit-desc">SLA enforcement with automated escalation ensures tasks are completed on time — dramatically reducing operational delays and penalties.</p>
-        </div>
-        <div class="benefit-card reveal">
-            <div class="benefit-icon">🔒</div>
-            <div class="benefit-title">100% Audit Trail</div>
-            <p class="benefit-desc">Every action, approval, and data change is logged with timestamps and user identity — meeting all regulatory and compliance requirements.</p>
-        </div>
-        <div class="benefit-card reveal">
-            <div class="benefit-icon">📈</div>
-            <div class="benefit-title">+12% Production Uplift</div>
-            <p class="benefit-desc">Better well monitoring, faster intervention decisions, and optimized test scheduling contribute to measurable production improvements.</p>
-        </div>
-        <div class="benefit-card reveal">
-            <div class="benefit-icon">🌐</div>
-            <div class="benefit-title">Zero Information Silos</div>
-            <p class="benefit-desc">All six departments share a single source of truth — eliminating duplicate work, miscommunication, and data inconsistencies across the field.</p>
-        </div>
-    </div>
-
-    <table class="compare-table reveal">
-        <thead>
-            <tr>
-                <th>Area</th>
-                <th>Before System</th>
-                <th>After System</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Daily Production Report</td>
-                <td class="td-before">4+ hours manual</td>
-                <td class="td-after">Under 20 minutes</td>
-            </tr>
-            <tr>
-                <td>Task Oversight</td>
-                <td class="td-before">Spreadsheets / phone calls</td>
-                <td class="td-after">Live dashboard — all depts</td>
-            </tr>
-            <tr>
-                <td>MPFM Test Scheduling</td>
-                <td class="td-before">Manual, often delayed</td>
-                <td class="td-after">Automated SLA enforcement</td>
-            </tr>
-            <tr>
-                <td>Compliance Audit</td>
-                <td class="td-before">Days to prepare</td>
-                <td class="td-after">Instant export, 100% complete</td>
-            </tr>
-            <tr>
-                <td>Overdue Task Rate</td>
-                <td class="td-before">~35% monthly</td>
-                <td class="td-after">Under 10%</td>
-            </tr>
-            <tr>
-                <td>Cross-dept Communication</td>
-                <td class="td-before">Email / WhatsApp</td>
-                <td class="td-after">In-system notifications &amp; log</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
-
-<!-- ══ IMAGE BANNER 2 ══ -->
-<div class="img-banner">
-    <img src="/assets/img/brand/offshore oilfield.jpg" alt="Offshore Oilfield" loading="lazy">
-    <div class="banner-text">
-        <h3>Enterprise-Grade Security</h3>
-        <p>Military-grade encryption, role-based access control, and full audit logging protect your most critical operational data.</p>
-    </div>
-</div>
-
-<!-- ══ SECURITY ══ -->
-<section class="security-section" id="security">
-    <div class="section-label">Security &amp; Compliance</div>
-    <h2 class="section-title">Built for Enterprise Security</h2>
-    <p class="section-sub">Protecting critical operational data with multiple layers of security, access control, and compliance frameworks.</p>
-    <div class="sec-grid">
-        <div class="sec-card reveal">
-            <div class="sec-icon">🔐</div>
-            <div class="sec-title">End-to-End Encryption</div>
-            <p class="sec-desc">All data in transit and at rest is encrypted using AES-256 and TLS 1.3 — industry-standard protection for your most sensitive operational data.</p>
-        </div>
-        <div class="sec-card reveal">
-            <div class="sec-icon">👤</div>
-            <div class="sec-title">Role-Based Access Control</div>
-            <p class="sec-desc">Granular permissions ensure each user sees only what they need — preventing unauthorized access to sensitive well data or financial information.</p>
-        </div>
-        <div class="sec-card reveal">
-            <div class="sec-icon">📋</div>
-            <div class="sec-title">Full Audit Logging</div>
-            <p class="sec-desc">Every user action, data change, and approval is logged with timestamp and IP — providing complete traceability for regulatory compliance.</p>
-        </div>
-        <div class="sec-card reveal">
-            <div class="sec-icon">🛡️</div>
-            <div class="sec-title">Multi-Factor Authentication</div>
-            <p class="sec-desc">Two-factor authentication for all privileged accounts, with session management and automatic timeout for inactive sessions.</p>
-        </div>
-        <div class="sec-card reveal">
-            <div class="sec-icon">☁️</div>
-            <div class="sec-title">Secure Data Infrastructure</div>
-            <p class="sec-desc">Hosted on hardened infrastructure with regular backups, disaster recovery plans, and 99.9% uptime SLA for critical operations.</p>
-        </div>
-        <div class="sec-card reveal">
-            <div class="sec-icon">✅</div>
-            <div class="sec-title">Compliance Ready</div>
-            <p class="sec-desc">Designed to meet ISO 27001 standards, oil &amp; gas industry data governance requirements, and regulatory compliance frameworks.</p>
-        </div>
-    </div>
-</section>
-
-<!-- ══ CAPABILITIES ══ -->
-<section class="caps-section" id="capabilities">
-    <div class="section-label">Platform Capabilities</div>
-    <h2 class="section-title">Everything Your Field Operations Need</h2>
-    <p class="section-sub">A complete operational platform covering every aspect of petroleum field management.</p>
-    <div class="caps-grid">
-        <div class="cap-card reveal">
-            <div class="cap-icon">📊</div>
-            <div class="cap-title">MPFM Test Management</div>
-            <p class="cap-desc">Schedule, execute, upload, and validate multi-phase flow meter tests with full data history and trend analysis.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">📅</div>
-            <div class="cap-title">Monthly Plan Engine</div>
-            <p class="cap-desc">Create and track monthly operational plans for every department with automatic SLA monitoring and alerts.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">🔔</div>
-            <div class="cap-title">Smart Notifications</div>
-            <p class="cap-desc">Real-time alerts for task deadlines, SLA breaches, approval requests, and production anomalies.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">📈</div>
-            <div class="cap-title">Production Analytics</div>
-            <p class="cap-desc">BOPD, GOR, BSW, and efficiency KPIs tracked per well, per department, and platform-wide.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">🗺️</div>
-            <div class="cap-title">Well &amp; Field Mapping</div>
-            <p class="cap-desc">Visual well registry with oil string assignments, tower groupings, and production status overview.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">📁</div>
-            <div class="cap-title">Document Management</div>
-            <p class="cap-desc">Centralized storage for test reports, work orders, and completion certificates with version control.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">🤖</div>
-            <div class="cap-title">Automated Workflows</div>
-            <p class="cap-desc">Task state machines with automated routing, escalation, and approval chains — zero manual hand-offs.</p>
-        </div>
-        <div class="cap-card reveal">
-            <div class="cap-icon">📱</div>
-            <div class="cap-title">Mobile-Responsive</div>
-            <p class="cap-desc">Full functionality on tablets and phones — field operators can update tasks directly from the well site.</p>
-        </div>
-    </div>
-</section>
-
-<!-- ══ CTA ══ -->
-<section class="cta-section">
-    <h2 class="cta-title">Ready to Transform Your Field Operations?</h2>
-    <p class="cta-sub">Join the field teams already using the platform to optimize production, reduce costs, and achieve full operational transparency.</p>
-    <div class="cta-btns">
-        @auth
-        <a href="{{ url('/dashboard') }}" class="btn-primary">&#9193; Open Dashboard</a>
-        @else
-        <a href="{{ route('login') }}" class="btn-primary">&#9193; Access Platform</a>
-        @endauth
-        <a href="#overview" class="btn-secondary">&#8635; Back to Top</a>
-    </div>
-</section>
-
-<!-- ══ FOOTER ══ -->
-<footer>
-    <div class="footer-top">
-        <div class="footer-brand">
-            <img src="/assets/img/brand/logo-white.png" alt="Oil Field Management System">
-            <p>Field Operations Management System — unifying petroleum field departments on a single enterprise platform for maximum production efficiency.</p>
-        </div>
-        <div class="footer-col">
-            <h5>Platform</h5>
-            <ul>
-                <li><a href="#overview">Field Overview</a></li>
-                <li><a href="#diagram">Production Flow</a></li>
-                <li><a href="#departments">Departments</a></li>
-                <li><a href="#workflow">Workflow</a></li>
+{{-- ═════════ FIELD SETUP ═════════ --}}
+<section id="field">
+    <div class="wrap mod">
+        <div class="txt rv">
+            <div class="num">05 · FIELD SETUP</div>
+            <h3>A clean asset hierarchy behind every record</h3>
+            <p>Fields, towers and wells (oil strings) are defined once. Every test, survey and task rolls up through the same structure, so field, tower and well views always agree.</p>
+            <ul class="ticks">
+                <li>Field → Tower → Well hierarchy with status control</li>
+                <li>Well profile pages with production statistics and charts</li>
+                <li>Cross-module well history: tests, Wire Line, department work</li>
             </ul>
         </div>
-        <div class="footer-col">
-            <h5>Operations</h5>
-            <ul>
-                <li><a href="#architecture">Well Architecture</a></li>
-                <li><a href="#roles">Access Roles</a></li>
-                <li><a href="#security">Security</a></li>
-                <li><a href="#capabilities">Capabilities</a></li>
-            </ul>
-        </div>
-        <div class="footer-col">
-            <h5>Business</h5>
-            <ul>
-                <li><a href="#benefits">ROI &amp; Benefits</a></li>
-                <li><a href="#benefits">Cost Reduction</a></li>
-                <li><a href="#benefits">Compliance</a></li>
-            </ul>
-        </div>
+        <figure class="fig rv">
+            <svg viewBox="0 0 560 300">
+                <g fill="none" stroke="#2e4170" stroke-width="1.6"><path d="M280 62V84M280 84H110V108M280 84H280V108M280 84H450V108M110 160V180M110 180H60V200M110 180H160V200M450 160V180M450 180H400V200M450 180H500V200"/></g>
+                <g font-size="11" font-weight="700" text-anchor="middle" fill="#fff">
+                    <rect x="200" y="14" width="160" height="48" rx="10" fill="#0d1730" stroke="#38bdf8"/><text x="280" y="43">Oil Field</text>
+                    <g><rect x="40" y="108" width="140" height="52" rx="10" fill="#0d1730" stroke="#22d3ee"/><text x="110" y="139">Tower A</text></g>
+                    <g><rect x="210" y="108" width="140" height="52" rx="10" fill="#0d1730" stroke="#22d3ee"/><text x="280" y="139">Tower B</text></g>
+                    <g><rect x="380" y="108" width="140" height="52" rx="10" fill="#0d1730" stroke="#22d3ee"/><text x="450" y="139">Tower C</text></g>
+                    <g font-size="10"><rect x="14" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#34d399"/><text x="60" y="225">Well 1</text>
+                    <rect x="114" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#34d399"/><text x="160" y="225">Well 2</text>
+                    <rect x="354" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#fbbf24"/><text x="400" y="225">Well 3</text>
+                    <rect x="454" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#34d399"/><text x="500" y="225">Well 4</text></g>
+                </g>
+                <g font-size="9.5" fill="#9aaccb"><circle cx="190" cy="278" r="4" fill="#34d399"/><text x="200" y="282">Active</text><circle cx="260" cy="278" r="4" fill="#fbbf24"/><text x="270" y="282">Maintenance</text><circle cx="360" cy="278" r="4" fill="#64748b"/><text x="370" y="282">Inactive</text></g>
+            </svg>
+            <figcaption>Every module attaches its data to a well in this hierarchy.</figcaption>
+        </figure>
     </div>
-    <div class="footer-bottom">
-        <span>&copy; {{ date('Y') }} Oil Field Management System. All rights reserved.</span>
-        <div class="footer-badge">
-            <span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 6px var(--green);"></span>
-            System Operational
-        </div>
-    </div>
-</footer>
+</section>
 
-<!-- ══ JAVASCRIPT ══ -->
+{{-- ═════════ GOVERNANCE ═════════ --}}
+<section id="governance" class="alt">
+    <div class="wrap">
+        <div class="center rv"><div class="kicker">06 · Governance &amp; security</div><h2 class="sh">Controlled, reviewable, accountable</h2>
+            <p class="sp">Role-based access, structured approval workflows and a recorded history keep data trustworthy and auditable.</p></div>
+        <figure class="fig rv" style="margin-top:40px">
+            <svg viewBox="0 0 1000 200">
+                <g font-size="13" font-weight="700" text-anchor="middle" fill="#fff">
+                    <rect x="20" y="62" width="150" height="62" rx="12" fill="#0d1730" stroke="#64748b"/><text x="95" y="98">Draft</text>
+                    <rect x="260" y="62" width="150" height="62" rx="12" fill="#0d1730" stroke="#fbbf24"/><text x="335" y="98">Submitted</text>
+                    <rect x="520" y="14" width="150" height="62" rx="12" fill="#0d2a22" stroke="#34d399"/><text x="595" y="50">Approved</text>
+                    <rect x="520" y="112" width="150" height="62" rx="12" fill="#2a1216" stroke="#f87171"/><text x="595" y="148">Rejected</text>
+                    <rect x="780" y="112" width="190" height="62" rx="12" fill="#0d1730" stroke="#a78bfa"/><text x="875" y="148">Re-test requested</text>
+                </g>
+                <g fill="none" stroke="#2e4170" stroke-width="2" class="flowd"><path d="M170 93H260M410 93L520 45M410 93L520 143M670 143H780"/><path d="M875 112V93H95" stroke-opacity=".5" stroke-dasharray="2 6"/></g>
+                <g font-size="10" fill="#9aaccb" text-anchor="middle"><text x="215" y="84">submit</text><text x="465" y="56">review ✓</text><text x="465" y="140">review ✗</text></g>
+            </svg>
+            <figcaption>Review workflow applied to MPFM and test-vessel results.</figcaption>
+        </figure>
+        <div class="cards">
+            <div class="c rv" style="--cc:#f87171"><div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h4>Role-based access</h4><p>Eight role profiles - administrators, managers, job officers, supervisors, engineers and operators - each see only what they should.</p></div>
+            <div class="c rv" style="--cc:#34d399"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h4>Validated data</h4><p>Configurable validation rules and quality scores stop questionable results before they reach reports.</p></div>
+            <div class="c rv" style="--cc:#38bdf8"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5h4"/></svg></div><h4>Full history</h4><p>Who recorded, reviewed and changed each test, survey and operation - with timestamps - is always visible.</p></div>
+        </div>
+    </div>
+</section>
+
+{{-- ═════════ ROADMAP ═════════ --}}
+<section id="roadmap">
+    <div class="wrap">
+        <div class="center rv"><div class="kicker">Modules</div><h2 class="sh">Built for the whole operation</h2>
+            <p class="sp">Surveillance and test modules are live today; the department workflow suite is next.</p></div>
+        <div class="cards">
+            <div class="c rv" style="--cc:#22d3ee"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h4>MPFM monitoring</h4><p>Log ingestion, validation, review and trends.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#fbbf24"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8V5M17 8V5"/></svg></div><h4>Test vessel</h4><p>Requests, vessel tests and meter comparison.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#a78bfa"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-4 4 4"/><circle cx="12" cy="15" r="3"/></svg></div><h4>Wire Line</h4><p>Memory-gauge surveys and intervention history.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#34d399"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/></svg></div><h4>Well analysis</h4><p>Health, forecast, reservoir and recommendations.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#60a5fa"><div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h4>Tasks &amp; monthly plans</h4><p>Department task management with SLA tracking.</p><span class="soon">Coming soon</span></div>
+            <div class="c rv" style="--cc:#fb923c"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div><h4>Drilling · Completion · Workover · Maintenance</h4><p>Department workflows on the same well record.</p><span class="soon">Coming soon</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-s">
+    <div class="wrap rv">
+        <span class="lg" role="img" aria-label="Company logo"></span>
+        <div class="kicker">Get started</div>
+        <h2 class="sh">See every well, every test, every survey - in one place</h2>
+        <p class="sp" style="margin:0 auto">Sign in to open your operations dashboard.</p>
+        <div class="cta">@auth<a href="{{ url('/dashboard') }}" class="btn p">Open dashboard</a>@else<a href="{{ route('login') }}" class="btn p">Sign in to the system</a>@endauth</div>
+    </div>
+</section>
+</main>
+
+<footer><div class="wrap"><span>© {{ date('Y') }} Oil Field Management System</span><span>Well testing · Wire Line · Reservoir insight</span></div></footer>
+
 <script>
-// ── Dark mode toggle ──
-const html = document.documentElement;
-const dmToggle = document.getElementById('dmToggle');
-const stored = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', stored);
-
-dmToggle.addEventListener('click', () => {
-    const current = html.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-});
-
-// ── Mobile nav ──
-const burger = document.getElementById('burger');
-const drawer = document.getElementById('drawer');
-burger.addEventListener('click', () => drawer.classList.toggle('open'));
-document.addEventListener('click', e => {
-    if (!burger.contains(e.target) && !drawer.contains(e.target)) {
-        drawer.classList.remove('open');
-    }
-});
-
-// ── Scroll reveal ──
-const revealEls = document.querySelectorAll('.reveal');
-const io = new IntersectionObserver(entries => {
-    entries.forEach((entry, idx) => {
-        if (entry.isIntersecting) {
-            const el = entry.target;
-            const siblings = Array.from(el.parentElement.querySelectorAll('.reveal'));
-            const i = siblings.indexOf(el);
-            el.style.transitionDelay = Math.min(i * 65, 450) + 'ms';
-            el.classList.add('visible');
-            io.unobserve(el);
-        }
-    });
-}, { threshold: 0.1 });
-revealEls.forEach(el => io.observe(el));
-
-// ── Interactive production diagram tooltips ──
-const tooltipData = {
-    wellhead: {
-        title: '🏗️ Wellhead',
-        rows: [
-            ['Pressure', '1,840 PSI'],
-            ['Temperature', '65°C'],
-            ['Flow Rate', '312 BOPD'],
-            ['Status', '🟢 Active']
-        ]
-    },
-    tubing: {
-        title: '🔩 Tubing / Downhole',
-        rows: [
-            ['Depth', '3,240 m'],
-            ['Tubing Size', '3½" OD'],
-            ['Integrity', '100%'],
-            ['Status', '🟢 Operational']
-        ]
-    },
-    mpfm: {
-        title: '📊 MPFM Meter',
-        rows: [
-            ['Oil Flow', '87 BOPD'],
-            ['Gas Flow', '12 MMSCFD'],
-            ['Water Cut', '18%'],
-            ['Status', '🟡 Monitoring']
-        ]
-    },
-    pressure: {
-        title: '⏱️ Pressure Sensor',
-        rows: [
-            ['Upstream', '1,840 PSI'],
-            ['Downstream', '1,620 PSI'],
-            ['Delta P', '220 PSI'],
-            ['Status', '🟢 Normal']
-        ]
-    },
-    temp: {
-        title: '🌡️ Temperature Sensor',
-        rows: [
-            ['Inlet Temp', '78°C'],
-            ['Outlet Temp', '52°C'],
-            ['Ambient', '38°C'],
-            ['Status', '🟢 Normal']
-        ]
-    },
-    separator: {
-        title: '⚗️ 3-Phase Separator',
-        rows: [
-            ['Efficiency', '96%'],
-            ['Inlet Flow', '312 BOPD'],
-            ['Oil Out', '301 BOPD'],
-            ['Status', '🟢 Running']
-        ]
-    },
-    flowline: {
-        title: '🌊 Flowline',
-        rows: [
-            ['Diameter', '6" pipe'],
-            ['Flow Velocity', '2.1 m/s'],
-            ['Pressure', '850 PSI'],
-            ['Status', '🟢 Clear']
-        ]
-    },
-    storage: {
-        title: '🛢️ Storage Tank',
-        rows: [
-            ['Capacity', '5,000 bbl'],
-            ['Current Level', '68%'],
-            ['Volume', '3,400 bbl'],
-            ['Status', '🟢 Normal']
-        ]
-    },
-    control: {
-        title: '🖥️ Control Panel (SCADA)',
-        rows: [
-            ['Uptime', '99.8%'],
-            ['Active Alarms', '1'],
-            ['Connected', '12 devices'],
-            ['Status', '🟢 Online']
-        ]
-    }
-};
-
-const svg = document.getElementById('prodSvg');
-const tooltip = document.getElementById('diagTooltip');
-const ttTitle = document.getElementById('ttTitle');
-const ttBody = document.getElementById('ttBody');
-
-svg.querySelectorAll('.diag-node').forEach(node => {
-    node.addEventListener('mouseenter', e => {
-        const key = node.getAttribute('data-node');
-        const data = tooltipData[key];
-        if (!data) return;
-        ttTitle.textContent = data.title;
-        ttBody.innerHTML = data.rows.map(r =>
-            `<div class="tt-row"><span>${r[0]}</span><span>${r[1]}</span></div>`
-        ).join('');
-        tooltip.classList.add('show');
-    });
-    node.addEventListener('mousemove', e => {
-        const wrap = svg.closest('.diagram-wrap');
-        const rect = wrap.getBoundingClientRect();
-        let x = e.clientX - rect.left + 12;
-        let y = e.clientY - rect.top + 12;
-        if (x + 180 > rect.width) x = e.clientX - rect.left - 190;
-        tooltip.style.left = x + 'px';
-        tooltip.style.top = y + 'px';
-    });
-    node.addEventListener('mouseleave', () => {
-        tooltip.classList.remove('show');
-    });
-});
+(function () {
+    var els = document.querySelectorAll('.rv');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .12 });
+    els.forEach(function (e) { io.observe(e); });
+})();
 </script>
 </body>
 </html>

@@ -23,44 +23,15 @@ class UserController extends Controller
     }
 
     /**
-     * Display a listing of users
+     * Display a listing of users (filtered and sorted client-side)
      */
     public function index(Request $request)
     {
-        $query = User::query();
-
-        // Search by name or email
-        if ($request->has('search') && $request->search !== '') {
-            $search = '%' . $request->search . '%';
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', $search)
-                    ->orWhere('email', 'like', $search);
-            });
-        }
-
-        // Filter by department
-        if ($request->has('department') && $request->department !== '') {
-            $query->where('department_id', $request->department);
-        }
-
-        // Filter by role
-        if ($request->has('role') && $request->role !== '') {
-            $query->whereHas('roles', function ($q) use ($request) {
-                $q->where('name', $request->role);
-            });
-        }
-
-        // Sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortOrder = $request->get('sort_order', 'desc');
-        $query->orderBy($sortBy, $sortOrder);
-
-        $users = $query->with(['roles', 'department'])->paginate(10);
+        $users = User::with(['roles.permissions', 'department', 'permissions'])->orderBy('name')->get();
         $departments = Department::where('is_active', true)->orderBy('display_order')->get();
-        $roles = Role::all();
-        $permissions = Permission::all();
+        $roles = Role::withCount('users')->orderBy('name')->get();
 
-        return view('users.index', compact('users', 'departments', 'roles', 'permissions'));
+        return view('users.index', compact('users', 'departments', 'roles'));
     }
 
     /**
@@ -69,7 +40,7 @@ class UserController extends Controller
     public function create()
     {
         $departments = Department::where('is_active', true)->orderBy('display_order')->get();
-        $roles = Role::all();
+        $roles = Role::with('permissions')->orderBy('name')->get();
 
         return view('users.create', compact('departments', 'roles'));
     }
@@ -111,7 +82,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $departments = Department::where('is_active', true)->orderBy('display_order')->get();
-        $roles = Role::all();
+        $roles = Role::with('permissions')->orderBy('name')->get();
         $userRoles = $user->roles->pluck('name')->toArray();
 
         return view('users.edit', compact('user', 'departments', 'roles', 'userRoles'));
@@ -145,10 +116,12 @@ class UserController extends Controller
             ]);
         }
 
-        // Sync roles
-        if (isset($validated['roles']) && is_array($validated['roles'])) {
-            $user->syncRoles($validated['roles']);
+        // Sync roles (an admin can't remove their own admin role and lock themselves out)
+        $roles = $validated['roles'] ?? [];
+        if ($user->id === auth()->id() && $user->hasRole('admin') && ! in_array('admin', $roles, true)) {
+            $roles[] = 'admin';
         }
+        $user->syncRoles($roles);
 
         return redirect()->route('users.index')
             ->with('success', 'User updated successfully!');
@@ -178,6 +151,16 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        $user->load(['roles.permissions', 'permissions', 'department']);
+        $allRoles = Role::orderBy('name')->get();
+        $allPermissions = Permission::orderBy('name')->get();
+
+        $activity = [
+            'mpfm' => \App\Models\MPFMTest::where('user_id', $user->id)->count(),
+            'tv' => \App\Models\TestVesselTest::where('user_id', $user->id)->count(),
+            'last_mpfm' => \App\Models\MPFMTest::where('user_id', $user->id)->latest('test_date')->value('test_date'),
+        ];
+
+        return view('users.show', compact('user', 'allRoles', 'allPermissions', 'activity'));
     }
 }

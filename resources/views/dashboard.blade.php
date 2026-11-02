@@ -1,907 +1,378 @@
 @extends('layouts.master')
 
-@section('title', 'System Dashboard')
+@section('title', 'Dashboard - Oil Field Management System')
 
 @section('css')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('assets/css/oilfield-anim.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/dash-illustrations.css') }}">
 <style>
-    body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 100vh;
-    }
+.ent { --glass:rgba(255,255,255,.05); --grad:linear-gradient(135deg,#3b82f6,#22d3ee); --ease:cubic-bezier(.22,1,.36,1); --blue2:#2563eb; --bg:#070d1c; --card:#0d1730; --card2:#111d3a; --ink:#e7edfb; --sub:#9aaccb; --mute:#64748b; --line:rgba(120,150,210,.16);
+    --blue:#3b82f6; --cyan:#22d3ee; --green:#34d399; --amber:#fbbf24; --red:#f87171; --violet:#a78bfa; --orange:#fb923c;
+    direction:ltr; text-align:left; padding:24px; border-radius:20px; background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; }
+.ent *, .ent *::before, .ent *::after { box-sizing:border-box; }
+.ent a { text-decoration:none; color:inherit; }
+.ent h1, .ent h2, .ent h3, .ent h4, .ent p { margin:0; color:inherit; }
 
-    .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 40px 0;
-        margin-bottom: 40px;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
-        border-bottom-right-radius: 16px;
-        border-bottom-left-radius: 16px;
-    }
+.ent .top { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; padding-bottom:20px; border-bottom:1px solid var(--line); }
+.ent .eyebrow { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--cyan); display:flex; gap:8px; align-items:center; }
+.ent .eyebrow i { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 0 rgba(52,211,153,.6); animation:entPing 2s infinite; }
+@keyframes entPing { to { box-shadow:0 0 0 10px rgba(52,211,153,0); } }
+.ent h1 { font-size:clamp(22px,2.6vw,32px); font-weight:800; letter-spacing:-.02em; margin:6px 0 6px; }
+.ent .meta { color:var(--sub); font-size:13px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+.ent .who { display:flex; align-items:center; gap:20px; }
+.ent .ct { font:700 12px 'Space Grotesk',sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--cyan); margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.ent .ct a { color:var(--sub); letter-spacing:.04em; font-size:11px; text-transform:none; font-family:'Inter',sans-serif; font-weight:600; }
+.ent .ct a:hover { color:var(--cyan); }
+.ent .ill { background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); }
+.ent .acts { display:flex; gap:10px; flex-wrap:wrap; }
+.ent .btn { display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:10px; font-size:13px; font-weight:600; border:1px solid var(--line); background:var(--card); color:var(--ink); transition:border-color .2s, transform .2s; cursor:pointer; font-family:inherit; }
+.ent .btn:hover { border-color:var(--cyan); transform:translateY(-2px); color:#fff; }
+.ent .btn.p { background:linear-gradient(135deg,#2563eb,#0ea5e9); border:0; color:#fff; box-shadow:0 6px 18px rgba(14,165,233,.28); }
 
-    .dashboard-header h1 {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin: 0;
-    }
+.ent .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:20px; }
+.ent .kpi { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; position:relative; overflow:hidden; }
+.ent .kpi::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--c,var(--cyan)); }
+.ent .kpi .l { font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); display:flex; justify-content:space-between; align-items:center; }
+.ent .kpi .l i { color:var(--c,var(--cyan)); font-size:15px; }
+.ent .kpi .v { font:700 28px/1.1 'Space Grotesk',sans-serif; margin-top:8px; color:#fff; }
+.ent .kpi .v small { font-size:13px; font-weight:500; color:var(--sub); margin-left:4px; }
+.ent .kpi .d { font-size:12px; color:var(--sub); margin-top:6px; }
+.ent .up { color:var(--green); } .ent .dn { color:var(--red); }
 
-    .dashboard-header p {
-        opacity: 0.9;
-        margin: 10px 0 0 0;
-        font-size: 1.1rem;
-    }
+.ent .sech { display:flex; align-items:center; gap:12px; margin:30px 0 14px; }
+.ent .sech h2 { font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--sub); white-space:nowrap; }
+.ent .sech span.ln { flex:1; height:1px; background:var(--line); }
+.ent .sech a { font-size:12px; font-weight:600; color:var(--cyan); white-space:nowrap; }
+.ent .tag { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:3px 9px; border-radius:20px; border:1px solid var(--line); color:var(--sub); }
 
-    .stat-card {
-        background: white;
-        border-radius: 16px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
-        border-left: 5px solid;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
+.ent .row { display:grid; gap:16px; margin-bottom:16px; }
+.ent .r21 { grid-template-columns:2fr 1fr; } .ent .r3 { grid-template-columns:repeat(3,1fr); } .ent .r2 { grid-template-columns:1fr 1fr; } .ent .r12 { grid-template-columns:1fr 2fr; }
+.ent .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; min-width:0; }
+.ent .card > header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:14px; }
+.ent .card h3 { font-size:14px; font-weight:700; }
+.ent .card header small { display:block; font-size:11.5px; color:var(--mute); margin-top:2px; font-weight:400; }
+.ent .cv { position:relative; height:250px; } .ent .cv.s { height:210px; } .ent .cv.t { height:290px; }
 
-    .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    }
+.ent table { width:100%; border-collapse:collapse; font-size:12.8px; }
+.ent th { text-align:left; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); padding:0 10px 9px 0; white-space:nowrap; }
+.ent td { padding:10px 10px 10px 0; border-top:1px solid var(--line); color:var(--ink); vertical-align:middle; }
+.ent td a { color:var(--cyan); font-weight:600; }
+.ent .scroll { overflow-x:auto; }
+.ent .pill { display:inline-block; padding:2px 10px; border-radius:20px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; background:rgba(255,255,255,.07); color:var(--sub); }
+.ent .pill.approved, .ent .pill.completed, .ent .pill.active { background:rgba(52,211,153,.14); color:var(--green); }
+.ent .pill.submitted, .ent .pill.in_progress, .ent .pill.open { background:rgba(59,130,246,.16); color:#93c5fd; }
+.ent .pill.rejected, .ent .pill.cancelled { background:rgba(248,113,113,.14); color:var(--red); }
+.ent .pill.maintenance, .ent .pill.planned, .ent .pill.pending { background:rgba(251,191,36,.14); color:var(--amber); }
+.ent .bar { height:6px; border-radius:4px; background:rgba(255,255,255,.07); overflow:hidden; min-width:70px; }
+.ent .bar i { display:block; height:100%; border-radius:4px; background:var(--bc,var(--cyan)); width:var(--w); }
 
-    .stat-card.primary {
-        border-left-color: #667eea;
-    }
+.ent .list { list-style:none; margin:0; padding:0; display:grid; gap:2px; }
+.ent .list li { display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); font-size:13px; }
+.ent .list li:last-child { border-bottom:0; }
+.ent .list .n { font:700 18px 'Space Grotesk',sans-serif; min-width:34px; color:var(--c); }
+.ent .list .tx { flex:1; color:var(--sub); } .ent .list .go { color:var(--cyan); font-size:12px; font-weight:600; }
+.ent .feed li { align-items:flex-start; }
+.ent .feed .dot { width:9px; height:9px; border-radius:50%; margin-top:6px; background:var(--c); flex:none; box-shadow:0 0 10px var(--c); }
+.ent .feed b { display:block; font-weight:600; color:#fff; font-size:13px; } .ent .feed small { color:var(--mute); font-size:11.5px; }
+.ent .ok { display:flex; gap:10px; align-items:center; padding:14px; border-radius:12px; background:rgba(52,211,153,.08); border:1px solid rgba(52,211,153,.3); color:#bbf7d0; font-size:13px; }
+.ent .empty { text-align:center; color:var(--mute); padding:28px 10px; font-size:13px; }
+.ent .tiles { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; }
+.ent .tile { display:flex; gap:12px; align-items:center; padding:14px 16px; border-radius:12px; border:1px solid var(--line); background:var(--card); transition:all .2s; }
+.ent .tile:hover { border-color:var(--tc); transform:translateY(-3px); background:var(--card2); }
+.ent .tile i { width:36px; height:36px; border-radius:10px; display:grid; place-items:center; background:color-mix(in srgb, var(--tc) 16%, transparent); color:var(--tc); font-size:17px; flex:none; }
+.ent .tile b { display:block; font-size:13px; font-weight:600; color:#fff; } .ent .tile small { font-size:11px; color:var(--mute); }
+.ent .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--sub); margin-top:10px; }
+.ent .legend b { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px; }
 
-    .stat-card.success {
-        border-left-color: #28a745;
-    }
-
-    .stat-card.warning {
-        border-left-color: #ffc107;
-    }
-
-    .stat-card.danger {
-        border-left-color: #dc3545;
-    }
-
-    .stat-card.info {
-        border-left-color: #17a2b8;
-    }
-
-    .stat-content {
-        flex: 1;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #2d3748;
-        margin: 0;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: #718096;
-        margin-top: 5px;
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-
-    .stat-icon {
-        font-size: 3rem;
-        margin-left: 20px;
-        opacity: 0.2;
-    }
-
-    .stat-card.primary .stat-icon {
-        color: #667eea;
-    }
-
-    .stat-card.success .stat-icon {
-        color: #28a745;
-    }
-
-    .stat-card.warning .stat-icon {
-        color: #ffc107;
-    }
-
-    .stat-card.danger .stat-icon {
-        color: #dc3545;
-    }
-
-    .stat-card.info .stat-icon {
-        color: #17a2b8;
-    }
-
-    .chart-container {
-        background: white;
-        border-radius: 16px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .chart-title {
-        font-size: 1.3rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2d3748;
-        margin-top: 40px;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 3px solid #667eea;
-    }
-
-    .department-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-
-    .department-card:hover {
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        transform: translateY(-3px);
-    }
-
-    .dept-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .dept-name {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #2d3748;
-    }
-
-    .dept-code {
-        background: #667eea;
-        color: white;
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-
-    .progress-bar {
-        height: 8px;
-        background: #e2e8f0;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-bottom: 10px;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #667eea, #764ba2);
-        border-radius: 10px;
-        transition: width 0.5s ease;
-    }
-
-    .dept-stats {
-        display: flex;
-        justify-content: space-around;
-        text-align: center;
-        font-size: 0.85rem;
-    }
-
-    .dept-stat {
-        flex: 1;
-    }
-
-    .dept-stat-value {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #667eea;
-    }
-
-    .dept-stat-label {
-        color: #718096;
-        margin-top: 5px;
-    }
-
-    .recent-activity {
-        background: white;
-        border-radius: 16px;
-        padding: 30px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .activity-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 15px 0;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .activity-item:last-child {
-        border-bottom: none;
-    }
-
-    .activity-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 15px;
-        flex-shrink: 0;
-        font-size: 18px;
-    }
-
-    .activity-icon.task {
-        background: #e0e7ff;
-        color: #667eea;
-    }
-
-    .activity-icon.plan {
-        background: #dbeafe;
-        color: #0284c7;
-    }
-
-    .activity-icon.user {
-        background: #fce7f3;
-        color: #ec4899;
-    }
-
-    .activity-content h4 {
-        margin: 0 0 5px 0;
-        color: #2d3748;
-        font-weight: 600;
-    }
-
-    .activity-content p {
-        margin: 0;
-        color: #718096;
-        font-size: 0.9rem;
-    }
-
-    .activity-time {
-        margin-left: auto;
-        color: #a0aec0;
-        font-size: 0.85rem;
-        white-space: nowrap;
-    }
-
-    .plan-progress-item {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .plan-progress-item:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-    }
-
-    .plan-name {
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 5px;
-    }
-
-    .plan-month {
-        font-size: 0.85rem;
-        color: #718096;
-        margin-bottom: 10px;
-    }
-
-    .plan-stats-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-    }
-
-    .plan-progress-percent {
-        font-weight: 700;
-        color: #667eea;
-    }
-
-    .badge-small {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin-right: 5px;
-    }
-
-    .badge-primary {
-        background: #e0e7ff;
-        color: #667eea;
-    }
-
-    .badge-success {
-        background: #dcfce7;
-        color: #16a34a;
-    }
-
-    .badge-warning {
-        background: #fef3c7;
-        color: #d97706;
-    }
-
-    .badge-danger {
-        background: #fee2e2;
-        color: #dc2626;
-    }
-
-    .row-equal {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0;
-    }
-
-    .row-equal > [class*='col-'] {
-        display: flex;
-        flex-direction: column;
-    }
-
-    @media (max-width: 768px) {
-        .dashboard-header h1 {
-            font-size: 1.8rem;
-        }
-
-        .stat-card {
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .stat-icon {
-            margin-left: 0;
-            margin-top: 15px;
-        }
-
-        .dept-stats {
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .activity-time {
-            margin-left: 0;
-            margin-top: 10px;
-        }
-    }
-
-    .canvas-container {
-        position: relative;
-        height: 300px;
-        margin-bottom: 20px;
-    }
+@media (max-width:1200px) { .ent .kpis { grid-template-columns:repeat(2,1fr); } .ent .r21, .ent .r3, .ent .r2, .ent .r12 { grid-template-columns:1fr; } }
+@media (max-width:560px) { .ent { padding:14px; } .ent .kpis { grid-template-columns:1fr; } }
 </style>
 @endsection
 
 @section('content')
-<div class="dashboard-header">
-    <div class="container-fluid">
-        <h1><i class="fas fa-chart-line mr-3"></i>System Dashboard</h1>
-        <h6>Hello , Welcome Back Mr / {{auth()->user()->name}}</h6>
-        <p>Real-time monitoring of all workflow systems and operations</p>
-    </div>
-</div>
+@php
+    $user = auth()->user();
+    $hour = (int) now()->format('G');
+    $greet = $hour < 12 ? 'Good morning' : ($hour < 18 ? 'Good afternoon' : 'Good evening');
+    $first = \Illuminate\Support\Str::of($user->name)->explode(' ')->first();
+    $nf = fn ($v, $d = 0) => $v === null ? '—' : number_format((float) $v, $d);
+    $wow = $mpfmWeek - $mpfmPrevWeek;
+    $covPct = $counts['strings'] > 0 ? round($counts['testedStrings'] / $counts['strings'] * 100) : 0;
+    $wl = $wireline;
+    $maxTop = max(1, (float) $topStrings->max('oil'));
+    $maxVessel = max(1, (int) $vessels->max('tests_count'));
+    $maxOp = max(1, (int) $operators->max('total'));
+    $feedColors = ['mpfm' => '#22d3ee', 'tv' => '#fbbf24', 'req' => '#a78bfa', 'log' => '#34d399'];
+    $wlTypes = \App\Models\WirelineOperation::TYPES;
+    $pair0 = $pairs->first();
+    $flow = $pair0
+        ? ['mpfm' => (float) $pair0['mpfm']->oil_rate, 'tv' => (float) $pair0['tv']->oil_rate, 'dev' => $pair0['oil']]
+        : ['mpfm' => $latest ? (float) $latest->oil_rate : null, 'tv' => null, 'dev' => null];
+@endphp
 
-<div class="container-fluid" style="padding: 0 20px;">
-    <!-- Key Statistics -->
-    <div class="section-title">
-        <i class="fas fa-tachometer-alt mr-2" style="color: #667eea;"></i>Key Metrics
-    </div>
+<div class="ent" id="ent">
 
-    <div class="row">
-        <!-- Total Tasks -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card primary">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $workflowStats['total_tasks'] }}</div>
-                    <div class="stat-label">Total Tasks</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+    {{-- ═════ HEADER ═════ --}}
+    <div class="top hero">
+        <div class="who">
+            <span class="lg" role="img" aria-label="Company logo"></span>
+        <div>
+            <div class="eyebrow"><i></i> Operations command center</div>
+            <h1>{{ $greet }}, {{ $first }}</h1>
+            <div class="meta">
+                <span>{{ now()->format('l, d F Y') }}</span>
+                <span class="tag">{{ str_replace('_', ' ', $user->roles->pluck('name')->first() ?? 'User') }}</span>
+                <span>{{ $counts['activeStrings'] }} active wells · {{ $counts['fields'] }} field(s) · {{ $counts['towers'] }} tower(s)</span>
             </div>
         </div>
-
-        <!-- Completed Tasks -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card success">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $workflowStats['completed_tasks'] }}</div>
-                    <div class="stat-label">Completed Tasks</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-            </div>
         </div>
-
-        <!-- In Progress -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card info">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $workflowStats['in_progress_tasks'] }}</div>
-                    <div class="stat-label">In Progress</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-spinner"></i></div>
-            </div>
+        <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+        <div class="acts">
+            <a href="{{ route('upload.form') }}" class="btn p"><i class="fe fe-upload"></i> Upload MPFM log</a>
+            <a href="{{ route('tv_test_requests.create') }}" class="btn"><i class="fe fe-clipboard"></i> Test request</a>
+            @if($wl)<a href="{{ route('wireline.create') }}" class="btn"><i class="fe fe-git-branch"></i> Wire Line operation</a>@endif
+            <a href="{{ route('tv_tests.compare') }}" class="btn"><i class="fe fe-repeat"></i> Compare vs MPFM</a>
         </div>
-
-        <!-- Completion Rate -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card warning">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $workflowStats['completion_rate'] }}%</div>
-                    <div class="stat-label">Completion Rate</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-percent"></i></div>
-            </div>
+        @include('partials.rig')
         </div>
     </div>
 
-    <!-- Additional Stats Row -->
-    <div class="row" style="margin-top: 20px;">
-        <!-- Active Plans -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card primary">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $workflowStats['active_plans'] }}</div>
-                    <div class="stat-label">Active Plans</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-calendar"></i></div>
-            </div>
-        </div>
+    {{-- ═════ EXECUTIVE KPIs ═════ --}}
+    <div class="kpis">
+        <div class="kpi" style="--c:#22d3ee"><div class="l">Oil production <i class="fe fe-droplet"></i></div>
+            <div class="v">{{ $nf($snap['oil'], 0) }}<small>B/D</small></div><div class="d">latest test of {{ $snap['strings'] }} well(s)</div></div>
+        <div class="kpi" style="--c:#fbbf24"><div class="l">Gas production <i class="fe fe-wind"></i></div>
+            <div class="v">{{ $nf($snap['gas'], 2) }}<small>MMscf/D</small></div><div class="d">field GOR {{ $nf($snap['gor']) }}</div></div>
+        <div class="kpi" style="--c:#38bdf8"><div class="l">Water cut <i class="fe fe-percent"></i></div>
+            <div class="v">{{ $nf($snap['wc'], 1) }}<small>%</small></div><div class="d">{{ $nf($snap['water'], 0) }} B/D water</div></div>
+        <div class="kpi" style="--c:#34d399"><div class="l">Well test coverage <i class="fe fe-target"></i></div>
+            <div class="v">{{ $covPct }}<small>%</small></div><div class="d">{{ $counts['testedStrings'] }} of {{ $counts['strings'] }} wells tested in 30 days</div></div>
 
-        <!-- Total Users -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card info">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $userStats['total_users'] }}</div>
-                    <div class="stat-label">Total Users</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-users"></i></div>
-            </div>
-        </div>
+        <div class="kpi" style="--c:#3b82f6"><div class="l">MPFM tests <i class="fe fe-bar-chart-2"></i></div>
+            <div class="v">{{ $mpfmTotal }}</div>
+            <div class="d">{{ $mpfmWeek }} this week <span class="{{ $wow >= 0 ? 'up' : 'dn' }}">{{ $wow >= 0 ? '▲' : '▼' }} {{ abs($wow) }}</span> · {{ $approvedRate }}% approved</div></div>
+        <div class="kpi" style="--c:#fbbf24"><div class="l">Test vessel tests <i class="fe fe-anchor"></i></div>
+            <div class="v">{{ $tvTotal }}</div><div class="d">{{ $tvWeek }} this week · {{ $openRequests }} open request(s)</div></div>
+        @if($wl)
+        <div class="kpi" style="--c:#a78bfa"><div class="l">Wire Line operations <i class="fe fe-git-branch"></i></div>
+            <div class="v">{{ $wl['stats']['total'] }}</div><div class="d">{{ $wl['stats']['month'] }} this month · {{ $wl['stats']['open'] }} open</div></div>
+        <div class="kpi" style="--c:{{ $wl['overdueCount'] ? '#f87171' : '#34d399' }}"><div class="l">Pressure surveys <i class="fe fe-activity"></i></div>
+            <div class="v">{{ $wl['stats']['runs'] }}</div><div class="d">{{ $wl['overdueCount'] }} well(s) overdue (180 d)</div></div>
+        @else
+        <div class="kpi" style="--c:#34d399"><div class="l">Approval rate <i class="fe fe-check-circle"></i></div>
+            <div class="v">{{ $approvedRate }}<small>%</small></div><div class="d">of all MPFM tests</div></div>
+        <div class="kpi" style="--c:#f87171"><div class="l">Meter agreement <i class="fe fe-shuffle"></i></div>
+            <div class="v">{{ $avgOilDeviation !== null ? '±' . $avgOilDeviation : '—' }}<small>%</small></div><div class="d">{{ $pairCount }} paired test(s)</div></div>
+        @endif
+    </div>
 
-        <!-- Departments -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card success">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $userStats['departments_count'] }}</div>
-                    <div class="stat-label">Departments</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-sitemap"></i></div>
-            </div>
+    {{-- ═════ FIELD & PROCESS ILLUSTRATIONS ═════ --}}
+    <div class="sech"><h2>Field &amp; process overview</h2><span class="ln"></span></div>
+    <div class="row r21">
+        <div class="card pano ill" style="position:relative">
+            <div class="ct"><span>Field overview · live cross-section</span></div>
+            @include('partials.dash_platform')
+            @include('partials.dash_strata')
+            <span class="cap">Figures = latest test of every oil string</span>
         </div>
-
-        <!-- Pending Tasks -->
-        <div class="col-md-6 col-lg-3">
-            <div class="stat-card danger">
-                <div class="stat-content">
-                    <div class="stat-value">{{ $workflowStats['pending_tasks'] }}</div>
-                    <div class="stat-label">Pending Tasks</div>
-                </div>
-                <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="card tankc ill">
+            <div class="ct"><span>Fluid split</span><a href="{{ route('mpfm_tests.index') }}">Tests →</a></div>
+            @include('partials.dash_tank', ['fill' => 78])
+            <div class="sx">
+                <div style="--c:#fbbf24"><small>Oil</small><b>{{ number_format($snap['oil'], 0) }}<i>B/D</i></b></div>
+                <div style="--c:#fb923c"><small>Gas</small><b>{{ number_format($snap['gas'], 1) }}<i>MMscf/d</i></b></div>
+                <div style="--c:#38bdf8"><small>Water</small><b>{{ number_format($snap['water'], 0) }}<i>B/D</i></b></div>
+                <div style="--c:#a78bfa"><small>GOR</small><b>{{ $snap['gor'] !== null ? number_format($snap['gor']) : '—' }}<i>scf/stb</i></b></div>
             </div>
         </div>
     </div>
-
-    <!-- Charts Section -->
-    <div class="section-title" style="margin-top: 40px;">
-        <i class="fas fa-chart-pie mr-2" style="color: #667eea;"></i>Task Analytics
+    <div class="card ill" style="margin-bottom:16px">
+        <div class="ct"><span>Process flow · wells → MPFM → test separator → storage</span><a href="{{ route('tv_tests.compare') }}">Compare tests →</a></div>
+        @include('partials.dash_flow')
     </div>
 
-    <div class="row">
-        <!-- Task State Distribution -->
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-pie-chart" style="color: #667eea;"></i>Task State Distribution
-                </div>
-                <div class="canvas-container">
-                    <canvas id="taskStateChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- User Role Distribution -->
-        <div class="col-lg-6">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-users" style="color: #764ba2;"></i>User Role Distribution
-                </div>
-                <div class="canvas-container">
-                    <canvas id="userRoleChart"></canvas>
-                </div>
-            </div>
+    {{-- ═════ PRODUCTION ═════ --}}
+    <div class="sech"><h2>Production &amp; priorities</h2><span class="ln"></span><a href="{{ route('mpfm_tests.trending_dashboard') }}">Analytics →</a></div>
+    <div class="row r21">
+        <div class="card"><header><div><h3>Production trend</h3><small>Latest MPFM tests · oil &amp; gas rate with water cut</small></div></header>
+            @if(count($trend)) <div class="cv t"><canvas id="cTrend"></canvas></div> @else <div class="empty">No MPFM data yet.</div> @endif</div>
+        <div class="card"><header><div><h3>Needs attention</h3><small>Across tests, requests, vessels @if($wl)and surveys @endif</small></div></header>
+            @php
+                $items = $attention->map(fn ($a) => ['n' => $a['n'], 'c' => $a['color'], 'tx' => $a['label'], 'url' => $a['url']]);
+                if ($wl) {
+                    if ($wl['overdueCount']) $items->push(['n' => $wl['overdueCount'], 'c' => '#f87171', 'tx' => 'active wells without a pressure survey in 180 days', 'url' => route('wireline.dashboard')]);
+                    if ($wl['stats']['open']) $items->push(['n' => $wl['stats']['open'], 'c' => '#a78bfa', 'tx' => 'open Wire Line operations', 'url' => route('wireline.operations', ['status' => 'planned'])]);
+                }
+            @endphp
+            @if($items->isEmpty())
+                <div class="ok"><i class="fe fe-check-circle"></i> Nothing needs attention right now.</div>
+            @else
+                <ul class="list">@foreach($items as $a)<li><span class="n" style="--c:{{ $a['c'] }}">{{ $a['n'] }}</span><span class="tx">{{ $a['tx'] }}</span><a class="go" href="{{ $a['url'] }}">Open →</a></li>@endforeach</ul>
+            @endif
         </div>
     </div>
 
-    <!-- Department Performance -->
-    <div class="section-title">
-        <i class="fas fa-building mr-2" style="color: #667eea;"></i>Department Performance
+    <div class="row r3">
+        <div class="card"><header><div><h3>Test activity</h3><small>Tests per day · last 30 days</small></div></header><div class="cv s"><canvas id="cActivity"></canvas></div></div>
+        <div class="card"><header><div><h3>MPFM review pipeline</h3><small>{{ $mpfmTotal }} tests by status</small></div></header>
+            @if($mpfmTotal) <div class="cv s"><canvas id="cStatus"></canvas></div> @else <div class="empty">No tests yet.</div> @endif</div>
+        <div class="card"><header><div><h3>MPFM vs test vessel</h3><small>Oil rate agreement{{ $avgOilDeviation !== null ? ' · mean ±' . $avgOilDeviation . '%' : '' }}</small></div></header>
+            @if(count($scatter)) <div class="cv s"><canvas id="cScatter"></canvas></div> @else <div class="empty">No paired tests yet.</div> @endif</div>
     </div>
 
-    <div class="row">
-        @forelse($departmentStats as $dept)
-        <div class="col-md-6 col-lg-4">
-            <div class="department-card">
-                <div class="dept-header">
-                    <span class="dept-name">{{ $dept['name'] }}</span>
-                    <span class="dept-code">{{ $dept['code'] }}</span>
-                </div>
+    {{-- ═════ WIRE LINE ═════ --}}
+    @if($wl)
+    <div class="sech"><h2>Wire Line</h2><span class="ln"></span><a href="{{ route('wireline.dashboard') }}">Open Wire Line →</a></div>
+    <div class="card ill" style="margin-bottom:16px">
+        <div class="ct"><span>Wire Line operation · memory-gauge survey</span><a href="{{ route('wireline.create') }}">New operation →</a></div>
+        @include('partials.wireline_rig')
+    </div>
+    <div class="row r3">
+        <div class="card"><header><div><h3>Operations per month</h3><small>Last 12 months</small></div></header><div class="cv s"><canvas id="cWlMonth"></canvas></div></div>
+        <div class="card"><header><div><h3>Operations by type</h3><small>{{ $wl['stats']['total'] }} total on {{ $wl['stats']['wells'] }} well(s)</small></div></header>
+            @if($wl['byType']->isEmpty()) <div class="empty">No operations recorded.</div> @else <div class="cv s"><canvas id="cWlType"></canvas></div> @endif</div>
+        <div class="card"><header><div><h3>Surveys overdue</h3><small>Active wells, no survey in 180 days</small></div><span class="tag">{{ $wl['overdueCount'] }}</span></header>
+            @if($wl['overdue']->isEmpty()) <div class="ok"><i class="fe fe-check-circle"></i> All active wells are up to date.</div>
+            @else <ul class="list">@foreach($wl['overdue']->take(6) as $o)<li><span class="tx"><a href="{{ route('mpfm_tests.string_analysis', $o['well']->id) }}" style="color:#fff;font-weight:600">{{ $o['well']->name }}</a><br><small style="color:var(--mute)">{{ $o['last'] ? $o['days'] . ' days since last survey' : 'never surveyed' }}</small></span><a class="go" href="{{ route('wireline.create', ['well' => $o['well']->id]) }}">Schedule →</a></li>@endforeach</ul> @endif</div>
+    </div>
+    <div class="row r2">
+        <div class="card"><header><div><h3>Latest memory-gauge surveys</h3><small>Final bottom-hole pressure &amp; temperature</small></div></header>
+            @if($wl['runs']->isEmpty()) <div class="empty">No gauge data uploaded yet.</div>
+            @else <div class="scroll"><table><thead><tr><th>Well</th><th>Date</th><th>Type</th><th>BHP (psi)</th><th>BHT (°C)</th><th></th></tr></thead><tbody>
+                @foreach($wl['runs']->take(6) as $r)
+                <tr><td>{{ $r->operation->oilString->name ?? '—' }}</td><td>{{ ($r->started_at ?? $r->operation->operation_date)->format('d M Y') }}</td><td>{{ strtoupper($r->survey_type) }}</td>
+                    <td>{{ $nf($r->bhp, 1) }}</td><td>{{ $nf($r->bht, 1) }}</td><td><a href="{{ route('wireline.show', [$r->operation, 'run' => $r->id]) }}">Open</a></td></tr>
+                @endforeach</tbody></table></div> @endif</div>
+        <div class="card"><header><div><h3>Recent Wire Line operations</h3><small>Latest interventions across the field</small></div></header>
+            @if($wl['recent']->isEmpty()) <div class="empty">No operations yet.</div>
+            @else <div class="scroll"><table><thead><tr><th>Date</th><th>Well</th><th>Operation</th><th>Status</th><th></th></tr></thead><tbody>
+                @foreach($wl['recent']->take(6) as $o)
+                <tr><td>{{ $o->operation_date->format('d M') }}</td><td>{{ $o->oilString->name ?? '—' }}</td><td>{{ $o->typeLabel() }}</td><td><span class="pill {{ $o->status }}">{{ $o->statusLabel() }}</span></td><td><a href="{{ route('wireline.show', $o) }}">Open</a></td></tr>
+                @endforeach</tbody></table></div> @endif</div>
+    </div>
+    @endif
 
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ $dept['progress'] }}%;"></div>
-                </div>
-
-                <div style="text-align: center; margin-bottom: 12px; font-weight: 600; color: #667eea;">
-                    {{ $dept['progress'] }}% Complete
-                </div>
-
-                <div class="dept-stats">
-                    <div class="dept-stat">
-                        <div class="dept-stat-value">{{ $dept['completed_tasks'] }}</div>
-                        <div class="dept-stat-label">Completed</div>
-                    </div>
-                    <div class="dept-stat">
-                        <div class="dept-stat-value">{{ $dept['total_tasks'] }}</div>
-                        <div class="dept-stat-label">Total</div>
-                    </div>
-                    <div class="dept-stat">
-                        <div class="dept-stat-value">{{ $dept['users_count'] }}</div>
-                        <div class="dept-stat-label">Users</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @empty
-        <div class="col-12">
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> No department data available yet.
-            </div>
-        </div>
-        @endforelse
+    {{-- ═════ WELLS & FIELDS ═════ --}}
+    <div class="sech"><h2>Wells &amp; fields</h2><span class="ln"></span><a href="{{ route('oil_fields.index') }}">Field setup →</a></div>
+    <div class="row r3">
+        <div class="card"><header><div><h3>Oil by field</h3><small>B/D · latest test per well</small></div></header>
+            @if($byField->isEmpty()) <div class="empty">No data.</div> @else <div class="cv s"><canvas id="cField"></canvas></div> @endif</div>
+        <div class="card"><header><div><h3>Top producing wells</h3><small>Latest oil rate</small></div></header>
+            @if($topStrings->isEmpty()) <div class="empty">No data.</div>
+            @else <div class="scroll"><table><thead><tr><th>Well</th><th>Oil (B/D)</th><th>WC %</th><th></th></tr></thead><tbody>
+                @foreach($topStrings as $s)<tr><td>{{ $s['name'] }}</td><td>{{ $nf($s['oil'], 1) }}</td><td>{{ $nf($s['wc'], 1) }}</td><td style="width:80px"><div class="bar"><i style="--w:{{ $s['oil'] / $maxTop * 100 }}%"></i></div></td></tr>@endforeach
+            </tbody></table></div> @endif</div>
+        <div class="card"><header><div><h3>Test coverage</h3><small>Wells tested in the last 30 days</small></div></header>
+            <div class="cv s"><canvas id="cCover"></canvas></div></div>
     </div>
 
-    <!-- Plans Progress -->
-    <div class="section-title">
-        <i class="fas fa-list-check mr-2" style="color: #667eea;"></i>Monthly Plans Progress
+    {{-- ═════ TEST VESSELS ═════ --}}
+    <div class="sech"><h2>Test vessels</h2><span class="ln"></span><a href="{{ route('test_vessels.index') }}">All vessels →</a></div>
+    <div class="row r21">
+        <div class="card"><header><div><h3>Vessel utilisation</h3><small>Tests performed per vessel</small></div></header>
+            @if($vessels->isEmpty()) <div class="empty">No vessels registered.</div>
+            @else <div class="scroll"><table><thead><tr><th>Vessel</th><th>Status</th><th>Tests</th><th>Last test</th><th></th></tr></thead><tbody>
+                @foreach($vessels as $v)<tr><td><a href="{{ route('test_vessels.show', $v) }}">{{ $v->name }}</a></td><td><span class="pill {{ $v->status }}">{{ $v->status }}</span></td><td>{{ $v->tests_count }}</td>
+                    <td>{{ $v->last_test_at ? \Carbon\Carbon::parse($v->last_test_at)->format('d M Y') : '—' }}</td><td style="width:110px"><div class="bar"><i style="--w:{{ $v->tests_count / $maxVessel * 100 }}%;--bc:#fbbf24"></i></div></td></tr>@endforeach
+            </tbody></table></div> @endif</div>
+        <div class="card"><header><div><h3>Test requests</h3><small>{{ $openRequests }} open</small></div></header>
+            @if(empty($requestsByStatus)) <div class="empty">No requests yet.</div> @else <div class="cv s"><canvas id="cReq"></canvas></div> @endif</div>
     </div>
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-chart-bar" style="color: #667eea;"></i>Plans Completion Status
-                </div>
-                <div class="canvas-container" style="height: 400px;">
-                    <canvas id="planProgressChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Plans List -->
-        <div class="col-lg-4">
-            <div class="chart-container">
-                <div class="chart-title">
-                    <i class="fas fa-list" style="color: #667eea;"></i>Top Plans
-                </div>
-
-                @forelse($planProgress as $plan)
-                <div class="plan-progress-item">
-                    <div class="plan-name">{{ $plan['name'] }}</div>
-                    <div class="plan-month">
-                        <i class="fas fa-calendar"></i> {{ $plan['month'] }}
-                    </div>
-
-                    <div class="progress-bar" style="margin-bottom: 10px;">
-                        <div class="progress-fill" style="width: {{ $plan['progress'] }}%;"></div>
-                    </div>
-
-                    <div class="plan-stats-row">
-                        <span>Progress</span>
-                        <span class="plan-progress-percent">{{ $plan['progress'] }}%</span>
-                    </div>
-
-                    <div style="font-size: 0.85rem; color: #718096;">
-                        <span class="badge badge-small badge-success">
-                            {{ $plan['completed_tasks'] }} Completed
-                        </span>
-                        <span class="badge badge-small badge-primary">
-                            {{ $plan['total_tasks'] }} Total
-                        </span>
-                    </div>
-                </div>
-                @empty
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No plans available yet.
-                </div>
-                @endforelse
-            </div>
-        </div>
+    {{-- ═════ TEAM & ACTIVITY ═════ --}}
+    <div class="sech"><h2>Team &amp; activity</h2><span class="ln"></span></div>
+    <div class="row r3">
+        <div class="card"><header><div><h3>Recent activity</h3><small>Tests, requests and log uploads</small></div></header>
+            @if($feed->isEmpty()) <div class="empty">No activity yet.</div>
+            @else <ul class="list feed">@foreach($feed->take(7) as $e)<li style="--c:{{ $feedColors[$e['type']] ?? '#64748b' }}"><span class="dot"></span><span><b><a href="{{ $e['url'] }}">{{ $e['title'] }}</a></b><small>{{ $e['sub'] }}{{ $e['who'] ? ' · ' . $e['who'] : '' }} · {{ $e['when']->diffForHumans() }}</small></span></li>@endforeach</ul> @endif</div>
+        <div class="card"><header><div><h3>Tests by shift</h3><small>MPFM and vessel tests</small></div></header><div class="cv s"><canvas id="cShift"></canvas></div></div>
+        <div class="card"><header><div><h3>Most active operators</h3><small>Tests recorded</small></div></header>
+            @if($operators->isEmpty()) <div class="empty">No data.</div>
+            @else <ul class="list">@foreach($operators as $o)<li><span class="tx" style="color:#fff;font-weight:600">{{ $o['name'] }}<div class="bar" style="margin-top:6px"><i style="--w:{{ $o['total'] / $maxOp * 100 }}%;--bc:#3b82f6"></i></div></span><span class="n" style="--c:#fff;font-size:15px">{{ $o['total'] }}</span></li>@endforeach</ul> @endif</div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="section-title">
-        <i class="fas fa-clock mr-2" style="color: #667eea;"></i>Recent Activity
-    </div>
-
-    <div class="row">
-        <div class="col-lg-6">
-            <div class="recent-activity">
-                <div class="chart-title">
-                    <i class="fas fa-tasks" style="color: #667eea;"></i>Recent Tasks
-                </div>
-
-                @forelse($recentActivity['recent_tasks'] as $task)
-                <div class="activity-item">
-                    <div class="activity-icon task">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <div class="activity-content" style="flex: 1;">
-                        <h4>Task #{{ $task->id }}</h4>
-                        <p>
-                            <strong>{{ $task->well_number }}</strong>
-                            @if($task->department)
-                            in <strong>{{ $task->department->name }}</strong>
-                            @endif
-                            - <span class="badge badge-primary" style="padding: 2px 8px; font-size: 0.75rem;">
-                                {{ str_replace('_', ' ', ucfirst($task->state->value ?? $task->state)) }}
-                            </span>
-                        </p>
-                    </div>
-                    <div class="activity-time">
-                        {{ $task->updated_at->diffForHumans() }}
-                    </div>
-                </div>
-                @empty
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No recent tasks.
-                </div>
-                @endforelse
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="recent-activity">
-                <div class="chart-title">
-                    <i class="fas fa-calendar" style="color: #764ba2;"></i>Recent Plans
-                </div>
-
-                @forelse($recentActivity['recent_plans'] as $plan)
-                <div class="activity-item">
-                    <div class="activity-icon plan">
-                        <i class="fas fa-calendar"></i>
-                    </div>
-                    <div class="activity-content" style="flex: 1;">
-                        <h4>{{ $plan->plan_name }}</h4>
-                        <p>
-                            <strong>{{ $plan->plan_month }}</strong>
-                            - <span class="badge badge-primary" style="padding: 2px 8px; font-size: 0.75rem;">
-                                {{ ucfirst($plan->status) }}
-                            </span>
-                            - {{ $plan->tasks()->count() }} tasks
-                        </p>
-                    </div>
-                    <div class="activity-time">
-                        {{ $plan->created_at->diffForHumans() }}
-                    </div>
-                </div>
-                @empty
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No recent plans.
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- User Activity -->
-    <div class="row" style="margin-top: 30px; margin-bottom: 40px;">
-        <div class="col-12">
-            <div class="recent-activity">
-                <div class="chart-title">
-                    <i class="fas fa-users" style="color: #667eea;"></i>Recent Users
-                </div>
-
-                @forelse($recentActivity['recent_users'] as $user)
-                <div class="activity-item">
-                    <div class="activity-icon user">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <div class="activity-content" style="flex: 1;">
-                        <h4>{{ $user->name }}</h4>
-                        <p>
-                            <strong>{{ $user->email }}</strong>
-                            @if($user->department)
-                            - <span style="color: #667eea; font-weight: 600;">{{ $user->department->name }}</span>
-                            @endif
-                            @if($user->roles->count() > 0)
-                            - Roles: {{ implode(', ', $user->roles->pluck('name')->toArray()) }}
-                            @endif
-                        </p>
-                    </div>
-                    <div class="activity-time">
-                        {{ $user->created_at->diffForHumans() }}
-                    </div>
-                </div>
-                @empty
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No recent users.
-                </div>
-                @endforelse
-            </div>
-        </div>
+    {{-- ═════ LAUNCHER ═════ --}}
+    <div class="sech"><h2>Modules</h2><span class="ln"></span></div>
+    <div class="tiles">
+        <a class="tile" style="--tc:#22d3ee" href="{{ route('mpfm_tests.index') }}"><i class="fe fe-activity"></i><span><b>MPFM tests</b><small>Review &amp; approve</small></span></a>
+        <a class="tile" style="--tc:#34d399" href="{{ route('well_tests.index') }}"><i class="fe fe-folder"></i><span><b>Test archive</b><small>Uploaded logs</small></span></a>
+        <a class="tile" style="--tc:#3b82f6" href="{{ route('mpfm_tests.trending_dashboard') }}"><i class="fe fe-trending-up"></i><span><b>Analytics</b><small>Trends &amp; alerts</small></span></a>
+        <a class="tile" style="--tc:#fbbf24" href="{{ route('test_vessels.index') }}"><i class="fe fe-anchor"></i><span><b>Test vessels</b><small>Fleet &amp; status</small></span></a>
+        <a class="tile" style="--tc:#f59e0b" href="{{ route('tv_tests.index') }}"><i class="fe fe-list"></i><span><b>Vessel tests</b><small>Results</small></span></a>
+        <a class="tile" style="--tc:#a78bfa" href="{{ route('tv_test_requests.index') }}"><i class="fe fe-clipboard"></i><span><b>Test requests</b><small>Plan &amp; track</small></span></a>
+        @if($wl)
+        <a class="tile" style="--tc:#a78bfa" href="{{ route('wireline.dashboard') }}"><i class="fe fe-git-branch"></i><span><b>Wire Line</b><small>Surveys &amp; interventions</small></span></a>
+        <a class="tile" style="--tc:#22d3ee" href="{{ route('wireline.operations') }}"><i class="fe fe-list"></i><span><b>Wire Line jobs</b><small>All operations</small></span></a>
+        @endif
+        <a class="tile" style="--tc:#38bdf8" href="{{ route('oil_fields.index') }}"><i class="fe fe-map"></i><span><b>Field setup</b><small>Fields, towers, wells</small></span></a>
     </div>
 </div>
 @endsection
 
-@push('scripts')
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // Chart.js configuration for Task State Distribution
-    const taskStateCtx = document.getElementById('taskStateChart');
-    if (taskStateCtx) {
-        const taskStateData = @json($taskStateDistribution);
-        const stateLabels = Object.keys(taskStateData).map(s => s.replace(/_/g, ' ').toUpperCase());
-        const stateValues = Object.values(taskStateData);
+(function () {
+    if (!window.Chart) return;
+    Chart.defaults.color = '#9aaccb';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+    Chart.defaults.borderColor = 'rgba(120,150,210,.12)';
+    Chart.defaults.plugins.legend.labels.boxWidth = 10;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    var base = { responsive: true, maintainAspectRatio: false };
+    var $ = function (id) { return document.getElementById(id); };
+    var make = function (id, cfg) { var el = $(id); if (el) new Chart(el, cfg); };
+    var grid = { color: 'rgba(120,150,210,.1)' };
 
-        const colors = ['#667eea', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14'];
+    var T = @json($trend);
+    make('cTrend', { type: 'line', data: { labels: T.map(function (t) { return t.date.slice(5) + ' ' + t.name; }), datasets: [
+        { label: 'Oil (B/D)', data: T.map(function (t) { return t.oil; }), borderColor: '#22d3ee', backgroundColor: 'rgba(34,211,238,.12)', fill: true, tension: .3, pointRadius: 2, yAxisID: 'y' },
+        { label: 'Water cut (%)', data: T.map(function (t) { return t.wc; }), borderColor: '#38bdf8', borderDash: [5, 4], tension: .3, pointRadius: 0, yAxisID: 'y1' },
+        { label: 'Gas (MMscf/D)', data: T.map(function (t) { return t.gas; }), borderColor: '#fbbf24', tension: .3, pointRadius: 0, yAxisID: 'y1' }
+    ] }, options: Object.assign({}, base, { interaction: { mode: 'index', intersect: false }, scales: { x: { ticks: { maxTicksLimit: 8, maxRotation: 0 }, grid: { display: false } }, y: { grid: grid }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }) });
 
-        new Chart(taskStateCtx, {
-            type: 'doughnut',
-            data: {
-                labels: stateLabels,
-                datasets: [{
-                    data: stateValues,
-                    backgroundColor: colors.slice(0, stateLabels.length),
-                    borderColor: 'white',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            font: { size: 12, weight: '500' },
-                            color: '#718096'
-                        }
-                    }
-                }
-            }
-        });
-    }
+    var A = @json($activity);
+    make('cActivity', { type: 'bar', data: { labels: A.labels, datasets: [
+        { label: 'MPFM', data: A.mpfm, backgroundColor: '#22d3ee', borderRadius: 3 },
+        { label: 'Test vessel', data: A.tv, backgroundColor: '#fbbf24', borderRadius: 3 }
+    ] }, options: Object.assign({}, base, { scales: { x: { stacked: true, ticks: { maxTicksLimit: 6 }, grid: { display: false } }, y: { stacked: true, grid: grid, ticks: { precision: 0 } } } }) });
 
-    // Chart.js configuration for User Role Distribution
-    const userRoleCtx = document.getElementById('userRoleChart');
-    if (userRoleCtx) {
-        const userRoleData = @json($userStats['users_by_role']);
-        const roleLabels = Object.keys(userRoleData).map(r => r.replace(/_/g, ' ').toUpperCase());
-        const roleValues = Object.values(userRoleData);
+    var S = @json($mpfmByStatus), sc = { draft: '#64748b', submitted: '#fbbf24', approved: '#34d399', rejected: '#f87171' };
+    make('cStatus', { type: 'doughnut', data: { labels: Object.keys(S), datasets: [{ data: Object.values(S), backgroundColor: Object.keys(S).map(function (k) { return sc[k] || '#3b82f6'; }), borderWidth: 0 }] },
+        options: Object.assign({}, base, { cutout: '66%', plugins: { legend: { position: 'bottom' } } }) });
 
-        const roleColors = {
-            'admin': '#dc3545',
-            'job_officer': '#667eea',
-            'surveillance_supervisor': '#17a2b8',
-            'department_manager': '#28a745',
-            'mpfm_operator': '#ffc107',
-            'operator': '#6f42c1'
-        };
+    var P = @json($scatter), mx = Math.max.apply(null, P.map(function (p) { return Math.max(p.tv, p.mpfm); }).concat([1])) * 1.1;
+    make('cScatter', { type: 'scatter', data: { datasets: [
+        { label: 'Tests', data: P.map(function (p) { return { x: p.tv, y: p.mpfm, n: p.name }; }), backgroundColor: '#22d3ee', pointRadius: 5 },
+        { label: 'Perfect agreement', type: 'line', data: [{ x: 0, y: 0 }, { x: mx, y: mx }], borderColor: '#34d399', borderDash: [6, 4], pointRadius: 0 },
+        { label: '+10%', type: 'line', data: [{ x: 0, y: 0 }, { x: mx, y: mx * 1.1 }], borderColor: 'rgba(248,113,113,.5)', borderWidth: 1, pointRadius: 0 },
+        { label: '-10%', type: 'line', data: [{ x: 0, y: 0 }, { x: mx, y: mx * .9 }], borderColor: 'rgba(248,113,113,.5)', borderWidth: 1, pointRadius: 0 }
+    ] }, options: Object.assign({}, base, { plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return (c.raw.n || '') + ' · TV ' + c.raw.x + ' / MPFM ' + c.raw.y; } } } },
+        scales: { x: { title: { display: true, text: 'Test vessel (B/D)' }, grid: grid, min: 0, max: mx }, y: { title: { display: true, text: 'MPFM (B/D)' }, grid: grid, min: 0, max: mx } } }) });
 
-        const colors = Object.keys(userRoleData).map(role => roleColors[role] || '#667eea');
+    @if($wl)
+    make('cWlMonth', { type: 'bar', data: { labels: @json($wl['monthLabels']), datasets: [{ label: 'Operations', data: @json($wl['perMonth']), backgroundColor: '#a78bfa', borderRadius: 4 }] },
+        options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: grid, ticks: { precision: 0 } } } }) });
+    var WM = @json(collect($wlTypes)->map(fn ($t) => ['l' => $t[0], 'c' => $t[2]])), WT = @json($wl['byType']), wk = Object.keys(WT);
+    make('cWlType', { type: 'doughnut', data: { labels: wk.map(function (k) { return WM[k] ? WM[k].l : k; }), datasets: [{ data: wk.map(function (k) { return WT[k]; }), backgroundColor: wk.map(function (k) { return WM[k] ? WM[k].c : '#94a3b8'; }), borderWidth: 0 }] },
+        options: Object.assign({}, base, { cutout: '62%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } }) });
+    @endif
 
-        new Chart(userRoleCtx, {
-            type: 'bar',
-            data: {
-                labels: roleLabels,
-                datasets: [{
-                    label: 'Number of Users',
-                    data: roleValues,
-                    backgroundColor: colors,
-                    borderRadius: 8,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                indexAxis: 'y',
-                plugins: {
-                    legend: {
-                        display: true,
-                        labels: {
-                            color: '#718096',
-                            font: { size: 12, weight: '500' }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: '#718096' },
-                        grid: { color: '#e2e8f0' }
-                    },
-                    y: {
-                        ticks: { color: '#718096' }
-                    }
-                }
-            }
-        });
-    }
+    var F = @json($byField);
+    make('cField', { type: 'bar', data: { labels: F.map(function (f) { return f.name; }), datasets: [{ label: 'Oil (B/D)', data: F.map(function (f) { return f.oil; }), backgroundColor: ['#22d3ee', '#fbbf24', '#a78bfa', '#34d399', '#f87171'], borderRadius: 4 }] },
+        options: Object.assign({}, base, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { grid: grid }, y: { grid: { display: false } } } }) });
 
-    // Chart.js configuration for Plan Progress
-    const planProgressCtx = document.getElementById('planProgressChart');
-    if (planProgressCtx) {
-        const planData = @json($planProgress);
-        const planNames = planData.map(p => p.name.substring(0, 20) + (p.name.length > 20 ? '...' : ''));
-        const progressValues = planData.map(p => p.progress);
-        const completedValues = planData.map(p => p.completed_tasks);
-        const totalValues = planData.map(p => p.total_tasks);
+    make('cCover', { type: 'doughnut', data: { labels: ['Tested (30 d)', 'Not tested'], datasets: [{ data: [{{ $counts['testedStrings'] }}, {{ max(0, $counts['strings'] - $counts['testedStrings']) }}], backgroundColor: ['#34d399', '#26324f'], borderWidth: 0 }] },
+        options: Object.assign({}, base, { cutout: '70%', plugins: { legend: { position: 'bottom' } } }) });
 
-        new Chart(planProgressCtx, {
-            type: 'bar',
-            data: {
-                labels: planNames,
-                datasets: [
-                    {
-                        label: 'Completed Tasks',
-                        data: completedValues,
-                        backgroundColor: '#28a745',
-                        borderRadius: 6,
-                        borderSkipped: false
-                    },
-                    {
-                        label: 'Remaining Tasks',
-                        data: totalValues.map((t, i) => t - completedValues[i]),
-                        backgroundColor: '#e2e8f0',
-                        borderRadius: 6,
-                        borderSkipped: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                indexAxis: 'y',
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#718096',
-                            font: { size: 12, weight: '500' }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        ticks: { color: '#718096' },
-                        grid: { color: '#e2e8f0' }
-                    },
-                    y: {
-                        stacked: true,
-                        ticks: { color: '#718096' }
-                    }
-                }
-            }
-        });
-    }
+    var R = @json($requestsByStatus), rc = { open: '#22d3ee', pending: '#fbbf24', in_progress: '#3b82f6', completed: '#34d399', cancelled: '#f87171' };
+    make('cReq', { type: 'doughnut', data: { labels: Object.keys(R).map(function (k) { return k.replace('_', ' '); }), datasets: [{ data: Object.values(R), backgroundColor: Object.keys(R).map(function (k) { return rc[k] || '#a78bfa'; }), borderWidth: 0 }] },
+        options: Object.assign({}, base, { cutout: '66%', plugins: { legend: { position: 'bottom' } } }) });
+
+    var SH = @json($shift);
+    make('cShift', { type: 'bar', data: { labels: ['Morning', 'Afternoon', 'Night'], datasets: [{ data: [SH.morning, SH.afternoon, SH.night], backgroundColor: ['#fbbf24', '#22d3ee', '#6366f1'], borderRadius: 6 }] },
+        options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: grid, ticks: { precision: 0 } } } }) });
+})();
 </script>
-@endpush
+@endsection

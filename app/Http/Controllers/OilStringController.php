@@ -114,8 +114,10 @@ class OilStringController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
+        $wireline = app(\App\Services\Wireline\WellWirelineSummary::class)->build($oilString);
+
         return view('oil_strings.show', compact(
-            'oilString', 'mpfmTests', 'approvedTests', 'stats',
+            'wireline', 'oilString', 'mpfmTests', 'approvedTests', 'stats',
             'chartDates', 'chartOilRate', 'chartGasRate', 'chartWaterCut', 'chartPressure',
             'liftCurveData', 'planTasks', 'tasks'
         ));

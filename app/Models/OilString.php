@@ -49,6 +49,14 @@ class OilString extends Model
     }
 
     /**
+     * Wire Line operations performed on this well
+     */
+    public function wirelineOperations(): HasMany
+    {
+        return $this->hasMany(WirelineOperation::class);
+    }
+
+    /**
      * Scope to filter active oil strings
      */
     public function scopeActive($query)

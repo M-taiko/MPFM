@@ -9,19 +9,31 @@ use App\Models\User;
 
 class RolePermissionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            if (! auth()->user()->hasRole('admin')) {
+                abort(403, 'Unauthorized access to roles and permissions.');
+            }
+
+            return $next($request);
+        });
+    }
+
     /* ===================== ROLES ===================== */
 
     public function indexRoles()
     {
-        $roles = Role::with('permissions', 'users')->get();
-        $allPermissions = Permission::all();
+        $roles = Role::with('permissions', 'users')->orderBy('name')->get();
+        $allPermissions = Permission::orderBy('name')->get();
 
         return view('roles.index', compact('roles', 'allPermissions'));
     }
 
     public function createRole()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::orderBy('name')->get();
         return view('roles.create', compact('permissions'));
     }
 
@@ -44,7 +56,8 @@ class RolePermissionController extends Controller
 
     public function editRole(Role $role)
     {
-        $permissions = Permission::all();
+        $role->load('users');
+        $permissions = Permission::orderBy('name')->get();
         return view('roles.edit', compact('role', 'permissions'));
     }
 
@@ -72,8 +85,9 @@ class RolePermissionController extends Controller
 
     public function indexPermissions()
     {
-        $permissions = Permission::all();
-        return view('permissions.index', compact('permissions'));
+        $permissions = Permission::with('roles')->orderBy('name')->get();
+        $roles = Role::orderBy('name')->get();
+        return view('permissions.index', compact('permissions', 'roles'));
     }
 
     public function createPermission()
@@ -94,6 +108,7 @@ class RolePermissionController extends Controller
 
     public function editPermission(Permission $permission)
     {
+        $permission->load('roles');
         return view('permissions.edit', compact('permission'));
     }
 

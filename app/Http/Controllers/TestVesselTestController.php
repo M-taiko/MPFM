@@ -34,7 +34,25 @@ class TestVesselTestController extends Controller
 
         $oilFields = OilField::active()->get();
         $testVessels = TestVessel::active()->get();
-        return view('tv_tests.index', compact('oilFields', 'testVessels'));
+        $byStatus = TestVesselTest::selectRaw('status, COUNT(*) c')->groupBy('status')->pluck('c', 'status')->all();
+        $days = collect(range(29, 0))->map(fn ($i) => now()->subDays($i)->toDateString());
+        $daily = TestVesselTest::selectRaw('DATE(test_date) d, COUNT(*) c')
+            ->where('test_date', '>=', $days->first())->groupBy('d')->pluck('c', 'd');
+        $stats = [
+            'total' => array_sum($byStatus),
+            'byStatus' => $byStatus,
+            'week' => TestVesselTest::where('test_date', '>=', now()->subDays(7))->count(),
+            'linked' => TestVesselTest::whereNotNull('mpfm_test_id')->count(),
+            'avgOil' => (float) TestVesselTest::avg('oil_rate'),
+            'avgWc' => (float) TestVesselTest::avg('water_cut'),
+            'activity' => [
+                'labels' => $days->map(fn ($d) => substr($d, 5))->values(),
+                'values' => $days->map(fn ($d) => (int) ($daily[$d] ?? 0))->values(),
+            ],
+            'vessels' => TestVessel::withCount('tests')->orderByDesc('tests_count')->limit(6)->get(['id', 'name'])
+                ->map(fn ($v) => ['name' => $v->name, 'count' => $v->tests_count])->values(),
+        ];
+        return view('tv_tests.index', compact('oilFields', 'testVessels', 'stats'));
     }
 
     /**
@@ -58,7 +76,7 @@ class TestVesselTestController extends Controller
         // Load towers/strings if available
         $towers = $tvTest->tower_id ? Tower::where('oil_field_id', $tvTest->oil_field_id)->get() : collect();
         $oilStrings = $tvTest->tower_id ? OilString::where('tower_id', $tvTest->tower_id)->get() : collect();
-        $mpfmTests = $tvTest->oil_field_id ? MPFMTest::where('oil_field_id', $tvTest->oil_field_id)->get() : collect();
+        $mpfmTests = MPFMTest::with('oilString')->orderByDesc('test_date')->limit(300)->get();
 
         return view('tv_tests.create', compact('oilFields', 'testVessels', 'tvTest', 'towers', 'oilStrings', 'mpfmTests'));
     }
@@ -94,8 +112,25 @@ class TestVesselTestController extends Controller
      */
     public function show(TestVesselTest $tvTest)
     {
-        $tvTest->load('testVessel', 'user', 'oilField', 'tower', 'oilString', 'mpfmTest');
-        return view('tv_tests.show', compact('tvTest'));
+        $tvTest->load('testVessel', 'user', 'oilField', 'tower', 'oilString', 'mpfmTest', 'reviewedBy');
+
+        // last tests on the same oil string (oldest first) for the trend charts
+        $history = TestVesselTest::where('oil_string_id', $tvTest->oil_string_id)
+            ->orderByDesc('test_date')->orderByDesc('id')
+            ->limit(12)->get()->reverse()->values()
+            ->map(fn ($t) => [
+                'id' => $t->id,
+                'date' => $t->test_date->format('Y-m-d'),
+                'oil' => (float) $t->oil_rate,
+                'gas' => (float) $t->gas_rate,
+                'wc' => (float) $t->water_cut,
+            ]);
+
+        $mpfmForWell = MPFMTest::where('oil_string_id', $tvTest->oil_string_id)
+            ->orderByDesc('test_date')->get();
+        $mpfmNearby = $mpfmForWell->filter(fn ($m) => abs($m->test_date->diffInDays($tvTest->test_date)) <= 7)->values();
+
+        return view('tv_tests.show', compact('tvTest', 'history', 'mpfmForWell', 'mpfmNearby'));
     }
 
     /**
@@ -200,6 +235,15 @@ class TestVesselTestController extends Controller
         } elseif ($mpfmTest->calculated_kpis) {
             $mpfmMetrics = $mpfmTest->calculated_kpis;
         }
+
+        // Well test metrics use bsw / avg_pressure / avg_temperature; fall back to the MPFM test's own fields
+        $mpfmMetrics += [
+            'oil_rate' => $mpfmTest->oil_rate,
+            'gas_rate' => $mpfmTest->gas_rate,
+        ];
+        $mpfmMetrics['water_cut'] = $mpfmMetrics['water_cut'] ?? $mpfmMetrics['bsw'] ?? $mpfmTest->water_cut;
+        $mpfmMetrics['pressure'] = $mpfmMetrics['pressure'] ?? $mpfmMetrics['avg_pressure'] ?? null;
+        $mpfmMetrics['temperature'] = $mpfmMetrics['temperature'] ?? $mpfmMetrics['avg_temperature'] ?? null;
 
         // Get TV metrics
         $tvMetrics = [

@@ -126,7 +126,27 @@ class VxLogController extends Controller
             }
         }
 
-        return view('logs.upload', compact('task', 'newTask', 'autoFillData'));
+        // Dynamic pickers for the manual upload form: field -> tower (well) -> string, operators, clients
+        $catalog = \App\Models\OilField::active()
+            ->with(['towers' => fn ($q) => $q->active()->orderBy('name')->with(['oilStrings' => fn ($q2) => $q2->active()->orderBy('name')])])
+            ->orderBy('name')->get()
+            ->map(fn ($f) => [
+                'id' => $f->id,
+                'name' => $f->name,
+                'towers' => $f->towers->map(fn ($t) => [
+                    'id' => $t->id,
+                    'name' => $t->name,
+                    'strings' => $t->oilStrings->map(fn ($st) => ['id' => $st->id, 'name' => $st->name])->values(),
+                ])->values(),
+            ])->values();
+
+        $operators = User::role(['mpfm_operator', 'operator'])->orderBy('name')->pluck('name')
+            ->push(auth()->user()->name)->unique()->values();
+
+        $clients = WellTest::query()->whereNotNull('client')->distinct()->pluck('client')
+            ->push(config('app.name', 'Oil Field Management System'))->filter()->unique()->values();
+
+        return view('logs.upload', compact('task', 'newTask', 'autoFillData', 'catalog', 'operators', 'clients'));
     }
 
     public function processLogFile(Request $request)
@@ -522,8 +542,15 @@ class VxLogController extends Controller
         return redirect()->back()->with('error', 'Failed to save test data to the database: ' . $e->getMessage());
     }
 
+    // Manual upload (no task): also register it as an MPFM test so it appears in the MPFM Tests list
+    $mpfmTest = app(\App\Services\WellTestMpfmSync::class)->create($wellTest, auth()->user());
+    if ($mpfmTest) {
+        return redirect()->route('mpfm_tests.show', $mpfmTest)
+            ->with('success', 'Well test saved to the archive and added to MPFM tests (draft).');
+    }
+
     return redirect()->route('well_tests.index')
-        ->with('success', 'Well test saved successfully!');
+        ->with('success', 'Well test saved to the archive. It could not be linked to an MPFM test because the oil string "' . ($summary['wellhead_string'] ?? '') . '" was not found.');
 }
 
 /**

@@ -16,22 +16,22 @@ class TestVesselTestDataTableService
         $query = TestVesselTest::query();
 
         // Filter by oil field
-        if ($request->has('oil_field_id') && $request->get('oil_field_id') !== '') {
+        if ($request->filled('oil_field_id')) {
             $query->where('oil_field_id', $request->get('oil_field_id'));
         }
 
         // Filter by test vessel
-        if ($request->has('test_vessel_id') && $request->get('test_vessel_id') !== '') {
+        if ($request->filled('test_vessel_id')) {
             $query->where('test_vessel_id', $request->get('test_vessel_id'));
         }
 
         // Filter by oil string
-        if ($request->has('oil_string_id') && $request->get('oil_string_id') !== '') {
+        if ($request->filled('oil_string_id')) {
             $query->where('oil_string_id', $request->get('oil_string_id'));
         }
 
         // Filter by status
-        if ($request->has('status') && $request->get('status') !== '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
         }
 

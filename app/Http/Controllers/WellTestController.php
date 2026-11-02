@@ -35,8 +35,35 @@ class WellTestController extends Controller
 
     public function index()
     {
-        $wellTests = WellTest::orderBy('created_at', 'desc')->paginate(10);
-        return view('well_tests.index', compact('wellTests'));
+        // the archive page filters/sorts client-side, so send a light row per test (no raw log rows)
+        $tests = WellTest::select('id', 'client', 'field', 'well', 'operator', 'test_date', 'test_type', 'wellhead_tower', 'wellhead_string', 'filename', 'calculated_metrics', 'created_at')
+            ->orderByDesc('test_date')->orderByDesc('id')->get()
+            ->map(function ($t) {
+                $m = $t->calculated_metrics ?? [];
+                $num = fn ($k) => isset($m[$k]) && is_numeric($m[$k]) ? (float) $m[$k] : null;
+
+                return [
+                    'id' => $t->id,
+                    'well' => $t->well,
+                    'client' => $t->client,
+                    'field' => $t->field,
+                    'operator' => $t->operator,
+                    'test_type' => $t->test_type,
+                    'tower' => $t->wellhead_tower,
+                    'string' => $t->wellhead_string,
+                    'filename' => $t->filename,
+                    'date' => $t->test_date ? \Illuminate\Support\Carbon::parse($t->test_date)->format('Y-m-d') : null,
+                    'created' => $t->created_at?->toIso8601String(),
+                    'oil' => $num('oil_rate'),
+                    'gas' => $num('gas_rate'),
+                    'gor' => $num('gor'),
+                    'bsw' => $num('bsw'),
+                    'gvf' => $num('gvf'),
+                    'pressure' => $num('avg_pressure'),
+                ];
+            })->values();
+
+        return view('well_tests.index', compact('tests'));
     }
 
     public function show($id)
@@ -71,6 +98,29 @@ class WellTestController extends Controller
         ]);
     }
 
+    /**
+     * Formal, print-ready report of one well test (use the browser's "Save as PDF" to attach it to an email).
+     */
+    public function print($id)
+    {
+        $wellTest = WellTest::findOrFail($id);
+
+        $rows = $wellTest->test_data['rows'] ?? [];
+        $columns = $wellTest->test_data['columns'] ?? [];
+        $metrics = ! empty($wellTest->calculated_metrics)
+            ? $wellTest->calculated_metrics
+            : $this->metricsService->calculateMetrics($rows, $columns);
+
+        return view('well_tests.print', [
+            'wellTest' => $wellTest,
+            'rows' => $rows,
+            'columns' => $columns,
+            'metrics' => $metrics,
+            'rates_chart_data' => $this->chartService->prepareFlowRatesChartData($rows, $columns),
+            'gor_chart_data' => $this->chartService->prepareGorChartData($rows, $columns),
+            'pressure_temp_chart_data' => $this->chartService->preparePressureTempChartData($rows, $columns),
+        ]);
+    }
     public function create()
     {
         return view('well_tests.create');

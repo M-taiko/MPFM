@@ -166,6 +166,9 @@ Route::get('well-tests/datatables', [WellTestController::class, 'getDatatables']
 
 Route::resource('well-tests', WellTestController::class)
     ->names('well_tests');
+Route::get('well-tests/{id}/print', [WellTestController::class, 'print'])
+    ->whereNumber('id')
+    ->name('well_tests.print');
 /** Compare */
 Route::get('/well-tests/compare', [WellTestController::class, 'compareForm'])
     ->name('well_tests.compare');
@@ -277,10 +280,31 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Wire Line (memory gauge surveys & interventions)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->prefix('wireline')->name('wireline.')->group(function () {
+    $c = \App\Http\Controllers\WirelineController::class;
+    Route::get('/', [$c, 'dashboard'])->name('dashboard');
+    Route::get('operations', [$c, 'index'])->name('operations');
+    Route::get('operations/create', [$c, 'create'])->name('create');
+    Route::post('operations', [$c, 'store'])->name('store');
+    Route::get('operations/{operation}', [$c, 'show'])->name('show');
+    Route::get('operations/{operation}/edit', [$c, 'edit'])->name('edit');
+    Route::put('operations/{operation}', [$c, 'update'])->name('update');
+    Route::delete('operations/{operation}', [$c, 'destroy'])->name('destroy');
+    Route::post('operations/{operation}/runs', [$c, 'uploadRun'])->name('runs.upload');
+    Route::delete('runs/{run}', [$c, 'destroyRun'])->name('runs.destroy');
+    Route::post('runs/{run}/reanalyse', [$c, 'reanalyseRun'])->name('runs.reanalyse');
+    Route::post('runs/{run}/stops', [$c, 'saveStops'])->name('runs.stops');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Reports
 |--------------------------------------------------------------------------
 */
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports',[ReportController::class, 'index'])->name('reports.index');
 Route::get('/reports/operator-performance', [ReportController::class, 'operatorPerformance'])->name('reports.operator_performance');
 Route::get('/reports/mpfm-tests-count', [ReportController::class, 'mpfmTestsCount'])->name('reports.mpfm_tests_count');
 Route::get('/reports/tower-efficiency', [ReportController::class, 'towerEfficiency'])->name('reports.tower_efficiency');

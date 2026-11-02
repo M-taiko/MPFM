@@ -49,41 +49,38 @@ class MPFMTestController extends Controller
         $oilStrings = OilString::active()->get();
         $users = \App\Models\User::role('mpfm_operator')->get();
 
-        return view('mpfm_tests.index', compact('oilFields', 'towers', 'oilStrings', 'users'));
+        $user = auth()->user();
+        $base = fn () => $user->hasRole('mpfm_operator') ? MPFMTest::accessibleByOperator($user) : MPFMTest::query();
+
+        $byStatus = $base()->selectRaw('status, COUNT(*) c')->groupBy('status')->pluck('c', 'status')->all();
+        $days = collect(range(29, 0))->map(fn ($i) => now()->subDays($i)->toDateString());
+        $daily = $base()->selectRaw('DATE(test_date) d, COUNT(*) c')
+            ->where('test_date', '>=', $days->first())->groupBy('d')->pluck('c', 'd');
+        $stats = [
+            'total' => array_sum($byStatus),
+            'byStatus' => $byStatus,
+            'week' => $base()->where('test_date', '>=', now()->subDays(7))->count(),
+            'avgOil' => (float) $base()->avg('oil_rate'),
+            'avgGas' => (float) $base()->avg('gas_rate'),
+            'avgWc' => (float) $base()->avg('water_cut'),
+            'activity' => [
+                'labels' => $days->map(fn ($d) => substr($d, 5))->values(),
+                'values' => $days->map(fn ($d) => (int) ($daily[$d] ?? 0))->values(),
+            ],
+            'strings' => $base()->selectRaw('oil_string_id, COUNT(*) c')->whereNotNull('oil_string_id')
+                ->groupBy('oil_string_id')->orderByDesc('c')->limit(6)->get()
+                ->map(fn ($r) => ['name' => optional(OilString::find($r->oil_string_id))->name ?? '#'.$r->oil_string_id, 'count' => (int) $r->c])->values(),
+        ];
+
+        return view('mpfm_tests.index', compact('oilFields', 'towers', 'oilStrings', 'users', 'stats'));
     }
 
     /**
-     * Show the form for creating a new resource (log-driven).
+     * Tests are created from an uploaded VX log; the log-processing endpoints live on the upload page.
      */
-    public function create()
+    public function create(Request $request)
     {
-        $user = auth()->user();
-        $oilFields = OilField::active()->get();
-        $towers = collect();
-        $oilStrings = collect();
-        $operationalPlans = collect();
-
-        // If user is operator, only show assigned assets
-        if ($user->hasRole('mpfm_operator')) {
-            $planIds = MPFMOperationalPlan::where('assigned_user_id', $user->id)
-                ->where('status', 'active')
-                ->pluck('id');
-
-            $operationalPlans = MPFMOperationalPlan::whereIn('id', $planIds)
-                ->with(['oilField', 'tower'])
-                ->get();
-
-            // Get unique oil fields and towers from assigned plans
-            $assignedFieldIds = $operationalPlans->pluck('oil_field_id')->unique();
-            $assignedTowerIds = $operationalPlans->pluck('tower_id')->unique();
-
-            $oilFields = OilField::whereIn('id', $assignedFieldIds)->active()->get();
-            $towers = Tower::whereIn('id', $assignedTowerIds)->active()->get();
-        } else {
-            $operationalPlans = MPFMOperationalPlan::with(['oilField', 'tower'])->active()->get();
-        }
-
-        return view('mpfm_tests.create', compact('oilFields', 'towers', 'oilStrings', 'operationalPlans'));
+        return redirect()->route('upload.form', $request->query());
     }
 
     /**
@@ -478,6 +475,10 @@ class MPFMTestController extends Controller
             $kpis['temperature'] = $mpfmTest->temperature_avg;
         }
 
+        $relatedTv = \App\Models\TestVesselTest::with('testVessel')
+            ->where('oil_string_id', $mpfmTest->oil_string_id)
+            ->latest('test_date')->limit(5)->get();
+
         return view('mpfm_tests.show_modern', compact(
             'mpfmTest',
             'kpis',
@@ -488,7 +489,8 @@ class MPFMTestController extends Controller
             'columns',
             'flowRatesChartData',
             'gorChartData',
-            'pressureTempChartData'
+            'pressureTempChartData',
+            'relatedTv'
         ));
     }
 
@@ -710,7 +712,19 @@ class MPFMTestController extends Controller
         $comparisonService = app(MPFMHistoricalComparisonService::class);
         $trendingData = $comparisonService->getStringTrendingAnalysis($oilStringId);
 
-        return view('mpfm_tests.string_analysis', compact('oilString', 'allTests', 'mpfmTests', 'tvTests', 'trendingData'));
+        $wlAccess = auth()->user()?->canAccessWireline() ?? false;
+        $wireline = $planTasks = $tasks = $analysis = null;
+        if ($wlAccess) {
+            // Wire Line users see everything on the well: wire line history plus work from every department
+            $wireline = app(\App\Services\Wireline\WellWirelineSummary::class)->build($oilString);
+            $planTasks = \App\Models\PlanTask::where('oil_string_id', $oilStringId)
+                ->with(['department', 'assignedOperator'])->orderByDesc('scheduled_date')->get();
+            $tasks = \App\Domains\Task\Models\Task::where('oil_string_id', $oilStringId)
+                ->with(['department', 'assignedTo'])->orderByDesc('created_at')->get();
+            $analysis = app(\App\Services\WellAnalysisService::class)->analyze($oilString, $mpfmTests, $tvTests, $wireline, $planTasks, $tasks);
+        }
+
+        return view('mpfm_tests.string_analysis', compact('oilString', 'allTests', 'mpfmTests', 'tvTests', 'trendingData', 'wlAccess', 'wireline', 'planTasks', 'tasks', 'analysis'));
     }
 
     /**
@@ -718,18 +732,26 @@ class MPFMTestController extends Controller
      */
     public function trendingDashboard(Request $request)
     {
-        $strings = OilString::with('tower')->get();
+        $strings = OilString::with('tower.oilField')->get();
 
         $comparisonService = app(MPFMHistoricalComparisonService::class);
 
-        $stringsWithAlerts = $strings->map(function($string) use ($comparisonService) {
+        $testsByString = MPFMTest::select('id', 'oil_string_id', 'test_date', 'oil_rate', 'water_cut', 'status')
+            ->orderBy('test_date')->get()->groupBy('oil_string_id');
+
+        $stringsWithAlerts = $strings->map(function ($string) use ($comparisonService, $testsByString) {
             $trending = $comparisonService->getStringTrendingAnalysis($string->id);
+            $tests = $testsByString->get($string->id, collect());
+
             return [
                 'string' => $string,
                 'alerts' => $trending['alerts'] ?? [],
                 'alert_count' => count($trending['alerts'] ?? []),
+                'tests' => $tests->count(),
+                'latest' => $tests->last(),
+                'spark' => $tests->take(-8)->pluck('oil_rate')->map(fn ($v) => (float) $v)->values()->all(),
             ];
-        })->sortByDesc('alert_count');
+        })->sortByDesc('alert_count')->values();
 
         return view('mpfm_tests.trending_dashboard', compact('stringsWithAlerts'));
     }

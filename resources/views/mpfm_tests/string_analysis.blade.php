@@ -2,733 +2,301 @@
 
 @section('title', 'Oil String Analysis - ' . $oilString->name)
 
-@push('styles')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/css/ofpage.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
-    .modern-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2.5rem 2rem;
-        border-radius: 0.75rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-    }
-
-    .modern-header h1 {
-        margin: 0;
-        font-size: 2rem;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .modern-header p {
-        margin: 0.5rem 0 0 0;
-        opacity: 0.9;
-    }
-
-    .breadcrumb-modern {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        opacity: 0.9;
-        font-size: 0.95rem;
-        margin-top: 1rem;
-    }
-
-    .breadcrumb-modern a {
-        color: white;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .breadcrumb-modern a:hover {
-        text-decoration: underline;
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .stat-card {
-        background: white;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e2e8f0;
-        text-align: center;
-    }
-
-    .stat-icon {
-        font-size: 2rem;
-        color: #667eea;
-        margin-bottom: 0.5rem;
-    }
-
-    .stat-value {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1a202c;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        color: #718096;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-top: 0.5rem;
-    }
-
-    .card-modern {
-        background: white;
-        border-radius: 0.75rem;
-        padding: 2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e2e8f0;
-    }
-
-    .section-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #667eea;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .section-title i {
-        color: #667eea;
-    }
-
-    .tests-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .tests-table thead {
-        background: #f7fafc;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .tests-table th {
-        padding: 1rem;
-        text-align: left;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #2d3748;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .tests-table tbody tr {
-        border-bottom: 1px solid #e2e8f0;
-        transition: all 0.3s ease;
-        position: relative;
-    }
-
-    .tests-table tbody tr:hover {
-        background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-        box-shadow: inset 0 0 10px rgba(102, 126, 234, 0.08);
-    }
-
-    .tests-table td {
-        padding: 1.15rem 1rem;
-        font-size: 0.95rem;
-        color: #4a5568;
-        font-weight: 500;
-    }
-
-    .tests-table td strong {
-        color: #2d3748;
-        font-weight: 700;
-    }
-
-    .badge-modern {
-        display: inline-block;
-        padding: 0.4rem 0.8rem;
-        border-radius: 0.3rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: capitalize;
-    }
-
-    .badge-mpfm {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .badge-tv {
-        background: #bee3f8;
-        color: #2c5282;
-    }
-
-    .status-draft { background: #e2e8f0; color: #2d3748; }
-    .status-submitted { background: #bee3f8; color: #2c5282; }
-    .status-approved { background: #c6f6d5; color: #22543d; }
-    .status-rejected { background: #fed7d7; color: #742a2a; }
-
-    .test-row-mpfm {
-        border-left: 4px solid #48bb78;
-    }
-
-    .test-row-tv {
-        border-left: 4px solid #667eea;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-
-    .btn-sm-modern {
-        padding: 0.4rem 0.8rem;
-        border-radius: 0.3rem;
-        font-size: 0.8rem;
-        border: none;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        font-weight: 500;
-    }
-
-    .btn-info-sm {
-        background: #bee3f8;
-        color: #2c5282;
-    }
-
-    .btn-info-sm:hover {
-        background: #90cdf4;
-    }
-
-    .btn-warning-sm {
-        background: #feebc8;
-        color: #7c2d12;
-    }
-
-    .btn-warning-sm:hover {
-        background: #fbd38d;
-    }
-
-    .chart-container {
-        background: white;
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e2e8f0;
-        margin-bottom: 2rem;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .chart-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .chart-title {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .chart-title i {
-        color: #667eea;
-        font-size: 1.25rem;
-    }
-
-    .filter-tabs {
-        display: flex;
-        gap: 0.75rem;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-        padding-bottom: 1.5rem;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .filter-tab {
-        padding: 0.65rem 1.5rem;
-        border-radius: 0.5rem;
-        border: 2px solid #e2e8f0;
-        background: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #4a5568;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .filter-tab:hover {
-        border-color: #667eea;
-        background: #f7fafc;
-        color: #667eea;
-        transform: translateY(-2px);
-    }
-
-    .filter-tab.active {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-color: transparent;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-        border-radius: 1rem;
-        border: 2px dashed #cbd5e0;
-        margin: 2rem 0;
-    }
-
-    .empty-state i {
-        font-size: 4rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-
-    .empty-state h5 {
-        color: #2d3748 !important;
-        font-size: 1.25rem;
-        font-weight: 600;
-    }
-
-    .empty-state p {
-        color: #718096 !important;
-        font-size: 0.95rem;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1.25rem;
-        margin-bottom: 2rem;
-    }
-
-    .info-card {
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-        border: 2px solid #e2e8f0;
-        border-radius: 0.75rem;
-        padding: 1.25rem;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .info-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .info-card:hover {
-        border-color: #667eea;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-        transform: translateY(-2px);
-    }
-
-    .info-label {
-        font-size: 0.75rem;
-        color: #718096;
-        text-transform: uppercase;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-    }
-
-    .info-value {
-        font-size: 1.5rem;
-        color: #1a202c;
-        font-weight: 700;
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .measurement-metrics {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 1rem;
-        margin-top: 1.5rem;
-    }
-
-    .metric-item {
-        background: white;
-        border: 1px solid #e2e8f0;
-        border-radius: 0.5rem;
-        padding: 1rem;
-        text-align: center;
-    }
-
-    .metric-label {
-        font-size: 0.75rem;
-        color: #718096;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .metric-value {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #667eea;
-        margin-top: 0.5rem;
-    }
+.ofp .top { display:grid; grid-template-columns:minmax(300px,.85fr) 1.5fr; gap:18px; margin-top:18px; align-items:stretch; }
+.ofp .top .kpis { margin-top:0; grid-template-columns:repeat(2,1fr); }
+.ofp .well svg { width:100%; height:auto; display:block; }
+.ofp .well text { font-family:'Inter',sans-serif; }
+.ofp .wl { font-size:8.5px; font-weight:700; letter-spacing:.12em; }
+.ofp .wv { font:700 15px 'Space Grotesk',sans-serif; fill:#fff; }
+.ofp .wu { font-size:8.5px; fill:#9fb0cf; }
+.ofp .wflow { fill:none; stroke-width:2; stroke-linecap:round; stroke-dasharray:3 8; animation:saDash 1.1s linear infinite; }
+@keyframes saDash { to { stroke-dashoffset:-22; } }
+.ofp .wpulse { animation:saPulse 2.4s ease-in-out infinite; } @keyframes saPulse { 50% { opacity:.35; } }
+.ofp .latest { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+.ofp .latest div { flex:1; min-width:120px; padding:11px 13px; border-radius:14px; background:var(--glass); border:1px solid var(--line); }
+.ofp .latest small { display:block; font-size:9.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); }
+.ofp .latest b { font:700 18px 'Space Grotesk'; color:#fff; } .ofp .latest span { font-size:11px; color:var(--sub); margin-left:4px; }
+.ofp .ftabs { display:flex; gap:8px; flex-wrap:wrap; }
+.ofp .ty { display:inline-flex; align-items:center; gap:6px; padding:3px 11px; border-radius:50px; font-size:10.5px; font-weight:700; letter-spacing:.06em; border:1px solid var(--line); }
+.ofp .ty.mpfm { color:var(--cyan); border-color:rgba(34,211,238,.5); background:rgba(34,211,238,.1); }
+.ofp .ty.tv { color:var(--amber); border-color:rgba(251,191,36,.5); background:rgba(251,191,36,.1); }
+.ofp tr.hide { display:none; }
+.ofp .alerts { display:grid; gap:10px; }
+.ofp .meta .sep { color:var(--mute); }
+@media (max-width:1100px) { .ofp .top { grid-template-columns:1fr; } }
 </style>
-@endpush
+@endsection
 
 @section('content')
-<!-- Modern Header -->
-<div class="modern-header">
-    <h1>
-        <i class="fe fe-trending-up"></i>
-        Oil String Analysis
-    </h1>
-    <p>{{ $oilString->name }} - Complete Test History</p>
-    <div class="breadcrumb-modern">
-        <a href="{{ route('oil_fields.show', $oilString->tower->oilField->id) }}">
-            <i class="fe fe-home"></i> {{ $oilString->tower->oilField->name }}
-        </a>
-        <span>/</span>
-        <a href="{{ route('towers.show', $oilString->tower->id) }}">
-            <i class="fe fe-layers"></i> {{ $oilString->tower->name }}
-        </a>
-        <span>/</span>
-        <span>{{ $oilString->name }}</span>
-    </div>
-</div>
+@php
+    $f = fn ($v, $d = 2) => is_numeric($v) ? number_format((float) $v, $d) : '—';
+    $tower = $oilString->tower; $field = $tower->oilField ?? null;
+    $total = $allTests->count();
+    $latest = $allTests->first();
+    $lt = $latest['test'] ?? null; $ltType = $latest['type'] ?? null;
 
-<!-- Statistics -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fe fe-activity"></i></div>
-        <div class="stat-value">{{ count($allTests) }}</div>
-        <div class="stat-label">Total Tests</div>
-    </div>
+    // chart data: one point per date, MPFM and TV on the same timeline
+    $dates = $allTests->map(fn ($i) => $i['test']->test_date->format('Y-m-d'))->unique()->sort()->values()->take(-40)->values();
+    $series = function ($coll, $col) use ($dates) {
+        $by = $coll->groupBy(fn ($t) => $t->test_date->format('Y-m-d'));
+        return $dates->map(fn ($d) => isset($by[$d]) ? round((float) $by[$d]->avg($col), 3) : null)->all();
+    };
+    $chart = [
+        'labels' => $dates->all(),
+        'oil' => ['mpfm' => $series($mpfmTests, 'oil_rate'), 'tv' => $series($tvTests, 'oil_rate')],
+        'gas' => ['mpfm' => $series($mpfmTests, 'gas_rate'), 'tv' => $series($tvTests, 'gas_rate')],
+        'wc' => ['mpfm' => $series($mpfmTests, 'water_cut'), 'tv' => $series($tvTests, 'water_cut')],
+    ];
+    $alerts = $trendingData['alerts'] ?? [];
+    $nearest = function ($tv) use ($mpfmTests) {
+        return $mpfmTests->sortBy(fn ($m) => abs($m->test_date->diffInDays($tv->test_date)))->first();
+    };
+    $oilV = $lt ? (float) $lt->oil_rate : 0; $gasV = $lt ? (float) $lt->gas_rate : 0; $wcV = $lt ? (float) $lt->water_cut : 0;
+@endphp
 
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fe fe-bar-chart-2"></i></div>
-        <div class="stat-value">{{ count($mpfmTests) }}</div>
-        <div class="stat-label">MPFM Tests</div>
-    </div>
+<div class="ofp" id="ofp">
+    <div class="bgl"><div class="orb o1"></div><div class="orb o2"></div></div>
 
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fe fe-anchor"></i></div>
-        <div class="stat-value">{{ count($tvTests) }}</div>
-        <div class="stat-label">TV Tests</div>
-    </div>
-
-    <div class="stat-card">
-        <div class="stat-icon"><i class="fe fe-calendar"></i></div>
-        <div class="stat-value">
-            @if($allTests->count() > 0)
-                {{ $allTests->first()['test']->test_date->format('Y-m-d') }}
-            @else
-                N/A
-            @endif
-        </div>
-        <div class="stat-label">Latest Test</div>
-    </div>
-</div>
-
-<!-- Oil String Info -->
-<div class="card-modern">
-    <div class="section-title">
-        <i class="fe fe-info"></i>
-        Oil String Information
-    </div>
-
-    <div class="info-grid">
-        <div class="info-card">
-            <div class="info-label">
-                <i class="fe fe-anchor" style="color: #667eea; margin-right: 0.3rem;"></i>
-                Oil String
-            </div>
-            <div class="info-value">{{ $oilString->name }}</div>
-        </div>
-        <div class="info-card">
-            <div class="info-label">
-                <i class="fe fe-layers" style="color: #667eea; margin-right: 0.3rem;"></i>
-                Tower
-            </div>
-            <div class="info-value">{{ $oilString->tower->name }}</div>
-        </div>
-        <div class="info-card">
-            <div class="info-label">
-                <i class="fe fe-map-pin" style="color: #667eea; margin-right: 0.3rem;"></i>
-                Oil Field
-            </div>
-            <div class="info-value">{{ $oilString->tower->oilField->name }}</div>
-        </div>
-        <div class="info-card">
-            <div class="info-label">
-                <i class="fe fe-activity" style="color: #667eea; margin-right: 0.3rem;"></i>
-                Total Tests
-            </div>
-            <div class="info-value">{{ count($allTests) }}</div>
-        </div>
-    </div>
-
-    @if(count($allTests) > 0)
-        <div class="section-title" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0;">
-            <i class="fe fe-bar-chart-2"></i>
-            Latest Measurements
-        </div>
-        @php
-            $latestTest = $allTests->first()['test'] ?? null;
-        @endphp
-        @if($latestTest)
-            <div class="measurement-metrics">
-                <div class="metric-item">
-                    <div class="metric-label">Oil Rate</div>
-                    <div class="metric-value">{{ number_format($latestTest->oil_rate, 2) }}</div>
-                    <div style="font-size: 0.75rem; color: #a0aec0;">B/D</div>
+    {{-- HERO --}}
+    <div class="hero rv">
+        <div class="who">
+            <span class="lg"></span>
+            <div>
+                <div class="eyebrow"><i></i> Oil string analysis</div>
+                <h1>{{ $oilString->name }} <em>· full test history</em></h1>
+                <div class="meta">
+                    @if($field)<a href="{{ route('oil_fields.show', $field->id) }}"><i class="fe fe-map-pin"></i> {{ $field->name }}</a><span class="sep">/</span>@endif
+                    @if($tower)<a href="{{ route('towers.show', $tower->id) }}"><i class="fe fe-layers"></i> {{ $tower->name }}</a><span class="sep">/</span>@endif
+                    <span>{{ $oilString->name }}</span>
                 </div>
-                <div class="metric-item">
-                    <div class="metric-label">Gas Rate</div>
-                    <div class="metric-value">{{ number_format($latestTest->gas_rate, 2) }}</div>
-                    <div style="font-size: 0.75rem; color: #a0aec0;">MMscf/D</div>
-                </div>
-                <div class="metric-item">
-                    <div class="metric-label">Water Cut</div>
-                    <div class="metric-value">{{ number_format($latestTest->water_cut, 2) }}</div>
-                    <div style="font-size: 0.75rem; color: #a0aec0;">%</div>
-                </div>
-                @if($latestTest->pressure)
-                <div class="metric-item">
-                    <div class="metric-label">Pressure</div>
-                    <div class="metric-value">{{ number_format($latestTest->pressure, 0) }}</div>
-                    <div style="font-size: 0.75rem; color: #a0aec0;">psi</div>
-                </div>
-                @endif
-                @if($latestTest->temperature)
-                <div class="metric-item">
-                    <div class="metric-label">Temperature</div>
-                    <div class="metric-value">{{ number_format($latestTest->temperature, 1) }}</div>
-                    <div style="font-size: 0.75rem; color: #a0aec0;">°C</div>
-                </div>
-                @endif
             </div>
-        @endif
+        </div>
+        <div class="actions">
+            @if($wlAccess)<a class="btn2 p" href="{{ route('wireline.create', ['well' => $oilString->id]) }}"><i class="fe fe-git-branch"></i> Wire Line op</a>@endif
+            <a class="btn2 g" href="{{ route('tv_tests.compare') }}"><i class="fe fe-shuffle"></i> Compare vs TV</a>
+            <a class="btn2" href="{{ route('mpfm_tests.trending_dashboard') }}"><i class="fe fe-bar-chart-2"></i> Trending dashboard</a>
+            <a class="btn2" href="{{ route('mpfm_tests.index') }}"><i class="fe fe-arrow-left"></i> MPFM tests</a>
+        </div>
+    </div>
+
+    @if($wlAccess)
+        @include('mpfm_tests._string_insight')
     @endif
-</div>
 
-<!-- All Tests Combined -->
-<div class="card-modern">
-    <div class="section-title">
-        <i class="fe fe-list"></i>
-        Complete Test History
-    </div>
-
-    @if($allTests->count() > 0)
-        <div class="filter-tabs">
-            <button class="filter-tab active" onclick="filterTests('all')">
-                <i class="fe fe-eye"></i> All Tests ({{ count($allTests) }})
-            </button>
-            <button class="filter-tab" onclick="filterTests('mpfm')">
-                <i class="fe fe-bar-chart-2"></i> MPFM ({{ count($mpfmTests) }})
-            </button>
-            <button class="filter-tab" onclick="filterTests('tv')">
-                <i class="fe fe-anchor"></i> Test Vessel ({{ count($tvTests) }})
-            </button>
+    {{-- WELL DRAWING + STATS --}}
+    <div class="top">
+        <div class="panel well rv">
+            <div class="ph" style="margin-bottom:6px"><h3><i class="fe fe-map-pin"></i> The string</h3><span class="sub">{{ $lt ? 'Latest reading · '.($ltType === 'mpfm' ? 'MPFM' : 'Test vessel') : 'No tests yet' }}</span></div>
+<svg viewBox="0 0 360 430" role="img" aria-label="Well string drawing">
+<defs>
+    <linearGradient id="saSteel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#475569"/><stop offset=".35" stop-color="#e2e8f0"/><stop offset=".65" stop-color="#94a3b8"/><stop offset="1" stop-color="#334155"/></linearGradient>
+    <linearGradient id="saRock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2a1d"/><stop offset="1" stop-color="#1a120b"/></linearGradient>
+    <linearGradient id="saOil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#78350f"/></linearGradient>
+    <linearGradient id="saSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1426" stop-opacity="0"/><stop offset="1" stop-color="#22d3ee" stop-opacity=".1"/></linearGradient>
+    <path id="saTube" d="M180,372 V150"/>
+    <path id="saLine" d="M180,96 H330"/>
+</defs>
+<rect x="0" y="0" width="360" height="120" fill="url(#saSky)"/>
+{{-- ground + strata --}}
+<rect x="0" y="120" width="360" height="310" fill="url(#saRock)"/>
+<path d="M0,120 H360" stroke="#64748b" stroke-width="2"/>
+<path d="M0,190 Q90,180 180,192 T360,186 M0,262 Q100,274 190,260 T360,266" fill="none" stroke="#5a4330" stroke-width="1.5" opacity=".7"/>
+<path d="M0,330 Q90,318 180,332 T360,326 V430 H0 Z" fill="url(#saOil)" opacity=".85"/>
+<text x="12" y="352" class="wl" fill="#fde68a">RESERVOIR</text>
+<text x="12" y="140" class="wl" fill="#94a3b8">SURFACE</text>
+<text x="12" y="212" class="wl" fill="#8a6d52">CAP ROCK</text>
+{{-- casing + tubing --}}
+<rect x="164" y="120" width="32" height="226" fill="#1e293b" stroke="#0b1220"/>
+<rect x="172" y="120" width="16" height="252" fill="url(#saSteel)" stroke="#0b1220"/>
+<rect x="176" y="150" width="8" height="222" fill="#0a1222"/>
+<path d="M176,150 V372" stroke="url(#saOil)" stroke-width="8" opacity=".9"/>
+{{-- perforations --}}
+@foreach([338, 348, 358] as $py)
+    <path d="M164,{{ $py }} H146 M196,{{ $py }} H214" stroke="#fbbf24" stroke-width="2.2" stroke-linecap="round"/>
+    <path class="wflow" d="M122,{{ $py }} H162 M238,{{ $py }} H198" stroke="#fde68a"/>
+@endforeach
+{{-- wellhead / christmas tree --}}
+<rect x="160" y="108" width="40" height="14" rx="2" fill="url(#saSteel)" stroke="#0b1220"/>
+<rect x="168" y="82" width="24" height="28" fill="url(#saSteel)" stroke="#0b1220"/>
+<path d="M180,82 V56" stroke="#94a3b8" stroke-width="7"/><circle cx="180" cy="48" r="9" fill="#0a1222" stroke="#22d3ee" stroke-width="1.8"/><path d="M180,48 L184,43" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round"/>
+<rect x="172" y="60" width="16" height="6" fill="#64748b" stroke="#0b1220"/>
+<g fill="none"><use href="#saLine" stroke="#0b1220" stroke-width="13"/><use href="#saLine" stroke="#64748b" stroke-width="9"/></g>
+<path d="M240,88 l12,8 l-12,8 Z M262,88 l-12,8 l12,8 Z" fill="#1e293b" stroke="#94a3b8" stroke-width="1.6" transform="translate(-6,0)"/>
+<path d="M246,88 V72" stroke="#94a3b8" stroke-width="2"/><rect x="238" y="66" width="16" height="5" rx="2" fill="#94a3b8"/>
+<text x="330" y="78" text-anchor="end" class="wl" fill="#67e8f9">FLOWLINE → MANIFOLD</text>
+<text x="196" y="132" class="wl" fill="#cbd5e1">{{ \Illuminate\Support\Str::limit($oilString->name, 14) }}</text>
+{{-- moving fluid --}}
+@foreach([0, .9, 1.8, 2.7, 3.6] as $b)
+    <circle r="3.4" fill="#fde68a"><animateMotion dur="4.5s" begin="{{ $b }}s" repeatCount="indefinite"><mpath href="#saTube"/></animateMotion></circle>
+    <circle r="2.4" fill="#a5f3fc"><animateMotion dur="4.5s" begin="{{ $b + .45 }}s" repeatCount="indefinite"><mpath href="#saTube"/></animateMotion></circle>
+    <circle r="3.2" fill="#fde68a"><animateMotion dur="2.6s" begin="{{ $b }}s" repeatCount="indefinite"><mpath href="#saLine"/></animateMotion></circle>
+@endforeach
+{{-- readouts --}}
+<g>
+    <rect x="228" y="150" width="124" height="44" rx="10" fill="#0a1222" stroke="#fbbf24" stroke-opacity=".6"/><text x="238" y="165" class="wl" fill="#fcd34d">OIL RATE</text><text x="238" y="185" class="wv">{{ $lt ? $f($oilV, 1) : '—' }}</text><text x="{{ 238 + 10 + strlen($lt ? $f($oilV, 1) : '—') * 8.4 }}" y="185" class="wu">B/D</text>
+    <rect x="228" y="204" width="124" height="44" rx="10" fill="#0a1222" stroke="#22d3ee" stroke-opacity=".6"/><text x="238" y="219" class="wl" fill="#67e8f9">GAS RATE</text><text x="238" y="239" class="wv">{{ $lt ? $f($gasV, 2) : '—' }}</text><text x="{{ 238 + 10 + strlen($lt ? $f($gasV, 2) : '—') * 8.4 }}" y="239" class="wu">MMscf/D</text>
+    <rect x="228" y="258" width="124" height="44" rx="10" fill="#0a1222" stroke="#38bdf8" stroke-opacity=".6"/><text x="238" y="273" class="wl" fill="#7dd3fc">WATER CUT</text><text x="238" y="293" class="wv">{{ $lt ? $f($wcV, 1) : '—' }}</text><text x="{{ 238 + 10 + strlen($lt ? $f($wcV, 1) : '—') * 8.4 }}" y="293" class="wu">%</text>
+    <circle cx="340" cy="160" r="3.4" fill="#34d399" class="wpulse"/>
+</g>
+</svg>
         </div>
 
-        <div class="table-responsive">
-            <table class="tests-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Test ID</th>
-                        <th>Status</th>
-                        <th>Shift</th>
-                        <th>Oil Rate (B/D)</th>
-                        <th>Gas Rate (MMscf/D)</th>
-                        <th>Water Cut (%)</th>
-                        <th>Operator</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <div style="display:grid;gap:18px;align-content:start">
+            <div class="kpis rv">
+                <div class="kpi" style="--c:#22d3ee"><div class="ic"><i class="fe fe-activity"></i></div><div class="l">Total tests</div><div class="v cu" data-to="{{ $total }}" data-dec="0">{{ $total }}</div><div class="u">on this string</div></div>
+                <div class="kpi" style="--c:#a78bfa"><div class="ic"><i class="fe fe-calendar"></i></div><div class="l">Latest test</div><div class="v" style="font-size:19px">{{ $lt ? $lt->test_date->format('d M Y') : 'N/A' }}</div><div class="u">{{ $lt ? ($ltType === 'mpfm' ? 'MPFM' : 'Test vessel') : '' }}</div></div>
+                <div class="kpi" style="--c:#22d3ee"><div class="ic"><i class="fe fe-bar-chart-2"></i></div><div class="l">MPFM tests</div><div class="v cu" data-to="{{ $mpfmTests->count() }}" data-dec="0">{{ $mpfmTests->count() }}</div><div class="u">{{ $f($mpfmTests->avg('oil_rate'), 0) }} B/D avg oil</div></div>
+                <div class="kpi" style="--c:#fbbf24"><div class="ic"><i class="fe fe-anchor"></i></div><div class="l">Test vessel tests</div><div class="v cu" data-to="{{ $tvTests->count() }}" data-dec="0">{{ $tvTests->count() }}</div><div class="u">{{ $f($tvTests->avg('oil_rate'), 0) }} B/D avg oil</div></div>
+            </div>
+            <div class="panel rv" style="--d:1">
+                <div class="ph"><h3><i class="fe fe-info"></i> String information</h3></div>
+                <div class="infog">
+                    <div class="info"><div class="l"><i class="fe fe-anchor"></i> Oil string</div><div class="v">{{ $oilString->name }}</div></div>
+                    <div class="info"><div class="l"><i class="fe fe-layers"></i> Tower</div><div class="v">{{ $tower->name ?? '—' }}</div></div>
+                    <div class="info"><div class="l"><i class="fe fe-map-pin"></i> Oil field</div><div class="v">{{ $field->name ?? '—' }}</div></div>
+                    <div class="info"><div class="l"><i class="fe fe-activity"></i> Status</div><div class="v">{{ ucfirst($oilString->status ?? '—') }}</div></div>
+                </div>
+                @if($lt)
+                    <div class="latest">
+                        @if($lt->pressure)<div><small>Pressure</small><b>{{ $f($lt->pressure, 0) }}</b><span>psi</span></div>@endif
+                        @if($lt->temperature)<div><small>Temperature</small><b>{{ $f($lt->temperature, 1) }}</b><span>°</span></div>@endif
+                        <div><small>Shift</small><b style="font-size:15px">{{ ucfirst($lt->shift) }}</b></div>
+                        <div><small>Status</small><b style="font-size:15px">{{ ucfirst($lt->status) }}</b></div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- ALERTS --}}
+    @if(count($alerts))
+    <div class="sec"><div class="panel rv">
+        <div class="ph"><h3><i class="fe fe-alert-triangle"></i> Trend alerts</h3><span class="sub">{{ count($alerts) }} flagged</span></div>
+        <div class="alerts">
+            @foreach($alerts as $a)
+                <div class="msg warn"><i class="fe fe-alert-triangle"></i><div>{{ is_array($a) ? ($a['message'] ?? ($a['type'] ?? json_encode($a))) : $a }}</div></div>
+            @endforeach
+        </div>
+    </div></div>
+    @endif
+
+    {{-- CHARTS --}}
+    @if($total)
+    <div class="sec">
+        <div class="panel rv">
+            <div class="ph"><h3><i class="fe fe-trending-up"></i> Oil rate — MPFM vs test vessel</h3><span class="sub">{{ $dates->count() }} test dates · click a legend chip to hide a series</span></div>
+            <div id="chOil"></div>
+        </div>
+    </div>
+    <div class="sec g2">
+        <div class="panel rv"><div class="ph"><h3><i class="fe fe-wind"></i> Gas rate</h3><span class="sub">MMscf/D</span></div><div id="chGas"></div></div>
+        <div class="panel rv" style="--d:1"><div class="ph"><h3><i class="fe fe-percent"></i> Water cut</h3><span class="sub">%</span></div><div id="chWc"></div></div>
+    </div>
+    @endif
+
+    @if($wlAccess)
+        @include('mpfm_tests._string_wireline')
+    @endif
+
+    {{-- TABLE --}}
+    <div class="sec">
+        <div class="panel rv">
+            <div class="ph"><h3><i class="fe fe-list"></i> Complete test history</h3>
+                <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                    <span class="ftabs">
+                        <button class="tab on" data-t="all">All ({{ $total }})</button>
+                        <button class="tab" data-t="mpfm">MPFM ({{ $mpfmTests->count() }})</button>
+                        <button class="tab" data-t="tv">Test vessel ({{ $tvTests->count() }})</button>
+                    </span>
+                    <span class="srch"><i class="fe fe-search"></i><input type="text" id="q" placeholder="Search…" autocomplete="off"></span>
+                </span></div>
+            @if($total)
+                <div class="scroll"><table class="t" id="hist">
+                    <thead><tr><th>Date</th><th>Type</th><th>Test</th><th>Status</th><th>Shift</th><th>Oil (B/D)</th><th>Gas (MMscf/D)</th><th>WC (%)</th><th>Operator</th><th></th></tr></thead>
+                    <tbody>
                     @foreach($allTests as $item)
-                        @php
-                            $test = $item['test'];
-                            $type = $item['type'];
-                            $rowClass = $type === 'mpfm' ? 'test-row-mpfm' : 'test-row-tv';
-                            $badgeClass = $type === 'mpfm' ? 'badge-mpfm' : 'badge-tv';
-                            $typeLabel = $type === 'mpfm' ? 'MPFM' : 'TV';
-                        @endphp
-                        <tr class="{{ $rowClass }} filter-row filter-{{ $type }}">
-                            <td><strong>{{ $test->test_date->format('Y-m-d') }}</strong></td>
-                            <td>
-                                <span class="badge-modern {{ $badgeClass }}">
-                                    @if($type === 'mpfm')
-                                        <i class="fe fe-bar-chart-2"></i> MPFM
-                                    @else
-                                        <i class="fe fe-anchor"></i> TV
-                                    @endif
-                                </span>
-                            </td>
-                            <td>
-                                @if($type === 'mpfm')
-                                    <a href="{{ route('mpfm_tests.show', $test->id) }}" class="font-weight-bold text-primary">
-                                        MPFM #{{ $test->id }}
-                                    </a>
+                        @php $t = $item['test']; $ty = $item['type']; @endphp
+                        <tr data-type="{{ $ty }}">
+                            <td>{{ $t->test_date->format('Y-m-d') }}</td>
+                            <td><span class="ty {{ $ty }}"><i class="fe {{ $ty === 'mpfm' ? 'fe-bar-chart-2' : 'fe-anchor' }}"></i> {{ $ty === 'mpfm' ? 'MPFM' : 'TV' }}</span></td>
+                            <td><a class="lnk" href="{{ $ty === 'mpfm' ? route('mpfm_tests.show', $t->id) : route('tv_tests.show', $t->id) }}">{{ $ty === 'mpfm' ? 'MPFM' : 'TV' }} #{{ $t->id }}</a></td>
+                            <td><span class="chip {{ $t->status }}">{{ $t->status }}</span></td>
+                            <td>{{ ucfirst($t->shift) }}</td>
+                            <td>{{ $f($t->oil_rate) }}</td><td>{{ $f($t->gas_rate) }}</td><td>{{ $f($t->water_cut) }}</td>
+                            <td>{{ $t->user->name ?? '-' }}</td>
+                            <td style="white-space:nowrap">
+                                @if($ty === 'mpfm')
+                                    <a class="lnk" href="{{ route('mpfm_tests.show', $t->id) }}"><i class="fe fe-eye"></i> View</a>
                                 @else
-                                    <a href="{{ route('tv_tests.show', $test->id) }}" class="font-weight-bold text-primary">
-                                        TV #{{ $test->id }}
-                                    </a>
+                                    <a class="lnk" href="{{ route('tv_tests.show', $t->id) }}"><i class="fe fe-eye"></i> View</a>
+                                    @php $nm = $nearest($t); @endphp
+                                    @if($nm)<a class="lnk w" href="{{ route('tv_tests.compare_result', ['tv_test_id' => $t->id, 'mpfm_test_id' => $nm->id]) }}" title="Closest MPFM test: #{{ $nm->id }}"><i class="fe fe-shuffle"></i> Compare</a>@endif
                                 @endif
-                            </td>
-                            <td>
-                                <span class="badge-modern status-{{ $test->status }}">{{ ucfirst($test->status) }}</span>
-                            </td>
-                            <td>{{ ucfirst($test->shift) }}</td>
-                            <td>{{ number_format($test->oil_rate, 2) }}</td>
-                            <td>{{ number_format($test->gas_rate, 2) }}</td>
-                            <td>{{ number_format($test->water_cut, 2) }}</td>
-                            <td>{{ $test->user->name ?? '-' }}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    @if($type === 'mpfm')
-                                        <a href="{{ route('mpfm_tests.show', $test->id) }}" class="btn btn-sm-modern btn-info-sm">
-                                            <i class="fe fe-eye"></i> View
-                                        </a>
-                                    @else
-                                        <a href="{{ route('tv_tests.show', $test->id) }}" class="btn btn-sm-modern btn-info-sm">
-                                            <i class="fe fe-eye"></i> View
-                                        </a>
-                                        @if($mpfmTests->count() > 0)
-                                        <a href="{{ route('tv_tests.compare_result', ['tv_test_id' => $test->id, 'mpfm_test_id' => $mpfmTests->first()->id]) }}" class="btn btn-sm-modern btn-warning-sm">
-                                            <i class="fe fe-shuffle"></i> Compare
-                                        </a>
-                                        @endif
-                                    @endif
-                                </div>
                             </td>
                         </tr>
                     @endforeach
-                </tbody>
-            </table>
+                    </tbody>
+                </table></div>
+            @else
+                <div class="empty">
+                    <svg viewBox="0 0 120 90"><circle cx="52" cy="40" r="26" fill="none" stroke="#64748b" stroke-width="4"/><path d="M72,60 L96,82" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><path d="M40,40 H64" stroke="#64748b" stroke-width="4" stroke-linecap="round" stroke-dasharray="4 6"/></svg>
+                    No tests recorded for this oil string yet.
+                </div>
+            @endif
         </div>
-    @else
-        <div class="empty-state">
-            <i class="fe fe-search"></i>
-            <h5 style="color: #718096; margin: 0;">No Tests Found</h5>
-            <p style="color: #a0aec0; margin-top: 0.5rem;">
-                There are no tests recorded for this oil string yet.
-            </p>
-        </div>
-    @endif
-</div>
-
-<!-- Trending Data -->
-@if(isset($trendingData) && count($trendingData) > 0)
-<div class="card-modern">
-    <div class="section-title">
-        <i class="fe fe-trending-up"></i>
-        Trending Analysis
-    </div>
-
-    <div class="chart-container">
-        <div class="chart-title">
-            <i class="fe fe-bar-chart-2"></i>
-            Oil Rate Trend
-        </div>
-        <canvas id="trendChart" height="80"></canvas>
     </div>
 </div>
-@endif
-
 @endsection
 
-@push('scripts')
+@section('js')
+<script src="{{ asset('assets/js/ofcharts.js') }}"></script>
 <script>
-function filterTests(type) {
-    // Update active tab
-    document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
-    event.target.closest('.filter-tab').classList.add('active');
+(function () {
+    var root = document.getElementById('ofp');
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var D = @json($chart);
+    function pair(key, o) {
+        var el = document.getElementById(key.el); if (!el) return;
+        OFCharts.line(el, Object.assign({
+            labels: D.labels, height: key.h || 260,
+            series: [
+                { name: 'MPFM', data: D[key.k].mpfm, color: '#22d3ee', unit: key.u },
+                { name: 'Test vessel', data: D[key.k].tv, color: '#fbbf24', unit: key.u }
+            ]
+        }, o));
+    }
+    if (D.labels.length) {
+        pair({ el: 'chOil', k: 'oil', u: 'B/D', h: 300 }, { dec: 0 });
+        pair({ el: 'chGas', k: 'gas', u: 'MMscf/D' }, { dec: 2 });
+        pair({ el: 'chWc', k: 'wc', u: '%' }, { dec: 1 });
+    }
 
-    // Filter rows
-    const rows = document.querySelectorAll('.filter-row');
-    rows.forEach(row => {
-        if (type === 'all') {
-            row.style.display = '';
-        } else if (row.classList.contains(`filter-${type}`)) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
-}
-
-@if(isset($trendingData) && count($trendingData) > 0)
-document.addEventListener('DOMContentLoaded', function() {
-    const trendingData = @json($trendingData);
-
-    if (trendingData.dates && trendingData.oil_rates) {
-        const ctx = document.getElementById('trendChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: trendingData.dates,
-                datasets: [{
-                    label: 'Oil Rate (B/D)',
-                    data: trendingData.oil_rates,
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#667eea',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2,
-                    pointRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
+    var type = 'all', qv = '';
+    function apply() {
+        document.querySelectorAll('#hist tbody tr').forEach(function (tr) {
+            var ok = (type === 'all' || tr.dataset.type === type) && (!qv || tr.textContent.toLowerCase().indexOf(qv) > -1);
+            tr.classList.toggle('hide', !ok);
         });
     }
-});
-@endif
+    root.querySelectorAll('.ftabs .tab').forEach(function (t) {
+        t.addEventListener('click', function () { root.querySelectorAll('.ftabs .tab').forEach(function (x) { x.classList.remove('on'); }); t.classList.add('on'); type = t.dataset.t; apply(); });
+    });
+    var q = document.getElementById('q'); if (q) q.addEventListener('input', function () { qv = q.value.toLowerCase(); apply(); });
+
+    function fmt(v, d) { return v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+    function countUp(el) {
+        var to = parseFloat(el.dataset.to) || 0, d = parseInt(el.dataset.dec || 0, 10), t0 = null;
+        if (reduce) return;
+        function step(t) { if (t0 === null) t0 = t; var p = Math.min((t - t0) / 1300, 1), e = 1 - Math.pow(1 - p, 4); el.textContent = fmt(to * e, d); if (p < 1) requestAnimationFrame(step); else el.textContent = fmt(to, d); }
+        requestAnimationFrame(step);
+    }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return; e.target.classList.add('in'); e.target.querySelectorAll('.cu').forEach(countUp); io.unobserve(e.target); }); }, { threshold: .1 });
+    root.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+    if (reduce) root.querySelectorAll('svg').forEach(function (s) { if (s.pauseAnimations) s.pauseAnimations(); });
+})();
 </script>
-@endpush
+@endsection

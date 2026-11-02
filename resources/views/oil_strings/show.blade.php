@@ -243,6 +243,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab-wireline">
+                        <i class="fe fe-git-branch mr-1"></i>Wire Line
+                        <span class="badge badge-secondary ml-1">{{ $wireline['stats']['total'] }}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#tab-info">
                         <i class="fe fe-info mr-1"></i>Well Info
                     </a>
@@ -458,6 +464,8 @@
                     </div>
                     @endif
                 </div>
+
+                @include('oil_strings._wireline_tab', ['wireline' => $wireline])
 
                 {{-- ===== Tab: Well Info ===== --}}
                 <div class="tab-pane fade" id="tab-info">

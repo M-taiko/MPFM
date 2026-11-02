@@ -1,0 +1,31 @@
+/* Shared form + layout pieces for the dark admin pages (root: .ofp) */
+.ofp .grid { display:grid; grid-template-columns:1fr 400px; gap:20px; margin-top:20px; align-items:start; }
+.ofp .side { position:sticky; top:84px; display:grid; gap:16px; }
+.ofp .main > .panel { margin-bottom:16px; }
+.ofp .ph.num { justify-content:flex-start; gap:12px; }
+.ofp .ph .n { width:32px; height:32px; border-radius:50%; background:var(--grad); color:#04111f; font:700 14px 'Space Grotesk'; display:grid; place-items:center; flex:none; }
+.ofp .ph.num h3 { font-size:16px; font-weight:800; margin:0; display:block; } .ofp .ph.num small { display:block; color:var(--mute); font-size:12px; font-weight:500; margin-top:1px; }
+.ofp .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+.ofp .f label.lb { display:flex; align-items:center; gap:7px; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); margin-bottom:7px; }
+.ofp .f label.lb b { color:var(--red); } .ofp .f label.lb i { color:var(--cyan); font-size:13px; }
+.ofp .fc { width:100%; height:46px; padding:0 14px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.06); color:#fff; font:500 14px 'Inter',sans-serif; transition:border-color .25s, box-shadow .25s, background .25s; outline:none; appearance:none; -webkit-appearance:none; }
+.ofp .fc:focus { border-color:var(--cyan); box-shadow:0 0 0 4px rgba(34,211,238,.14); background:rgba(255,255,255,.09); }
+.ofp .fc::placeholder { color:#52627d; }
+.ofp select.fc { padding-right:36px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2322d3ee' stroke-width='2'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; }
+.ofp select.fc option { background:#0b1426; color:#fff; }
+.ofp .f.has-err .fc, .ofp .fc.bad { border-color:var(--red); }
+.ofp .em { color:#fca5a5; font-size:12px; margin-top:5px; display:block; }
+.ofp .hintt { color:var(--mute); font-size:12px; margin-top:6px; display:block; }
+.ofp .err { margin-top:18px; padding:14px 18px; border-radius:16px; border:1px solid rgba(248,113,113,.45); background:rgba(248,113,113,.08); color:#fecaca; font-size:13px; }
+.ofp .err ul { margin:8px 0 0; padding-left:18px; }
+.ofp .okb { margin-top:18px; padding:14px 18px; border-radius:16px; border:1px solid rgba(52,211,153,.4); background:rgba(52,211,153,.08); color:#bbf7d0; font-size:13px; }
+.ofp .bar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; padding:18px 22px; border-radius:22px; border:1px solid var(--line); background:rgba(255,255,255,.04); }
+.ofp .bar .sp { flex:1; } .ofp .bar .hint { font-size:12px; color:var(--mute); }
+.ofp .pw { position:relative; } .ofp .pw button { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:0; color:var(--sub); cursor:pointer; font-size:16px; padding:6px; }
+.ofp .meter { height:6px; border-radius:6px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:9px; } .ofp .meter i { display:block; height:100%; width:0; border-radius:6px; transition:width .4s var(--ease), background .3s; }
+.ofp .av { width:46px; height:46px; border-radius:50%; display:grid; place-items:center; font:800 16px 'Space Grotesk',sans-serif; color:#04111f; flex:none; background:var(--a,linear-gradient(135deg,#3b82f6,#22d3ee)); box-shadow:0 0 0 3px rgba(255,255,255,.08); }
+.ofp .rc { display:inline-flex; align-items:center; gap:6px; padding:3px 11px; border-radius:50px; font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; border:1px solid color-mix(in srgb, var(--rc,#60a5fa) 55%, transparent); color:var(--rc,#60a5fa); background:color-mix(in srgb, var(--rc,#60a5fa) 12%, transparent); white-space:nowrap; }
+.ofp .rc button { background:none; border:0; color:inherit; cursor:pointer; padding:0 0 0 2px; font-size:12px; line-height:1; opacity:.7; } .ofp .rc button:hover { opacity:1; }
+.ofp .tg { padding:4px 11px; border-radius:50px; font:600 11px 'Inter',sans-serif; color:var(--sub); border:1px solid var(--line); background:var(--glass); white-space:nowrap; }
+@media (max-width:1200px) { .ofp .grid { grid-template-columns:1fr; } .ofp .side { position:static; grid-template-columns:1fr 1fr; } }
+@media (max-width:760px) { .ofp .side { grid-template-columns:1fr; } }

@@ -29,7 +29,14 @@ class TestVesselController extends Controller
         }
 
         $oilFields = OilField::active()->get();
-        return view('test_vessels.index', compact('oilFields'));
+        $vessels = TestVessel::with('oilField')
+            ->withCount('tests')
+            ->withAvg('tests as avg_oil', 'oil_rate')
+            ->withMax('tests as last_test_at', 'test_date')
+            ->orderBy('name')
+            ->get();
+
+        return view('test_vessels.index', compact('oilFields', 'vessels'));
     }
 
     /**

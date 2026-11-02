@@ -16,6 +16,18 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | While true only MPFM and Test Vessel modules are enabled in the UI (sidebar + dashboard);
+    | everything else is shown greyed-out. Set FOCUS_MPFM_TV=false to enable all modules again.
+    */
+    'focus_mpfm_tv' => env('FOCUS_MPFM_TV', true),
+
+    /*
+    | The admin theme ships LTR and RTL builds. The UI is English, so LTR is the default;
+    | set UI_RTL=true to bring back the right-to-left shell.
+    */
+    'ui_rtl' => env('UI_RTL', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------

@@ -33,7 +33,10 @@ class TVTestRequestController extends Controller
         }
 
         $oilFields = OilField::active()->get();
-        return view('tv_test_requests.index', compact('oilFields'));
+        $requests = TVTestRequest::with(['testVessel', 'tower', 'oilField', 'requestedBy', 'wells'])
+            ->latest('test_date')->latest('id')->get();
+
+        return view('tv_test_requests.index', compact('oilFields', 'requests'));
     }
 
     /**

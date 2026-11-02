@@ -130,6 +130,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Wire Line access: management roles, supervisors, and Wire Line department users
+     */
+    public function canAccessWireline(): bool
+    {
+        return $this->hasAnyRole(['admin', 'department_manager', 'job_officer', 'surveillance_supervisor', 'production_supervisor'])
+            || $this->department?->code === 'WIRELINE';
+    }
+
+    /**
      * Check if user is admin
      */
     public function isAdmin(): bool
