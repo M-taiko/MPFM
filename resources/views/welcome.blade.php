@@ -187,7 +187,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
     <div class="wrap">
         <a class="brand" href="#top"><span class="lg" role="img" aria-label="Logo"></span><span>Oil Field<small>Management System</small></span></a>
         <nav class="links" aria-label="Sections">
-            <a href="#platform">Platform</a><a href="#flow">Production flow</a><a href="#mpfm">MPFM</a><a href="#vessel">Well Testing</a><a href="#wireline">Wire Line</a><a href="#analysis">Well Analysis</a><a href="#governance">Governance</a><a href="#roadmap">Roadmap</a>
+            <a href="#platform">Platform</a><a href="#flow">Production flow</a><a href="#mpfm">MPFM</a><a href="#vessel">Well Testing</a><a href="#wireline">Wire Line</a><a href="#integrity">Integrity</a><a href="#analysis">Well Analysis</a><a href="#governance">Governance</a><a href="#roadmap">Roadmap</a>
         </nav>
         @auth<a href="{{ url('/dashboard') }}" class="btn p sm">Open dashboard</a>@else<a href="{{ route('login') }}" class="btn p sm">Sign in</a>@endauth
     </div>
@@ -248,6 +248,8 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
 </div>
 
 {{-- ═════════ PLATFORM OVERVIEW ═════════ --}}
+@include('partials.welcome_sites')
+
 <section id="platform" class="alt">
     <div class="wrap">
         <div class="center rv"><div class="kicker">Platform</div><h2 class="sh">Everything starts at the well</h2>
@@ -569,7 +571,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
         <div class="txt rv">
             <div class="num">02 · WELL TESTING</div>
             <h3>Cross-check every meter against the separator</h3>
-            <p>Plan vessel tests with requests, record results and compare them with MPFM readings for the same well. Deviations beyond tolerance are surfaced automatically so meter issues are caught early.</p>
+            <p>Offshore or onshore, plan vessel tests with requests, record results and compare them with MPFM readings for the same well. Deviations beyond tolerance are surfaced automatically so meter issues are caught early.</p>
             <ul class="ticks">
                 <li>Fleet register with status (active, maintenance, inactive)</li>
                 <li>Test requests with multi-well scheduling and tracking</li>
@@ -675,6 +677,8 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
 </section>
 
 {{-- ═════════ FIELD SETUP ═════════ --}}
+@include('partials.welcome_wellbore')
+
 <section id="field">
     <div class="wrap mod">
         <div class="txt rv">
@@ -744,6 +748,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             <div class="c rv" style="--cc:#fbbf24"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8V5M17 8V5"/></svg></div><h4>Well testing</h4><p>Offshore and onshore test vessels, requests and meter comparison.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#a78bfa"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-4 4 4"/><circle cx="12" cy="15" r="3"/></svg></div><h4>Wire Line</h4><p>Memory-gauge surveys and intervention history.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#34d399"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/></svg></div><h4>Well analysis</h4><p>Health, forecast, reservoir and recommendations.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#2dd4bf"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h4>Well integrity</h4><p>Barriers, annulus pressures, wellhead checks and anomalies.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#60a5fa"><div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h4>Tasks &amp; monthly plans</h4><p>Department task management with SLA tracking.</p><span class="soon">Coming soon</span></div>
             <div class="c rv" style="--cc:#fb923c"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div><h4>Drilling · Completion · Workover · Maintenance</h4><p>Department workflows on the same well record.</p><span class="soon">Coming soon</span></div>
         </div>
