@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Oil Field Management System logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c2250"/><stop offset="1" stop-color="#040b1c"/></linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#3b82f6"/></linearGradient>
+    <linearGradient id="oil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".7" r=".62"><stop offset="0" stop-color="#22d3ee" stop-opacity=".38"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient>
+    <clipPath id="sq"><rect width="120" height="120" rx="27"/></clipPath>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="120" height="120" fill="url(#bg)"/>
+    <rect width="120" height="120" fill="url(#glow)"/>
+
+    <!-- slow rotating dashed ring -->
+    <g>
+      <circle cx="60" cy="60" r="50" fill="none" stroke="url(#ring)" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="58 18 8 18" opacity=".95"/>
+      <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="18s" repeatCount="indefinite"/>
+    </g>
+    <circle cx="60" cy="60" r="42" fill="none" stroke="#3b82f6" stroke-opacity=".28" stroke-width="1"/>
+    <!-- data point orbiting the inner ring -->
+    <circle r="3" fill="#fde68a">
+      <animateMotion dur="9s" repeatCount="indefinite" path="M60 18 A42 42 0 1 1 59.99 18"/>
+    </circle>
+
+    <!-- ground -->
+    <rect x="0" y="99" width="120" height="21" fill="#08142e"/>
+    <g>
+      <path d="M-40 99 q9.5 -5 19 0 t19 0 t19 0 t19 0 t19 0 t19 0 t19 0 t19 0 t19 0 t19 0" fill="none" stroke="url(#oil)" stroke-width="3" stroke-linecap="round"/>
+      <animateTransform attributeName="transform" type="translate" from="0 0" to="38 0" dur="3.2s" repeatCount="indefinite"/>
+    </g>
+
+    <!-- pressure pulse leaving the well -->
+    <circle cx="60" cy="93" r="6" fill="none" stroke="#22d3ee" stroke-width="1.6">
+      <animate attributeName="r" values="6;38" dur="3.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".85;0" dur="3.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="60" cy="93" r="6" fill="none" stroke="#22d3ee" stroke-width="1.2">
+      <animate attributeName="r" values="6;38" dur="3.2s" begin="1.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values=".6;0" dur="3.2s" begin="1.6s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- derrick -->
+    <path d="M50.4 66 L65.3 50 M69.6 66 L54.7 50 M44 90 L69.6 66 M76 90 L50.4 66" fill="none" stroke="#22d3ee" stroke-width="1.6" stroke-linecap="round"/>
+    <g fill="none" stroke="#eaf6ff" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M60 31 L44 90 M60 31 L76 90"/>
+      <path d="M50.4 66 H69.6 M54.7 50 H65.3"/>
+      <path d="M36 90 H84"/>
+    </g>
+    <rect x="55.5" y="25" width="9" height="5.5" rx="1.6" fill="#eaf6ff"/>
+
+    <!-- oil drop falling through the derrick -->
+    <path d="M60 40 C60 40 54.6 46.4 54.6 50.2 a5.4 5.4 0 0 0 10.8 0 C65.4 46.4 60 40 60 40Z" fill="url(#oil)">
+      <animateTransform attributeName="transform" type="translate" values="0 -6;0 34;0 34" keyTimes="0;.72;1" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;.12;.6;.74;1" dur="2.8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>

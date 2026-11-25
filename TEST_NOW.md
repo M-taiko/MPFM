@@ -45,7 +45,7 @@ Click the blue "Start Task" button on any pending task.
 Once on the upload page, check all fields:
 
 ### Well Information Section (should be filled):
-- [ ] **Client:** `ADNOC` ✅
+- [ ] **Client:** `Oil Field` ✅
 - [ ] **Field:** Shows field name ✅
 - [ ] **Well Name:** Shows well name ✅ **FIXED**
 

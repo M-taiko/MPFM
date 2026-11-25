@@ -117,6 +117,38 @@
         @endif
     </div>
 
+    {{-- WELL INTEGRITY (feeds the health score, production state and recommendations above) --}}
+    @if($analysis['integrity'])
+    @php $ig = $analysis['integrity']; @endphp
+    <div class="panel" style="margin-top:18px">
+        <div class="ph"><h3><i class="fe fe-shield"></i> Well integrity</h3>
+            <span class="sub">{{ $ig['guidance'] }}</span>
+            <a class="lnk" href="{{ route('integrity.show', $oilString) }}">Open integrity file</a></div>
+        @if(!$ig['has_data'])
+            <div class="msg warn"><i class="fe fe-alert-triangle"></i><span>No integrity data recorded for this well, so it is shown as <b>not assessed</b> (not assumed healthy).</span></div>
+        @else
+        <div class="kpis" style="margin-top:0">
+            <div class="kpi" style="--c:{{ $ig['color'] }}"><div class="l">Integrity status</div><div class="v" style="font-size:24px">{{ strtoupper($ig['label']) }}</div><div class="u">score {{ $ig['score'] }}</div></div>
+            <div class="kpi" style="--c:#fbbf24"><div class="l">Annuli in alert</div><div class="v">{{ $ig['counts']['annuli_alert'] }}</div><div class="u">of {{ count($ig['annuli']) }} monitored</div></div>
+            <div class="kpi" style="--c:#f87171"><div class="l">Failed barriers</div><div class="v">{{ $ig['counts']['failed'] }}</div><div class="u">{{ $ig['counts']['degraded'] }} degraded · {{ $ig['counts']['overdue_tests'] }} tests overdue</div></div>
+            <div class="kpi" style="--c:#a78bfa"><div class="l">Open anomalies</div><div class="v">{{ $ig['counts']['open_anomalies'] }}</div><div class="u">{{ $ig['counts']['critical'] }} critical</div></div>
+            <div class="kpi" style="--c:#2dd4bf"><div class="l">Last wellhead check</div><div class="v" style="font-size:18px">{{ $ig['latest_check']?->check_date->format('d M Y') ?? '—' }}</div><div class="u">{{ $ig['counts']['check_issues'] ? $ig['counts']['check_issues'] . ' issue(s)' : 'no issues' }}</div></div>
+            @if($ig['profile'] && ($ig['profile']->max_oil_rate || $ig['profile']->mawhp))
+            <div class="kpi" style="--c:#fb923c"><div class="l">Operating limits</div><div class="v" style="font-size:16px">{{ $ig['profile']->max_oil_rate ? number_format($ig['profile']->max_oil_rate) . ' B/D' : '' }}<br>{{ $ig['profile']->mawhp ? 'MAWHP ' . number_format($ig['profile']->mawhp) : '' }}</div><div class="u">applied to this analysis</div></div>
+            @endif
+        </div>
+        @if($ig['reasons'])
+            <div class="ins-sub">Integrity factors</div>
+            @foreach(array_slice($ig['reasons'], 0, 8) as $r)<div class="fac"><b>{{ $r['delta'] }}</b><span><span style="color:var(--mute)">{{ $r['area'] }} ·</span> {{ $r['text'] }}</span></div>@endforeach
+        @endif
+        @isset($rs['pi'])
+            @if(!empty($rs['pi']['restricted']))<div class="msg warn" style="margin-top:14px"><i class="fe fe-alert-triangle"></i><span><b>Productivity index:</b> {{ $rs['pi']['restricted'] }}</span></div>
+            @elseif(!empty($rs['pi']['caution']))<div class="msg" style="margin-top:14px"><i class="fe fe-info"></i><span><b>Productivity index:</b> {{ $rs['pi']['caution'] }}</span></div>@endif
+        @endisset
+        @endif
+    </div>
+    @endif
+
     {{-- RECOMMENDATIONS --}}
     <div class="panel" style="margin-top:18px">
         <div class="ph"><h3><i class="fe fe-check-square"></i> Recommendations</h3><span class="sub">{{ count($analysis['recommendations']) }} item(s) · ranked by priority</span></div>

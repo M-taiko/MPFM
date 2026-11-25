@@ -109,7 +109,7 @@ URL: http://localhost/MPFM/public/upload?task_id=X
 │        Upload Test Log                      │
 ├─────────────────────────────────────────────┤
 │  Task Context Information:                  │
-│  ├─ Field: ADNOC Onshore Field Alpha       │
+│  ├─ Field: Oil Field Onshore Field Alpha       │
 │  ├─ Tower: Tower 1                         │
 │  ├─ String: String A1                      │
 │  └─ MPFM Device: MPFM Type A               │
@@ -335,7 +335,7 @@ if (!$task->isAssignedTo(auth()->id())) {
 
 ```bash
 # 1. دخول كـ Job Officer
-Email: job.officer@adnoc.ae
+Email: job.officer@oilfield.com
 Password: password
 
 # 2. إنشاء Monthly Plan
@@ -344,7 +344,7 @@ Password: password
 → Submit for Review
 
 # 3. دخول كـ Surveillance Supervisor
-Email: ?@adnoc.ae (تحتاج تعيين هذا الدور)
+Email: ?@oilfield.com (تحتاج تعيين هذا الدور)
 Password: password
 
 # 4. مراجعة والتصنيف
@@ -352,7 +352,7 @@ Password: password
 → Assign to MPFM
 
 # 5. دخول كـ Operator
-Email: operator1@adnoc.ae
+Email: operator1@oilfield.com
 Password: password
 
 # 6. تنفيذ التاسك
@@ -361,7 +361,7 @@ Password: password
 → Upload Log File
 
 # 7. دخول كـ MPFM Supervisor
-Email: supervisor@adnoc.ae
+Email: supervisor@oilfield.com
 Password: password
 
 # 8. مراجعة النتائج

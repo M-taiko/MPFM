@@ -82,7 +82,7 @@ public function showUploadForm(Request $request)
 
         // Prepare auto-fill data
         $autoFillData = [
-            'client' => 'ADNOC',
+            'client' => 'Oil Field',
             'field' => $task->oilString->tower->oilField->name,
             'well' => $task->dailyPlan->plan_name,
             'wellhead_tower' => $task->oilString->tower->name,
@@ -126,7 +126,7 @@ public function showUploadForm(Request $request)
 
         // Prepare auto-fill data from monthly plan task structure
         $autoFillData = [
-            'client' => 'ADNOC',
+            'client' => 'Oil Field',
             'field' => $task->towerModel?->oilField?->name ?? 'N/A',
             'well' => $task->towerModel?->well_name ?? 'N/A',
             'wellhead_tower' => $task->towerModel?->name ?? 'N/A',

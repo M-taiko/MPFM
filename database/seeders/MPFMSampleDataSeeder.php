@@ -24,12 +24,12 @@ class MPFMSampleDataSeeder extends Seeder
 
     /**
      * Run the database seeds.
-     * Creates realistic ADNOC-grade operational plans and MPFM tests
+     * Creates realistic production-grade operational plans and MPFM tests
      */
     public function run(): void
     {
         // // Get users
-        // $supervisor = User::where('email', 'supervisor@adnoc.ae')->first();
+        // $supervisor = User::where('email', 'supervisor@oilfield.com')->first();
         // $operators = User::role('mpfm_operator')->get();
 
         // if (!$supervisor || $operators->isEmpty()) {

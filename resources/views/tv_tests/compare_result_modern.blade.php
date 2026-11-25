@@ -18,7 +18,7 @@
 .tvr .o1 { width:440px; height:440px; background:#2563eb; top:-140px; left:-120px; }
 .tvr .o2 { width:400px; height:400px; background:#0891b2; bottom:-160px; right:-100px; animation-delay:-6s; }
 @keyframes trFloat { 50% { transform:translate(40px,-40px) scale(1.12); } }
-.tvr .lg { --h:76px; display:inline-block; flex:none; height:var(--h); aspect-ratio:600/940; border-radius:calc(var(--h) * .14); background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; animation:trGlow 3.2s ease-in-out infinite; }
+.tvr .lg { --h:76px; display:inline-block; flex:none; height:var(--h); aspect-ratio:1/1; border-radius:calc(var(--h) * .14); background:#071326 url('/assets/img/brand/logo.svg') center/cover no-repeat; border:2px solid rgba(34,211,238,.5); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; animation:trGlow 3.2s ease-in-out infinite; }
 .tvr .lg::after { content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(34,211,238,.45),transparent); transform:skewX(-20deg); animation:trShine 4.5s infinite; }
 @keyframes trShine { 60%,100% { left:160%; } }
 @keyframes trGlow { 50% { box-shadow:0 0 0 1px rgba(59,130,246,.6),0 10px 40px rgba(0,0,0,.5),0 0 54px rgba(34,211,238,.65); } }

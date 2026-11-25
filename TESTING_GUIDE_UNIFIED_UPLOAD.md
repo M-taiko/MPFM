@@ -9,7 +9,7 @@
 ### Steps:
 ```
 1. Go to: http://127.0.0.1:8000/operator/dashboard
-2. Log in as operator1@adnoc.ae (password: your password)
+2. Log in as operator1@oilfield.com (password: your password)
 3. Find a PENDING task (blue "Pending" badge)
 4. Click on the task to view details
 5. Click the "Start Task" button
@@ -27,7 +27,7 @@ Example: http://127.0.0.1:8000/upload?task_id=12
 ✓ Upload form appears
 ✓ "Auto-filled from task" label visible under form sections
 ✓ Form fields contain task information:
-  - Client: ADNOC
+  - Client: Oil Field
   - Field: (tower name)
   - Well: (tower well name)
   - Tower: (tower name)
@@ -51,7 +51,7 @@ Example: http://127.0.0.1:8000/upload?task_id=12
 ### Expected Result:
 ```
 Form Section 1: Well Information
-  ✓ Client = "ADNOC"
+  ✓ Client = "Oil Field"
   ✓ Field = (actual tower name)
   ✓ Well = (actual well name)
 
@@ -139,7 +139,7 @@ Ensure a task is assigned to:
 
 ### Steps as Operator 1:
 ```
-1. Log in as operator1@adnoc.ae
+1. Log in as operator1@oilfield.com
 2. Go to dashboard
 3. Find the shared task
 4. Click "Start Task"
@@ -150,7 +150,7 @@ Ensure a task is assigned to:
 ### Steps as Operator 2:
 ```
 1. Log out Operator 1
-2. Log in as operator2@adnoc.ae
+2. Log in as operator2@oilfield.com
 3. Go to dashboard
 4. Find the SAME task
 5. Should see status is "COMPLETED" ✅
@@ -237,7 +237,7 @@ Ensure a task is assigned to:
 - [ ] Upload form displays
 
 ### Test Case 2: Auto-Fill
-- [ ] Client shows ADNOC
+- [ ] Client shows Oil Field
 - [ ] Field shows tower name
 - [ ] Well shows tower well name
 - [ ] Operator shows logged-in name

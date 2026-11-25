@@ -22,10 +22,10 @@ class MonthlyPlanTaskSeeder extends Seeder
         //     $this->command->info('Creating monthly plans and tasks...');
 
         //     // Get operators
-        //     $op1 = User::where('email', 'operator1@adnoc.ae')->first();
-        //     $op2 = User::where('email', 'operator2@adnoc.ae')->first();
-        //     $op3 = User::where('email', 'operator3@adnoc.ae')->first();
-        //     $supervisor = User::where('email', 'supervisor@adnoc.ae')->first();
+        //     $op1 = User::where('email', 'operator1@oilfield.com')->first();
+        //     $op2 = User::where('email', 'operator2@oilfield.com')->first();
+        //     $op3 = User::where('email', 'operator3@oilfield.com')->first();
+        //     $supervisor = User::where('email', 'supervisor@oilfield.com')->first();
 
         //     if (!$op1 || !$op2 || !$op3 || !$supervisor) {
         //         $this->command->error('Required users not found. Run: php artisan db:seed --class=UserSeeder');

@@ -13,13 +13,13 @@ URL: http://localhost/MPFM/public
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | donia.a5ra2019@gmail.com | password |
-| Job Officer | job.officer@adnoc.ae | password |
-| MPFM Supervisor | supervisor@adnoc.ae | password |
-| Operator 1 | operator1@adnoc.ae | password |
-| Operator 2 | operator2@adnoc.ae | password |
-| Operator 3 | operator3@adnoc.ae | password |
-| Production Supervisor | prod.supervisor@adnoc.ae | password |
-| Reservoir Engineer | reservoir.engineer@adnoc.ae | password |
+| Job Officer | job.officer@oilfield.com | password |
+| MPFM Supervisor | supervisor@oilfield.com | password |
+| Operator 1 | operator1@oilfield.com | password |
+| Operator 2 | operator2@oilfield.com | password |
+| Operator 3 | operator3@oilfield.com | password |
+| Production Supervisor | prod.supervisor@oilfield.com | password |
+| Reservoir Engineer | reservoir.engineer@oilfield.com | password |
 
 ## Key Pages to Visit
 
@@ -47,7 +47,7 @@ URL: http://localhost/MPFM/public
 
 ### Workflow 1: Submit Plan for Approval (Job Officer)
 
-1. **Login** as Job Officer (job.officer@adnoc.ae)
+1. **Login** as Job Officer (job.officer@oilfield.com)
 2. **Navigate** to "Monthly Plans"
 3. **Click** "January 2026 MPFM Testing Plan"
 4. **Review** the 5 tasks in DRAFT state
@@ -67,7 +67,7 @@ Note: Surveillance Supervisor role needs to be assigned to a user first.
 
 ### Workflow 3: Start Task Execution (MPFM Operator)
 
-1. **Login** as Operator (operator1@adnoc.ae)
+1. **Login** as Operator (operator1@oilfield.com)
 2. **Navigate** to "Operator Dashboard"
 3. **View** "My Assigned Tasks"
 4. **Click** task "Well 375 String A1"
@@ -76,7 +76,7 @@ Note: Surveillance Supervisor role needs to be assigned to a user first.
 
 ### Workflow 4: Review and Approve (MPFM Supervisor)
 
-1. **Login** as MPFM Supervisor (supervisor@adnoc.ae)
+1. **Login** as MPFM Supervisor (supervisor@oilfield.com)
 2. **Navigate** to "Dashboard"
 3. **View** "Tasks Pending Review"
 4. **Click** completed task

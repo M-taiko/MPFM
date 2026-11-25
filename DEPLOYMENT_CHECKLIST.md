@@ -158,7 +158,7 @@ Expected: Full system access to all features
 
 #### Job Officer Login
 ```
-Email: job.officer@adnoc.ae
+Email: job.officer@oilfield.com
 Password: password
 Expected: Can view plans, create tasks, assign to departments
 ```
@@ -170,7 +170,7 @@ Expected: Can view plans, create tasks, assign to departments
 
 #### Department Manager Login
 ```
-Email: supervisor@adnoc.ae
+Email: supervisor@oilfield.com
 Password: password
 Expected: Can view own department tasks, assign operators
 ```
@@ -182,7 +182,7 @@ Expected: Can view own department tasks, assign operators
 
 #### Operator Login
 ```
-Email: operator1@adnoc.ae
+Email: operator1@oilfield.com
 Password: password
 Expected: Can view assigned tasks only
 ```
@@ -270,10 +270,10 @@ php artisan tinker
 > User::where('email', 'donia.a5ra2019@gmail.com')->first()->roles
 # Should show: admin
 
-> User::where('email', 'supervisor@adnoc.ae')->first()->roles
+> User::where('email', 'supervisor@oilfield.com')->first()->roles
 # Should show: department_manager
 
-> User::where('email', 'operator1@adnoc.ae')->first()->roles
+> User::where('email', 'operator1@oilfield.com')->first()->roles
 # Should show: mpfm_operator
 
 > Role::find('admin')->permissions->count()

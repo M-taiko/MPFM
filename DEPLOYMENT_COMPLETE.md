@@ -38,12 +38,12 @@ The MPFM (Multiphase Flow Meter) system has been successfully deployed with:
 
 ```
 Admin:               donia.a5ra2019@gmail.com
-Job Officer:         job.officer@adnoc.ae
+Job Officer:         job.officer@oilfield.com
 Surveillance Sup:    Not assigned (seed as needed)
-MPFM Supervisor:     supervisor@adnoc.ae
-MPFM Operators:      operator1@adnoc.ae, operator2@adnoc.ae, operator3@adnoc.ae
-Prod. Supervisor:    prod.supervisor@adnoc.ae
-Reservoir Engineer:  reservoir.engineer@adnoc.ae
+MPFM Supervisor:     supervisor@oilfield.com
+MPFM Operators:      operator1@oilfield.com, operator2@oilfield.com, operator3@oilfield.com
+Prod. Supervisor:    prod.supervisor@oilfield.com
+Reservoir Engineer:  reservoir.engineer@oilfield.com
 ```
 
 ## State Machine Workflow

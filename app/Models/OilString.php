@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OilString extends Model
@@ -54,6 +55,42 @@ class OilString extends Model
     public function wirelineOperations(): HasMany
     {
         return $this->hasMany(WirelineOperation::class);
+    }
+
+    // ── Well Integrity ───────────────────────────────────────────
+    public function integrityProfile(): HasOne
+    {
+        return $this->hasOne(WellIntegrityProfile::class);
+    }
+
+    public function integrityAnnuli(): HasMany
+    {
+        return $this->hasMany(WellIntegrityAnnulus::class)->orderBy('name');
+    }
+
+    public function barrierElements(): HasMany
+    {
+        return $this->hasMany(WellBarrierElement::class)->orderBy('id');
+    }
+
+    public function integrityTests(): HasMany
+    {
+        return $this->hasMany(WellIntegrityTest::class);
+    }
+
+    public function integrityInspections(): HasMany
+    {
+        return $this->hasMany(WellIntegrityInspection::class)->orderByDesc('inspection_date');
+    }
+
+    public function wellheadChecks(): HasMany
+    {
+        return $this->hasMany(WellheadCheck::class)->orderByDesc('check_date')->orderByDesc('id');
+    }
+
+    public function integrityAnomalies(): HasMany
+    {
+        return $this->hasMany(WellIntegrityAnomaly::class)->orderByDesc('risk_score');
     }
 
     /**

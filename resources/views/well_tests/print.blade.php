@@ -101,7 +101,7 @@ body { font:10pt/1.45 'Segoe UI',Arial,sans-serif; color:#0f172a; background:#e5
 .bar label { font-size:12.5px; display:flex; gap:7px; align-items:center; cursor:pointer; color:#cbd5e1; }
 .sheet { width:210mm; margin:18px auto; background:#fff; padding:14mm 12mm; box-shadow:0 10px 40px rgba(15,23,42,.18); }
 .head { display:flex; align-items:center; gap:14px; padding-bottom:10px; border-bottom:2.5px solid #1e3a8a; }
-.badge { height:56px; aspect-ratio:600/940; border-radius:8px; background:#fff url('{{ asset('assets/img/brand/logo.png') }}') 50% 50.8%/333.33% auto no-repeat; border:1.5px solid #cbd5e1; flex:none; }
+.badge { height:56px; aspect-ratio:1/1; border-radius:12px; background:#071326 url('{{ asset('assets/img/brand/logo.svg') }}') center/cover no-repeat; border:1.5px solid #cbd5e1; flex:none; }
 .head h1 { margin:0; font-size:17pt; color:#1e3a8a; letter-spacing:-.01em; } .head p { margin:2px 0 0; color:#475569; font-size:9.5pt; }
 .head .ref { margin-left:auto; text-align:right; font-size:8.5pt; color:#475569; line-height:1.5; } .head .ref b { display:block; font-size:13pt; color:#0f172a; letter-spacing:.04em; }
 h2 { font-size:11pt; color:#1e3a8a; margin:16px 0 7px; padding-bottom:3px; border-bottom:1px solid #cbd5e1; text-transform:uppercase; letter-spacing:.06em; break-after:avoid; }

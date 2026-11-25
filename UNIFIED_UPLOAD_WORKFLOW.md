@@ -44,7 +44,7 @@ Example: /upload?task_id=12
 ### Step 3: Upload Form Appears
 ```
 Form is auto-filled with:
-  ✅ Client: ADNOC
+  ✅ Client: Oil Field
   ✅ Field: (from tower)
   ✅ Well: (from tower)
   ✅ Tower: (from tower model)
@@ -111,7 +111,7 @@ The upload form is automatically filled with task information:
 
 ```php
 $autoFillData = [
-    'client' => 'ADNOC',
+    'client' => 'Oil Field',
     'field' => $task->towerModel?->oilField?->name,
     'well' => $task->towerModel?->well_name,
     'wellhead_tower' => $task->towerModel?->name,

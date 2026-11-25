@@ -120,7 +120,7 @@
                                 <div class="form-group">
                                     <label>Client</label>
                                     <input type="text" name="client" class="form-control @error('client') is-invalid @enderror"
-                                           placeholder="ADNOC"
+                                           placeholder="Oil Field"
                                            value="{{ old('client', $autoFillData['client'] ?? '') }}"
                                            {{ isset($task) ? 'readonly' : '' }} required>
                                     @error('client')

@@ -167,7 +167,7 @@ Task 16: Well 379 → Op2 (primary), Op1, Op3
 
 ### Test as Operator 1
 ```
-Email: operator1@adnoc.ae
+Email: operator1@oilfield.com
 Password: (your password)
 Tasks: 12, 14, 15, 16 (can also see 12, 14, 15, 16)
 ```
@@ -268,7 +268,7 @@ For complete technical details, see:
 
 2. **Log in as Operator 1**:
    ```
-   Email: operator1@adnoc.ae
+   Email: operator1@oilfield.com
    Password: (your password)
    ```
 

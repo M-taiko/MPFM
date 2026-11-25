@@ -1,7 +1,7 @@
 /* Illustration styles carried over from the previous dashboard (platform, strata, tank, process flow, rig, logo). Scoped to .ent */
 @keyframes ofdGrid { to { background-position:0 56px; } }
 @keyframes ofdFloat { 50% { transform:translate(40px,-40px) scale(1.12); } }
-.ent .lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:600/940; border-radius:calc(var(--h) * .14); background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
+.ent .lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:1/1; border-radius:calc(var(--h) * .14); background:#071326 url('/assets/img/brand/logo.svg') center/cover no-repeat; border:2px solid rgba(34,211,238,.5); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
 .ent .lg::after { content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(34,211,238,.45),transparent); transform:skewX(-20deg); animation:ofdShine 4.5s infinite; }
 @keyframes ofdShine { 60%,100% { left:160%; } }
 .ent .hero .lg { --h:96px; animation:ofdGlowLg 3.2s ease-in-out infinite; }

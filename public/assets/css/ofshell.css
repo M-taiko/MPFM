@@ -7,7 +7,7 @@
 .app-sidebar > * { position:relative; }
 .main-sidebar-header { background:transparent !important; border-bottom:1px solid var(--ofs-line) !important; height:72px !important; padding:0 18px !important; display:flex !important; align-items:center; }
 .ofs-brand { display:flex; align-items:center; gap:12px; text-decoration:none !important; min-width:0; }
-.ofs-badge { --h:42px; display:inline-block; flex:none; height:var(--h); aspect-ratio:600/940; border-radius:calc(var(--h) * .14); background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 4px 16px rgba(0,0,0,.45),0 0 18px rgba(34,211,238,.35); position:relative; overflow:hidden; animation:ofsGlow 3.2s ease-in-out infinite; }
+.ofs-badge { --h:42px; display:inline-block; flex:none; height:var(--h); aspect-ratio:1/1; border-radius:calc(var(--h) * .14); background:#071326 url('/assets/img/brand/logo.svg') center/cover no-repeat; border:2px solid rgba(34,211,238,.5); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 4px 16px rgba(0,0,0,.45),0 0 18px rgba(34,211,238,.35); position:relative; overflow:hidden; animation:ofsGlow 3.2s ease-in-out infinite; }
 .ofs-badge::after { content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(34,211,238,.5),transparent); transform:skewX(-20deg); animation:ofsShine 4.5s infinite; }
 @keyframes ofsShine { 60%,100% { left:160%; } }
 @keyframes ofsGlow { 50% { box-shadow:0 0 0 1px rgba(59,130,246,.6),0 4px 16px rgba(0,0,0,.45),0 0 30px rgba(34,211,238,.65); } }

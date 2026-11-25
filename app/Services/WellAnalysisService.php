@@ -20,25 +20,44 @@ class WellAnalysisService
     private const STATIC_SURVEYS = ['bhcip', 'static_gradient', 'pbu'];
     private const FLOWING_SURVEYS = ['bhfp', 'flowing_gradient', 'drawdown'];
 
-    public function analyze(OilString $well, Collection $mpfmTests, Collection $tvTests, array $wireline, Collection $planTasks, Collection $tasks): array
+    public function analyze(OilString $well, Collection $mpfmTests, Collection $tvTests, array $wireline, Collection $planTasks, Collection $tasks, ?array $integrity = null): array
     {
         $points = $this->usablePoints($mpfmTests, $tvTests);
         $production = $this->production($points);
         $reservoir = $this->reservoir($wireline, $points);
+        $this->applyIntegrityToPi($reservoir, $integrity);
         $meters = $this->meterAgreement($mpfmTests, $tvTests);
-        $status = $this->status($well, $production, $reservoir, $wireline, $meters);
-        $recs = $this->recommendations($production, $reservoir, $wireline, $meters, $status, $mpfmTests);
+        $status = $this->status($well, $production, $reservoir, $wireline, $meters, $integrity);
+        $recs = $this->recommendations($production, $reservoir, $wireline, $meters, $status, $mpfmTests, $integrity);
 
         return [
             'status'          => $status,
             'production'      => $production,
             'reservoir'       => $reservoir,
             'meters'          => $meters,
+            'integrity'       => $integrity,
             'recommendations' => $recs,
             'charts'          => $this->charts($points, $production, $reservoir),
-            'timeline'        => $this->timeline($mpfmTests, $tvTests, $wireline['operations'], $planTasks, $tasks),
+            'timeline'        => $this->timeline($mpfmTests, $tvTests, $wireline['operations'], $planTasks, $tasks, $integrity),
             'breakdown'       => $this->breakdown($wireline['operations'], $planTasks, $tasks, $mpfmTests, $tvTests),
         ];
+    }
+
+    /**
+     * A productivity index measured while the well was held at an integrity rate limit
+     * describes the restriction, not the reservoir - flag it so nobody reads it as deliverability.
+     */
+    private function applyIntegrityToPi(array &$reservoir, ?array $integrity): void
+    {
+        if (!isset($reservoir['pi']) || !$integrity) {
+            return;
+        }
+        $cap = $integrity['profile']?->max_oil_rate;
+        if ($cap && $reservoir['pi']['q'] >= 0.95 * $cap) {
+            $reservoir['pi']['restricted'] = 'Test rate (' . $this->f($reservoir['pi']['q']) . ' B/D) was at the integrity limit of ' . $this->f($cap) . ' B/D - PI is a lower bound.';
+        } elseif (in_array($integrity['key'], ['red', 'amber'], true)) {
+            $reservoir['pi']['caution'] = 'Well integrity is ' . strtoupper($integrity['label']) . ' - confirm the flowing survey was taken under normal operating conditions.';
+        }
     }
 
     // ── Data preparation ─────────────────────────────────────────
@@ -241,7 +260,7 @@ class WellAnalysisService
     }
 
     // ── Overall status & health score ────────────────────────────
-    private function status(OilString $well, array $prod, array $res, array $wl, ?array $meters): array
+    private function status(OilString $well, array $prod, array $res, array $wl, ?array $meters, ?array $integrity = null): array
     {
         $factors = [];
         $score = 100;
@@ -286,17 +305,84 @@ class WellAnalysisService
         if ($meters && $meters['mean_abs_pct'] > 10) { $add(-7, "MPFM vs test vessel differ by {$meters['mean_abs_pct']}%"); }
         if ($well->status !== 'active') { $add(-10, 'Well is marked ' . $well->status); }
 
+        // Well integrity: a compromised well cannot be called "healthy" however well it produces
+        if ($integrity && $integrity['has_data']) {
+            $top = $integrity['reasons'][0]['text'] ?? null;
+            if ($integrity['key'] === 'red') {
+                $add(-30, 'Well integrity RED' . ($top ? ' - ' . $top : ''));
+                if ($state[1] !== 'bad') { $state = ['Producing - integrity risk', 'bad']; }
+            } elseif ($integrity['key'] === 'amber') {
+                $add(-12, 'Well integrity AMBER' . ($top ? ' - ' . $top : ''));
+                if ($state[1] === 'ok') { $state = ['Producing - integrity watch', 'warn']; }
+            }
+            $cap = $integrity['profile']?->max_oil_rate;
+            $oilNow = $prod['has_data'] ? ($prod['latest']['oil'] ?? null) : null;
+            if ($cap && $oilNow !== null && $oilNow > $cap) {
+                $add(-8, 'Oil rate ' . $this->f($oilNow) . ' B/D exceeds the integrity limit of ' . $this->f($cap) . ' B/D');
+            }
+        }
+
         $score = max(0, min(100, $score));
         return [
             'operational' => $well->status, 'production_state' => $state[0], 'production_class' => $state[1],
+            'integrity' => $integrity['key'] ?? null,
             'last_test_date' => $lastTest, 'days_since_test' => $daysTest,
             'score' => $score, 'label' => $score >= 80 ? 'Good' : ($score >= 60 ? 'Fair' : 'Needs attention'),
             'class' => $score >= 80 ? 'ok' : ($score >= 60 ? 'warn' : 'bad'), 'factors' => $factors,
         ];
     }
 
+    // ── Integrity-driven recommendations ─────────────────────────
+    private function integrityRecommendations(?array $i, array $prod, \Closure $add): void
+    {
+        if (!$i) {
+            return;
+        }
+        if (!$i['has_data']) {
+            $add('medium', 'Integrity', 'No well integrity data', 'No annulus readings, barrier tests or inspections are recorded. Set up the integrity file so the well can be assessed against its barrier envelopes.');
+            return;
+        }
+        if ($i['key'] === 'red') {
+            $add('high', 'Integrity', 'Well integrity is RED', ($i['reasons'][0]['text'] ?? 'Unacceptable integrity risk') . '. Review shut-in or obtain a documented waiver before continuing production; confirm that rate and wellhead pressure stay within limits.');
+        } elseif ($i['key'] === 'amber') {
+            $add('medium', 'Integrity', 'Well integrity is AMBER', ($i['reasons'][0]['text'] ?? 'Integrity margins reduced') . '. Operate within the mitigation plan and track the open items in the integrity file.');
+        }
+        foreach ($i['annuli'] as $an) {
+            if ($an['state'] === 'bad') {
+                $add('high', 'Integrity', "Annulus {$an['name']} above MAASP", "Annulus {$an['name']} is at {$an['last']->pressure} psi against a MAASP of {$an['maasp']} psi. Bleed down within limits, investigate the leak path and consider reducing rate / wellhead pressure.");
+            } elseif ($an['scp'] || ($an['slope'] ?? 0) > 50) {
+                $add('medium', 'Integrity', "Annulus {$an['name']} pressure rebuild", "Annulus {$an['name']} " . ($an['scp'] ? 'rebuilds after bleed-down (sustained casing pressure)' : 'is rising ' . $an['slope'] . ' psi/month') . '. Run a bleed / build-up diagnostic and assess the tubing, packer or casing leak path.');
+            }
+        }
+        foreach (['primary', 'secondary'] as $env) {
+            foreach ($i['envelopes'][$env]['failed'] as $e) {
+                $add('high', 'Integrity', "{$e->name} failed", ucfirst($env) . ' barrier element failed its last test. Re-test, repair or replace it, and record a risk assessment for operating with a single barrier.');
+            }
+        }
+        if ($i['counts']['overdue_tests'] > 0) {
+            $add('medium', 'Integrity', 'Barrier tests overdue', $i['counts']['overdue_tests'] . ' barrier element test(s) are past their due date. Schedule the valve / SCSSV / wellhead tests.');
+        }
+        if (($i['worst_wall_loss'] ?? 0) >= 30) {
+            $add($i['worst_wall_loss'] >= 50 ? 'high' : 'medium', 'Integrity', 'Wall loss detected', "Inspection recorded up to {$i['worst_wall_loss']}% wall loss. Evaluate remaining life and burst / collapse margins before any pressure increase or stimulation.");
+        }
+        foreach ($i['anomalies']->where('risk_score', '>=', 10) as $an) {
+            $add($an->risk_score >= 15 ? 'high' : 'medium', 'Integrity', 'Open anomaly: ' . $an->title, 'Risk ' . $an->risk_score . ' (' . $an->level()[0] . ')' . ($an->due_date ? ', due ' . $an->due_date->format('d M Y') : '') . '. ' . ($an->mitigation ?: 'No mitigation recorded yet.'));
+        }
+        if ($i['review_overdue']) {
+            $add('low', 'Integrity', 'Integrity review overdue', 'The periodic well integrity review was due on ' . $i['next_review']->format('d M Y') . '.');
+        }
+        $cap = $i['profile']?->max_oil_rate;
+        $oil = $prod['has_data'] ? ($prod['latest']['oil'] ?? null) : null;
+        if ($cap && $oil !== null && $oil > $cap) {
+            $add('high', 'Integrity', 'Rate above integrity limit', 'Latest oil rate ' . $this->f($oil) . ' B/D is above the integrity-imposed limit of ' . $this->f($cap) . ' B/D' . ($i['profile']->restriction_note ? " ({$i['profile']->restriction_note})" : '') . '. Reduce the choke or revise the limit with an approved assessment.');
+        }
+        if (isset($prod['latest']) && ($i['profile']->mawhp ?? null) && ($prod['whfp']['latest'] ?? 0) > $i['profile']->mawhp) {
+            $add('high', 'Integrity', 'Wellhead pressure above MAWHP', 'Latest WHFP ' . number_format($prod['whfp']['latest']) . ' psi exceeds the maximum allowable wellhead pressure of ' . number_format($i['profile']->mawhp) . ' psi.');
+        }
+    }
+
     // ── Recommendations ──────────────────────────────────────────
-    private function recommendations(array $prod, array $res, array $wl, ?array $meters, array $status, Collection $mpfm): array
+    private function recommendations(array $prod, array $res, array $wl, ?array $meters, array $status, Collection $mpfm, ?array $integrity = null): array
     {
         $r = [];
         $add = function (string $sev, string $area, string $title, string $detail) use (&$r) {
@@ -311,8 +397,10 @@ class WellAnalysisService
             }
             $d = $prod['decline'];
             if ($d && $d['pct_per_year'] > 20) {
+                $capNote = ($integrity['profile']->max_oil_rate ?? null)
+                    ? ' Note: an integrity rate limit of ' . $this->f($integrity['profile']->max_oil_rate) . ' B/D applies, so part of this decline may be the restriction rather than the reservoir.' : '';
                 $add($d['pct_per_year'] > 35 ? 'high' : 'medium', 'Production', 'Investigate oil-rate decline',
-                    "Oil is declining about {$d['pct_per_year']}%/yr (fit R² {$d['r2']}, {$d['n']} tests). Review choke size, artificial-lift options and consider a stimulation or a flowing-pressure survey. Projected {$d['fc']['d180']} B/D in 180 days.");
+                    "Oil is declining about {$d['pct_per_year']}%/yr (fit R² {$d['r2']}, {$d['n']} tests). Review choke size, artificial-lift options and consider a stimulation or a flowing-pressure survey. Projected {$d['fc']['d180']} B/D in 180 days." . $capNote);
             } elseif ($d && $d['pct_per_year'] < -5) {
                 $add('info', 'Production', 'Rate is increasing', 'Oil rate is trending up; confirm it is not a choke change before treating it as improvement.');
             }
@@ -368,6 +456,8 @@ class WellAnalysisService
         if ($open) {
             $add('info', 'Wire Line', 'Open Wire Line operations', "$open Wire Line operation(s) are planned or in progress on this well.");
         }
+
+        $this->integrityRecommendations($integrity, $prod, $add);
 
         if (!$r) {
             $add('info', 'Overall', 'No action required', 'No adverse indicators were found. Continue routine testing and surveys.');
@@ -429,9 +519,25 @@ class WellAnalysisService
     }
 
     // ── Timeline & breakdown ─────────────────────────────────────
-    private function timeline(Collection $mpfm, Collection $tv, Collection $ops, Collection $planTasks, Collection $tasks): array
+    private function timeline(Collection $mpfm, Collection $tv, Collection $ops, Collection $planTasks, Collection $tasks, ?array $integrity = null): array
     {
         $ev = collect();
+        foreach ($integrity['envelopes'] ?? [] as $env) {
+            foreach ($env['els'] as $el) {
+                foreach ($el->tests as $t) {
+                    $ev->push(['date' => $t->test_date, 'kind' => 'Integrity test', 'color' => ['fail' => '#f87171', 'marginal' => '#fbbf24', 'pass' => '#34d399'][$t->result],
+                        'icon' => 'fe-shield', 'text' => $el->name . ' - ' . strtoupper($t->result), 'status' => $t->result, 'url' => route('integrity.show', $t->oil_string_id)]);
+                }
+            }
+        }
+        foreach ($integrity['all_anomalies'] ?? [] as $an) {
+            $ev->push(['date' => $an->identified_date, 'kind' => 'Integrity anomaly', 'color' => $an->level()[2], 'icon' => 'fe-alert-octagon',
+                'text' => $an->title . ' (risk ' . $an->risk_score . ')', 'status' => $an->status, 'url' => route('integrity.show', $an->oil_string_id)]);
+        }
+        foreach ($integrity['inspections'] ?? [] as $in) {
+            $ev->push(['date' => $in->inspection_date, 'kind' => 'Inspection', 'color' => '#2dd4bf', 'icon' => 'fe-search',
+                'text' => $in->typeLabel() . ($in->max_wall_loss_pct !== null ? ' - ' . $in->max_wall_loss_pct . '% wall loss' : ''), 'status' => $in->status, 'url' => route('integrity.show', $in->oil_string_id)]);
+        }
         foreach ($mpfm as $t) {
             $ev->push(['date' => $t->test_date, 'kind' => 'MPFM test', 'color' => '#22d3ee', 'icon' => 'fe-bar-chart-2',
                 'text' => sprintf('Oil %s B/D · WC %s%%', $this->f($t->oil_rate), $this->f($t->water_cut)), 'status' => $t->status, 'url' => route('mpfm_tests.show', $t->id)]);

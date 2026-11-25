@@ -42,7 +42,7 @@
             $focus = config('app.focus_mpfm_tv', true);
         @endphp
 
-        {{-- greyed-out, non-clickable menu entry used for every module outside MPFM / Test Vessel --}}
+        {{-- greyed-out, non-clickable menu entry used for every module outside MPFM / Well Testing --}}
         @once
         <style>
             .side-menu .is-disabled { opacity:.42; cursor:not-allowed; }
@@ -93,7 +93,7 @@
             @endif
 
             @if($canTv)
-            <li class="side-item side-item-category">Test Vessel</li>
+            <li class="side-item side-item-category">Well Testing</li>
             {!! $link('fe-anchor', 'Vessels', route('test_vessels.index'), request()->is('test-vessels*') && !request()->routeIs('test_vessels.create')) !!}
             @if($canTvManage)
                 {!! $link('fe-plus-circle', 'Add Vessel', route('test_vessels.create'), request()->routeIs('test_vessels.create')) !!}
@@ -116,6 +116,13 @@
             @if($canWlManage)
                 {!! $link('fe-plus-circle', 'New Operation', route('wireline.create'), request()->routeIs('wireline.create')) !!}
             @endif
+            @endif
+
+            @if(auth()->user()->canAccessIntegrity())
+            <li class="side-item side-item-category">Well Integrity</li>
+            {!! $link('fe-shield', 'Dashboard', route('integrity.dashboard'), request()->routeIs('integrity.dashboard')) !!}
+            {!! $link('fe-list', 'Wells', route('integrity.wells'), request()->routeIs('integrity.wells', 'integrity.show', 'integrity.checks.*')) !!}
+            {!! $link('fe-alert-octagon', 'Anomalies', route('integrity.anomalies'), request()->routeIs('integrity.anomalies')) !!}
             @endif
 
             @can('manage_users')
@@ -306,12 +313,12 @@
 
             {{-- ══════════ Test Vessel (enabled) ══════════ --}}
             @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('job_officer') || $isOp)
-            <li class="side-item side-item-category">Test Vessel</li>
+            <li class="side-item side-item-category">Well Testing</li>
             <li class="slide">
                 <a class="side-menu__item {{ request()->is('test-vessels*') || request()->is('tv-tests*') ? 'active' : '' }}"
                    data-toggle="slide" href="javascript:void(0);">
                     <i class="side-menu__icon fe fe-anchor"></i>
-                    <span class="side-menu__label">Test Vessel</span>
+                    <span class="side-menu__label">Well Testing</span>
                     <i class="angle fe fe-chevron-down"></i>
                 </a>
                 <ul class="slide-menu">
@@ -389,7 +396,7 @@
                 <circle cx="92" cy="50" r="10" fill="#0a1222" stroke="#34d399" stroke-width="2"/><path d="M92,50 L96,45" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
                 <path d="M92,60 V62" stroke="#64748b" stroke-width="3"/>
             </svg>
-            <b>MPFM &amp; Test Vessel</b>
+            <b>MPFM &amp; Well Testing</b>
             <small>Demo mode — other modules are coming soon</small>
         </div>
         @endif

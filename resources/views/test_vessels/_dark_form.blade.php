@@ -59,7 +59,7 @@
         <div class="who">
             <span class="lg"></span>
             <div>
-                <div class="eyebrow"><i></i> Test vessel</div>
+                <div class="eyebrow"><i></i> Well Testing · Vessel</div>
                 <h1>{{ $edit ? 'Edit' : 'Add a' }} <em>{{ $edit ? $testVessel->name : 'vessel' }}</em></h1>
                 <div class="meta"><span>{{ $edit ? 'Update the vessel details — the drawing follows what you type.' : 'Register a separator for well tests — the drawing follows what you type.' }}</span></div>
             </div>

@@ -129,7 +129,7 @@
 5. Link task_id to upload process
 
 **Auto-Fill Requirements:**
-- Pre-fill client (ADNOC)
+- Pre-fill client (Oil Field)
 - Pre-fill field (from oil_fields)
 - Pre-fill well (from plan_task.well_name)
 - Pre-fill tower (from towers.name)

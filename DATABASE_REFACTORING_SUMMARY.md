@@ -1,7 +1,7 @@
-# Database Refactoring Summary - ADNOC MPFM System
+# Database Refactoring Summary - Oil Field MPFM System
 
 ## Overview
-This document summarizes the comprehensive database refactoring performed on the ADNOC MPFM Production Management System to ensure enterprise-grade data integrity, performance, and maintainability.
+This document summarizes the comprehensive database refactoring performed on the Oil Field MPFM Production Management System to ensure enterprise-grade data integrity, performance, and maintainability.
 
 ## Refactoring Objectives Achieved
 
@@ -9,7 +9,7 @@ This document summarizes the comprehensive database refactoring performed on the
 ✅ **Proper Foreign Keys** - All relationships have correct constraints
 ✅ **Performance Indexes** - Strategic indexes for common queries
 ✅ **Idempotent Seeders** - Seeders can run multiple times safely
-✅ **ADNOC-Grade Data** - Realistic oil & gas production data
+✅ **Oil Field-Grade Data** - Realistic oil & gas production data
 ✅ **Clean Hierarchy** - Proper seeder execution order
 ✅ **Relational Integrity** - Cascade rules properly configured
 
@@ -134,12 +134,12 @@ INDEX idx_tests_tower_date (tower_id, test_date) -- Composite
 **Purpose:** Centralized user creation with proper role assignment
 
 **Users Created:**
-- Admin (`admin@adnoc.ae`)
-- MPFM Supervisor (`supervisor@adnoc.ae`)
-- MPFM Operators (3 operators: `operator1@adnoc.ae`, `operator2@adnoc.ae`, `operator3@adnoc.ae`)
-- Production Supervisor (`prod.supervisor@adnoc.ae`)
-- Reservoir Engineer (`reservoir.engineer@adnoc.ae`)
-- Job Officer (`job.officer@adnoc.ae`)
+- Admin (`admin@oilfield.com`)
+- MPFM Supervisor (`supervisor@oilfield.com`)
+- MPFM Operators (3 operators: `operator1@oilfield.com`, `operator2@oilfield.com`, `operator3@oilfield.com`)
+- Production Supervisor (`prod.supervisor@oilfield.com`)
+- Reservoir Engineer (`reservoir.engineer@oilfield.com`)
+- Job Officer (`job.officer@oilfield.com`)
 
 **Features:**
 - ✅ Uses `firstOrCreate` for idempotency
@@ -147,20 +147,20 @@ INDEX idx_tests_tower_date (tower_id, test_date) -- Composite
 - ✅ All passwords: `password` (change in production!)
 
 ### 2.3 OilFieldSeeder (NEW)
-**Purpose:** Creates realistic ADNOC-grade oil fields, towers, and oil strings
+**Purpose:** Creates realistic production-grade oil fields, towers, and oil strings
 
 **Data Created:**
 - **Onshore Fields:**
-  - ADNOC Onshore Field Alpha (3 towers, 2-4 strings each)
-  - ADNOC Onshore Field Beta (2 towers, 2-4 strings each)
+  - Oil Field Onshore Field Alpha (3 towers, 2-4 strings each)
+  - Oil Field Onshore Field Beta (2 towers, 2-4 strings each)
 - **Offshore Fields:**
-  - ADNOC Offshore Field Gamma (2 platforms, 2-4 strings each)
+  - Oil Field Offshore Field Gamma (2 platforms, 2-4 strings each)
 
 **Features:**
 - ✅ Uses `firstOrCreate` with `code` as unique identifier
 - ✅ Creates hierarchical structure (Field → Tower → String)
 - ✅ All assets set to `active` status
-- ✅ Realistic naming conventions (ADNOC-ONS-ALPHA, TWR-A1, etc.)
+- ✅ Realistic naming conventions (Oil Field-ONS-ALPHA, TWR-A1, etc.)
 
 ### 2.4 MPFMSampleDataSeeder (REFACTORED)
 **Purpose:** Creates operational plans and MPFM tests with realistic production data
@@ -356,7 +356,7 @@ hasMany(MPFMTest::class, 'user_id')
 
 ---
 
-## 8. ADNOC Enterprise Standards Compliance
+## 8. Oil Field Enterprise Standards Compliance
 
 ✅ **Naming Conventions:**
 - All tables: plural, snake_case
@@ -409,7 +409,7 @@ hasMany(MPFMTest::class, 'user_id')
 - `DatabaseSeeder.php` - Refactored with proper order
 - `RolePermissionSeeder.php` - Fixed duplicate
 - `UserSeeder.php` - **NEW** - Centralized user creation
-- `OilFieldSeeder.php` - **NEW** - ADNOC-grade assets
+- `OilFieldSeeder.php` - **NEW** - production-grade assets
 - `MPFMSampleDataSeeder.php` - **REFACTORED** - Realistic production data
 
 ---
@@ -440,7 +440,7 @@ hasMany(MPFMTest::class, 'user_id')
 
 ## Summary
 
-The database layer has been completely refactored to ADNOC enterprise standards:
+The database layer has been completely refactored to Oil Field enterprise standards:
 - ✅ Clean, consistent structure
 - ✅ Proper indexes for performance
 - ✅ Idempotent seeders

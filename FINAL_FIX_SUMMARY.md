@@ -157,7 +157,7 @@ if ($task->completion_status === 'pending') {
 - [ ] **Verify:** No longer shows `/operator/tasks/4/start`
 - [ ] **Verify:** Form displays
 - [ ] **Verify:** All fields are filled:
-  - Client: ADNOC ✅
+  - Client: Oil Field ✅
   - Field: (task field name) ✅
   - Well: (task well name) ✅ NOW WORKS
   - Tower: (task tower) ✅

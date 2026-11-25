@@ -60,7 +60,7 @@ if (!$task->isAssignedTo(auth()->id())) {
 
 // Auto-fill data from monthly plan task
 $autoFillData = [
-    'client' => 'ADNOC',
+    'client' => 'Oil Field',
     'field' => $task->towerModel?->oilField?->name,
     'well' => $task->towerModel?->well_name,
     'wellhead_tower' => $task->towerModel?->name,
@@ -167,7 +167,7 @@ When operator starts a task:
 
 | Form Field | Source | Value |
 |-----------|--------|-------|
-| Client | Hard-coded | ADNOC |
+| Client | Hard-coded | Oil Field |
 | Field | Tower relationship | oil_field.name |
 | Well | Tower column | well_name |
 | Tower | Tower model | towerModel.name |
@@ -226,7 +226,7 @@ All fields are **read-only** when viewing from a task.
 ### Test 2: Check Auto-Fill
 ```
 1. On upload page, verify these are pre-filled:
-   ✓ Client: ADNOC
+   ✓ Client: Oil Field
    ✓ Field: (from tower)
    ✓ Well: (from tower)
    ✓ Tower: (from task)

@@ -88,7 +88,7 @@ public function getOilStrings(OilField $oilField)
 
 ### Sample Data Verification
 ```
-Oil Field: ADNOC Onshore Field Alpha (ID: 1)
+Oil Field: Oil Field Onshore Field Alpha (ID: 1)
 Towers: 3 towers available
 ```
 
@@ -128,7 +128,7 @@ To verify the fix works:
 1. **Login to the application**
    ```
    URL: http://localhost/MPFM/public/login
-   Email: job.officer@adnoc.ae
+   Email: job.officer@oilfield.com
    Password: password
    ```
 

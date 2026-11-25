@@ -139,6 +139,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Well Integrity access (view): same audience as Wire Line plus reservoir engineers
+     */
+    public function canAccessIntegrity(): bool
+    {
+        return $this->canAccessWireline() || $this->hasRole('reservoir_engineer');
+    }
+
+    /**
+     * Well Integrity management (create / edit records)
+     */
+    public function canManageIntegrity(): bool
+    {
+        return $this->hasAnyRole(['admin', 'department_manager', 'job_officer', 'surveillance_supervisor']);
+    }
+
+    /**
      * Check if user is admin
      */
     public function isAdmin(): bool

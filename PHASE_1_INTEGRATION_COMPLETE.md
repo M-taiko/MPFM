@@ -14,7 +14,7 @@ Successfully integrated the existing upload workflow (`/upload`) with the Daily 
 - **Loads task with relationships**: `dailyPlan`, `oilString.tower.oilField`, `operator`
 - **Security check**: Ensures operator can only access their own tasks (line 51-52)
 - **Auto-fill data preparation**: Extracts all required fields from task context:
-  - Client (ADNOC)
+  - Client (Oil Field)
   - Field, Well, Tower, String
   - Operator name
   - Test date

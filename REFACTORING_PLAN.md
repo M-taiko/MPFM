@@ -114,7 +114,7 @@ notifications:
 
 #### 3.2 Auto-Fill Upload Form
 **When operator selects a task:**
-- Pre-fill client (ADNOC by default)
+- Pre-fill client (Oil Field by default)
 - Pre-fill field (from oil_fields.name)
 - Pre-fill well (from plan_task.well_name)
 - Pre-fill tower (from towers.name)

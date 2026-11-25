@@ -68,7 +68,7 @@
         <div class="who">
             <span class="lg"></span>
             <div>
-                <div class="eyebrow"><i></i> Test vessel requests</div>
+                <div class="eyebrow"><i></i> Well Testing · Test requests</div>
                 <h1>Request <em>board</em></h1>
                 <div class="meta"><span>Schedule wells on a vessel and follow each request until every well is tested</span></div>
             </div>

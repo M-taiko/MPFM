@@ -13,7 +13,7 @@ Follow these steps to test the unified upload workflow from start to finish.
    - Task is assigned to a user via `plan_task_operators` pivot table
 
 2. **You are logged in as an operator:**
-   - Email: `operator1@adnoc.ae` (or any operator assigned to tasks)
+   - Email: `operator1@oilfield.com` (or any operator assigned to tasks)
    - Password: Your password
 
 3. **You have a test file ready:**
@@ -106,13 +106,13 @@ Look for:
 **3.3 Verify Auto-Filled Fields**
 
 **Well Information Section:**
-- [ ] Client: Should show "ADNOC" (readonly)
+- [ ] Client: Should show "Oil Field" (readonly)
 - [ ] Field: Should show field name (readonly)
 - [ ] Well: Should show well identifier (readonly)
 
 **Example:**
 ```
-Client:   ADNOC ← Should be filled
+Client:   Oil Field ← Should be filled
 Field:    Upper Zakum ← Should be filled
 Well:     375/1 ← Should be filled
 ```
@@ -197,7 +197,7 @@ Method: POST
 Route: /process-log
 Payload:
   - logfile: [file contents]
-  - client: ADNOC
+  - client: Oil Field
   - field: [auto-filled]
   - well: [auto-filled]
   - operator: [auto-filled]

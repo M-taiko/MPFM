@@ -301,6 +301,38 @@ Route::middleware('auth')->prefix('wireline')->name('wireline.')->group(function
 
 /*
 |--------------------------------------------------------------------------
+| Well Integrity (barriers, annulus pressures, inspections, anomalies)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'integrity.access'])->prefix('well-integrity')->name('integrity.')->group(function () {
+    $c = \App\Http\Controllers\WellIntegrityController::class;
+    Route::get('/', [$c, 'dashboard'])->name('dashboard');
+    Route::get('wells', [$c, 'wells'])->name('wells');
+    Route::get('anomalies', [$c, 'anomalies'])->name('anomalies');
+    Route::get('wells/{well}', [$c, 'show'])->name('show');
+    Route::get('wells/{well}/checks/create', [$c, 'createCheck'])->name('checks.create');
+    Route::post('wells/{well}/checks', [$c, 'storeCheck'])->name('checks.store');
+    Route::get('checks/{check}', [$c, 'showCheck'])->name('checks.show');
+    Route::delete('checks/{check}', [$c, 'destroyCheck'])->name('checks.destroy');
+    Route::post('wells/{well}/profile', [$c, 'saveProfile'])->name('profile');
+    Route::post('wells/{well}/annuli', [$c, 'saveAnnulus'])->name('annulus.save');
+    Route::delete('annuli/{annulus}', [$c, 'destroyAnnulus'])->name('annulus.destroy');
+    Route::post('wells/{well}/readings', [$c, 'storeReading'])->name('readings.store');
+    Route::delete('readings/{reading}', [$c, 'destroyReading'])->name('readings.destroy');
+    Route::post('wells/{well}/barriers/template', [$c, 'seedBarriers'])->name('barriers.template');
+    Route::post('wells/{well}/barriers', [$c, 'storeElement'])->name('barriers.store');
+    Route::delete('barriers/{element}', [$c, 'destroyElement'])->name('barriers.destroy');
+    Route::post('barriers/{element}/tests', [$c, 'storeTest'])->name('tests.store');
+    Route::delete('tests/{test}', [$c, 'destroyTest'])->name('tests.destroy');
+    Route::post('wells/{well}/inspections', [$c, 'storeInspection'])->name('inspections.store');
+    Route::delete('inspections/{inspection}', [$c, 'destroyInspection'])->name('inspections.destroy');
+    Route::post('wells/{well}/anomalies', [$c, 'storeAnomaly'])->name('anomalies.store');
+    Route::put('anomalies/{anomaly}', [$c, 'updateAnomaly'])->name('anomalies.update');
+    Route::delete('anomalies/{anomaly}', [$c, 'destroyAnomaly'])->name('anomalies.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Reports
 |--------------------------------------------------------------------------
 */

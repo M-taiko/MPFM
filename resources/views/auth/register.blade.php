@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <div class="text-center mb-5">
                         <a href="{{ route('register') }}">
-                            <img src="{{ asset('assets/img/brand/logo.png') }}" class="header-brand-img desktop-logo" alt="logo">
+                            <img src="{{ asset('assets/img/brand/logo.svg') }}" class="header-brand-img desktop-logo" alt="logo">
                         </a>
                         <div class="mt-4">
                             <h4 class="mb-1">Create Account</h4>

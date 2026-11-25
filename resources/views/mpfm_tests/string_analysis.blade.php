@@ -77,13 +77,14 @@
         </div>
         <div class="actions">
             @if($wlAccess)<a class="btn2 p" href="{{ route('wireline.create', ['well' => $oilString->id]) }}"><i class="fe fe-git-branch"></i> Wire Line op</a>@endif
+            @if($intAccess)<a class="btn2 p" href="{{ route('integrity.show', $oilString) }}"><i class="fe fe-shield"></i> Well integrity</a>@endif
             <a class="btn2 g" href="{{ route('tv_tests.compare') }}"><i class="fe fe-shuffle"></i> Compare vs TV</a>
             <a class="btn2" href="{{ route('mpfm_tests.trending_dashboard') }}"><i class="fe fe-bar-chart-2"></i> Trending dashboard</a>
             <a class="btn2" href="{{ route('mpfm_tests.index') }}"><i class="fe fe-arrow-left"></i> MPFM tests</a>
         </div>
     </div>
 
-    @if($wlAccess)
+    @if($analysis)
         @include('mpfm_tests._string_insight')
     @endif
 

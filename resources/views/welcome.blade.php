@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Oil Field Management System - Well surveillance, testing and intervention in one platform</title>
 <meta name="description" content="Enterprise platform for well testing (MPFM and test vessel), Wire Line memory-gauge surveys, reservoir pressure and well performance analysis.">
-<link rel="icon" href="{{ asset('assets/img/brand/favicon.png') }}">
+<link rel="icon" href="{{ asset('assets/img/brand/favicon.svg') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -22,7 +22,7 @@ h1,h2,h3,h4 { letter-spacing:-.02em; line-height:1.15; }
 .nav { position:fixed; top:0; left:0; right:0; z-index:50; background:rgba(6,11,24,.82); backdrop-filter:blur(14px); border-bottom:1px solid var(--line); }
 .nav .wrap { display:flex; align-items:center; justify-content:space-between; height:64px; gap:20px; }
 .brand { display:flex; align-items:center; gap:12px; font-weight:800; font-size:15px; }
-.brand .lg { --h:38px; height:38px; aspect-ratio:600/940; border-radius:6px; background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:1px solid rgba(255,255,255,.9); box-shadow:0 0 18px rgba(34,211,238,.35); }
+.brand .lg { --h:38px; height:38px; aspect-ratio:1/1; border-radius:6px; background:#071326 url('/assets/img/brand/logo.svg') center/cover no-repeat; border:1px solid rgba(34,211,238,.5); box-shadow:0 0 18px rgba(34,211,238,.35); }
 .brand small { display:block; font-size:10px; font-weight:600; color:var(--sub); letter-spacing:.12em; text-transform:uppercase; }
 .links { display:flex; gap:26px; font-size:13.5px; font-weight:500; color:var(--sub); }
 .links a:hover { color:#fff; }
@@ -90,7 +90,7 @@ footer { border-top:1px solid var(--line); padding:28px 0; color:var(--mute); fo
 footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
 
 /* company logo badge */
-.lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:600/940; border-radius:calc(var(--h) * .14); background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
+.lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:1/1; border-radius:calc(var(--h) * .14); background:#071326 url('/assets/img/brand/logo.svg') center/cover no-repeat; border:2px solid rgba(34,211,238,.5); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
 .lg::after { content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(34,211,238,.45),transparent); transform:skewX(-20deg); animation:shine 4.5s infinite; }
 @keyframes shine { 60%,100% { left:160%; } }
 @keyframes spin { to { transform:rotate(360deg); } }
@@ -187,7 +187,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
     <div class="wrap">
         <a class="brand" href="#top"><span class="lg" role="img" aria-label="Logo"></span><span>Oil Field<small>Management System</small></span></a>
         <nav class="links" aria-label="Sections">
-            <a href="#platform">Platform</a><a href="#flow">Production flow</a><a href="#mpfm">MPFM</a><a href="#vessel">Test Vessel</a><a href="#wireline">Wire Line</a><a href="#analysis">Well Analysis</a><a href="#governance">Governance</a><a href="#roadmap">Roadmap</a>
+            <a href="#platform">Platform</a><a href="#flow">Production flow</a><a href="#mpfm">MPFM</a><a href="#vessel">Well Testing</a><a href="#wireline">Wire Line</a><a href="#analysis">Well Analysis</a><a href="#governance">Governance</a><a href="#roadmap">Roadmap</a>
         </nav>
         @auth<a href="{{ url('/dashboard') }}" class="btn p sm">Open dashboard</a>@else<a href="{{ route('login') }}" class="btn p sm">Sign in</a>@endauth
     </div>
@@ -240,7 +240,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
                 <g>
                     <rect x="20" y="298" width="520" height="44" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
                     <g fill="#22d3ee" opacity=".9"><rect x="40" y="322" width="10" height="8" rx="2"/><rect x="58" y="316" width="10" height="14" rx="2"/><rect x="76" y="319" width="10" height="11" rx="2"/><rect x="94" y="310" width="10" height="20" rx="2"/><rect x="112" y="314" width="10" height="16" rx="2"/></g>
-                    <text x="140" y="318" font-size="10" fill="#9aaccb" font-weight="600">MPFM · Test Vessel · Wire Line</text><text x="140" y="332" font-size="9" fill="#64748b">Unified activity across every well</text>
+                    <text x="140" y="318" font-size="10" fill="#9aaccb" font-weight="600">MPFM · Well Testing · Wire Line</text><text x="140" y="332" font-size="9" fill="#64748b">Unified activity across every well</text>
                 </g>
             </svg>
         </div>
@@ -263,7 +263,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
                 <text x="500" y="204" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">WELL</text><text x="500" y="224" text-anchor="middle" font-size="10" fill="#9aaccb">single record</text>
                 <g font-size="12" font-weight="700" fill="#fff" text-anchor="middle">
                     <g transform="translate(90,70)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#22d3ee"/><text x="80" y="28">MPFM</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Log upload &amp; validation</text></g>
-                    <g transform="translate(90,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#fbbf24"/><text x="80" y="28">Test Vessel</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Separator tests &amp; requests</text></g>
+                    <g transform="translate(90,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#fbbf24"/><text x="80" y="28">Well Testing</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Separator tests &amp; requests</text></g>
                     <g transform="translate(420,-2)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#a78bfa"/><text x="80" y="28">Wire Line</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Memory-gauge surveys</text></g>
                     <g transform="translate(750,70)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#34d399"/><text x="80" y="28">Well Analysis</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Health &amp; recommendations</text></g>
                     <g transform="translate(750,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#38bdf8"/><text x="80" y="28">Field Setup</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Field → Tower → Well</text></g>
@@ -567,7 +567,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
 <section id="vessel" class="alt">
     <div class="wrap mod rev">
         <div class="txt rv">
-            <div class="num">02 · TEST VESSEL</div>
+            <div class="num">02 · WELL TESTING</div>
             <h3>Cross-check every meter against the separator</h3>
             <p>Plan vessel tests with requests, record results and compare them with MPFM readings for the same well. Deviations beyond tolerance are surfaced automatically so meter issues are caught early.</p>
             <ul class="ticks">
@@ -741,7 +741,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             <p class="sp">Surveillance and test modules are live today; the department workflow suite is next.</p></div>
         <div class="cards">
             <div class="c rv" style="--cc:#22d3ee"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h4>MPFM monitoring</h4><p>Log ingestion, validation, review and trends.</p><span class="live">Live</span></div>
-            <div class="c rv" style="--cc:#fbbf24"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8V5M17 8V5"/></svg></div><h4>Test vessel</h4><p>Requests, vessel tests and meter comparison.</p><span class="live">Live</span></div>
+            <div class="c rv" style="--cc:#fbbf24"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M7 8V5M17 8V5"/></svg></div><h4>Well testing</h4><p>Offshore and onshore test vessels, requests and meter comparison.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#a78bfa"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-4 4 4"/><circle cx="12" cy="15" r="3"/></svg></div><h4>Wire Line</h4><p>Memory-gauge surveys and intervention history.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#34d399"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/></svg></div><h4>Well analysis</h4><p>Health, forecast, reservoir and recommendations.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#60a5fa"><div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h4>Tasks &amp; monthly plans</h4><p>Department task management with SLA tracking.</p><span class="soon">Coming soon</span></div>

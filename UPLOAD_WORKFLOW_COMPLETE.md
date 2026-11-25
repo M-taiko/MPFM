@@ -210,7 +210,7 @@ PlanTask::whereHas('operators', function($q) use ($operator) {
 
 **Step 1: Log in as Operator 1**
 ```
-Email: operator1@adnoc.ae
+Email: operator1@oilfield.com
 Password: (your password)
 Role: mpfm_operator
 ```

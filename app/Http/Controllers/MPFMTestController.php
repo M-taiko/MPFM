@@ -713,18 +713,21 @@ class MPFMTestController extends Controller
         $trendingData = $comparisonService->getStringTrendingAnalysis($oilStringId);
 
         $wlAccess = auth()->user()?->canAccessWireline() ?? false;
-        $wireline = $planTasks = $tasks = $analysis = null;
-        if ($wlAccess) {
+        $intAccess = auth()->user()?->canAccessIntegrity() ?? false;
+        $wireline = $planTasks = $tasks = $analysis = $integrity = null;
+        if ($wlAccess || $intAccess) {
             // Wire Line users see everything on the well: wire line history plus work from every department
             $wireline = app(\App\Services\Wireline\WellWirelineSummary::class)->build($oilString);
             $planTasks = \App\Models\PlanTask::where('oil_string_id', $oilStringId)
                 ->with(['department', 'assignedOperator'])->orderByDesc('scheduled_date')->get();
             $tasks = \App\Domains\Task\Models\Task::where('oil_string_id', $oilStringId)
                 ->with(['department', 'assignedTo'])->orderByDesc('created_at')->get();
-            $analysis = app(\App\Services\WellAnalysisService::class)->analyze($oilString, $mpfmTests, $tvTests, $wireline, $planTasks, $tasks);
+            // Integrity feeds the analysis: health score, production state, PI caveats and recommendations
+            $integrity = $intAccess ? app(\App\Services\Integrity\WellIntegrityAssessor::class)->assess($oilString) : null;
+            $analysis = app(\App\Services\WellAnalysisService::class)->analyze($oilString, $mpfmTests, $tvTests, $wireline, $planTasks, $tasks, $integrity);
         }
 
-        return view('mpfm_tests.string_analysis', compact('oilString', 'allTests', 'mpfmTests', 'tvTests', 'trendingData', 'wlAccess', 'wireline', 'planTasks', 'tasks', 'analysis'));
+        return view('mpfm_tests.string_analysis', compact('oilString', 'allTests', 'mpfmTests', 'tvTests', 'trendingData', 'wlAccess', 'intAccess', 'wireline', 'planTasks', 'tasks', 'analysis', 'integrity'));
     }
 
     /**

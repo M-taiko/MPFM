@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Sign In - Oil Field Management System</title>
-    <link rel="icon" href="{{ asset('assets/img/brand/favicon.png') }}">
+    <link rel="icon" href="{{ asset('assets/img/brand/favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ a { text-decoration:none; color:inherit; }
 .cursor-glow { position:fixed; left:0; top:0; width:420px; height:420px; margin:-210px 0 0 -210px; border-radius:50%; background:radial-gradient(circle,rgba(34,211,238,.13),transparent 65%); pointer-events:none; z-index:0; will-change:transform; }
 
 /* ── company logo (cropped to the mark, inside a white badge) ── */
-.lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:600/940; border-radius:calc(var(--h) * .14); background:#fff url('/assets/img/brand/logo.png') 50% 50.8%/333.33% auto no-repeat; border:2px solid rgba(255,255,255,.9); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
+.lg { --h:64px; display:inline-block; flex:none; height:var(--h); aspect-ratio:1/1; border-radius:calc(var(--h) * .14); background:#071326 url('/assets/img/brand/logo.svg') center/cover no-repeat; border:2px solid rgba(34,211,238,.5); box-shadow:0 0 0 1px rgba(59,130,246,.5),0 8px 30px rgba(0,0,0,.45),0 0 26px rgba(34,211,238,.35); position:relative; overflow:hidden; }
 .lg::after { content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(34,211,238,.45),transparent); transform:skewX(-20deg); animation:shine 4.5s infinite; }
 @keyframes shine { 60%,100% { left:160%; } }
 

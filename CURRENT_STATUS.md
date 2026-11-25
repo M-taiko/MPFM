@@ -80,7 +80,7 @@
 ```bash
 # 1. دخول Dashboard
 URL: http://localhost/MPFM/public/operator/dashboard
-Email: operator1@adnoc.ae
+Email: operator1@oilfield.com
 Password: password
 
 # 2. يجب أن تشوف:
@@ -145,13 +145,13 @@ Password: password
 ### Users
 ```
 ✅ admin: donia.a5ra2019@gmail.com
-✅ job_officer: job.officer@adnoc.ae
-✅ mpfm_supervisor: supervisor@adnoc.ae
-✅ operator1: operator1@adnoc.ae  ← معهم 5 تاسكات
-✅ operator2: operator2@adnoc.ae
-✅ operator3: operator3@adnoc.ae
-✅ production_supervisor: prod.supervisor@adnoc.ae
-✅ reservoir_engineer: reservoir.engineer@adnoc.ae
+✅ job_officer: job.officer@oilfield.com
+✅ mpfm_supervisor: supervisor@oilfield.com
+✅ operator1: operator1@oilfield.com  ← معهم 5 تاسكات
+✅ operator2: operator2@oilfield.com
+✅ operator3: operator3@oilfield.com
+✅ production_supervisor: prod.supervisor@oilfield.com
+✅ reservoir_engineer: reservoir.engineer@oilfield.com
 ```
 
 ### Tasks (حالي)

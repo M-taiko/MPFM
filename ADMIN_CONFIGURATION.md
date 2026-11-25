@@ -91,7 +91,7 @@ The system includes a seeder that creates admin users:
 ```php
 // In UserSeeder.php
 $admin = User::firstOrCreate(
-    ['email' => 'admin@adnoc.ae'],
+    ['email' => 'admin@oilfield.com'],
     [
         'name' => 'System Administrator',
         'password' => bcrypt('password'),

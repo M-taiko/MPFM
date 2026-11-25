@@ -96,7 +96,7 @@ return redirect('/upload?task_id=' . $planTask->id)
 ### Test 2: Auto-Fill Form Fields
 1. Go to: `http://127.0.0.1:8000/upload?task_id=4`
 2. **Expected:** Form fields should be filled:
-   - Client: `ADNOC`
+   - Client: `Oil Field`
    - Field: (populated from task)
    - Well: (populated from task) ✅ NOW FIXED
    - Tower: (populated from task)
@@ -150,7 +150,7 @@ return redirect('/upload?task_id=' . $planTask->id)
 
 The form validation requires these fields (from line 80-93):
 - ✅ `logfile` - required file
-- ✅ `client` - required (auto-filled: ADNOC)
+- ✅ `client` - required (auto-filled: Oil Field)
 - ✅ `field` - required (auto-filled from task)
 - ✅ `well` - required (auto-filled from task) **FIXED**
 - ✅ `operator` - required (auto-filled: logged-in user)

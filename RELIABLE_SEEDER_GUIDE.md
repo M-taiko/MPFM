@@ -63,7 +63,7 @@ php artisan config:clear
 ### As Operator 1 (ID 3)
 
 **Login:**
-- Email: `operator1@adnoc.ae`
+- Email: `operator1@oilfield.com`
 - Password: (same as before)
 - Role: `mpfm_operator`
 
@@ -91,7 +91,7 @@ php artisan config:clear
 
 ### Step 1: Log In as Operator 1
 - Go to: `http://127.0.0.1:8000/login`
-- Email: `operator1@adnoc.ae`
+- Email: `operator1@oilfield.com`
 - Password: (your password)
 
 ### Step 2: View Dashboard
@@ -215,9 +215,9 @@ Access granted ✅
 ## Data Provided by Seeder
 
 ### Operators (Pre-existing)
-- Operator 1: `operator1@adnoc.ae` (ID: 3)
-- Operator 2: `operator2@adnoc.ae` (ID: 4)
-- Operator 3: `operator3@adnoc.ae` (ID: 5)
+- Operator 1: `operator1@oilfield.com` (ID: 3)
+- Operator 2: `operator2@oilfield.com` (ID: 4)
+- Operator 3: `operator3@oilfield.com` (ID: 5)
 
 ### Monthly Plan (Created by Seeder)
 - Name: "January 2026 MPFM Testing Plan"
@@ -304,7 +304,7 @@ php artisan db:seed --class=MonthlyPlanTaskSeeder
 ## Next Steps
 
 1. **Run the seeder:** `php artisan db:seed --class=MonthlyPlanTaskSeeder`
-2. **Log in as Operator 1:** `operator1@adnoc.ae`
+2. **Log in as Operator 1:** `operator1@oilfield.com`
 3. **Go to dashboard:** `/operator/dashboard`
 4. **Start Task 7:** `/operator/tasks/7/start`
 5. **Verify it works:** Should update status to "in_progress" ✅

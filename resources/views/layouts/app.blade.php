@@ -17,7 +17,7 @@
     <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet">
 
     <!-- Fevicon -->
-    <link rel="icon" href="{{ asset('assets/img/brand/favicon.png') }}" type="image/x-icon"/>
+    <link rel="icon" href="{{ asset('assets/img/brand/favicon.svg') }}" type="image/svg+xml"/>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -39,8 +39,8 @@
                         <a aria-label="Hide Sidebar" class="app-sidebar__toggle" data-bs-toggle="sidebar" href="#"></a>
                         <!-- sidebar-toggle-->
                         <a class="header-brand" href="{{ route('dashboard') }}">
-                            <img src="{{ asset('assets/img/brand/logo.png') }}" class="header-brand-img desktop-logo" alt="logo">
-                            <img src="{{ asset('assets/img/brand/favicon.png') }}" class="header-brand-img mobile-view-logo" alt="logo">
+                            <img src="{{ asset('assets/img/brand/logo.svg') }}" class="header-brand-img desktop-logo" alt="logo">
+                            <img src="{{ asset('assets/img/brand/favicon.svg') }}" class="header-brand-img mobile-view-logo" alt="logo">
                         </a>
                         <div class="d-flex order-lg-2 ms-auto header-right-icons">
                             <div class="dropdown d-none">

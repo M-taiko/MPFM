@@ -146,7 +146,7 @@ Total: 5 pending tasks (should show in "All Pending Tasks")
 ### الخطوة 1: دخول Dashboard
 ```
 URL: http://localhost/MPFM/public/operator/dashboard
-User: operator1@adnoc.ae
+User: operator1@oilfield.com
 Password: password
 ```
 

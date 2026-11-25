@@ -1,7 +1,7 @@
 # Frontend Blade Views Refactoring Summary
 
 ## Overview
-This document summarizes the comprehensive refactoring of all Blade views to align with the new backend architecture for the ADNOC MPFM Production Management System.
+This document summarizes the comprehensive refactoring of all Blade views to align with the new backend architecture for the Oil Field MPFM Production Management System.
 
 ## Views Created/Refactored
 

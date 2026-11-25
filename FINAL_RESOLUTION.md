@@ -141,7 +141,7 @@ Total: 6 tasks assigned to Operator 1
 
 1. **Log In**
    ```
-   Email: operator1@adnoc.ae
+   Email: operator1@oilfield.com
    Password: (your password)
    Role: mpfm_operator
    ```

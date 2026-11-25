@@ -68,7 +68,7 @@ Browser shows beautiful upload form:
 │ TASK CONTEXT                                            │
 │ ┌──────────────────────────────────────────────────┐  │
 │ │ ℹ Task: TASK-12                                  │  │
-│ │ 📍 Field: ADNOC                                  │  │
+│ │ 📍 Field: Oil Field                                  │  │
 │ │ 🏗 Tower: Tower 375                              │  │
 │ │ 💧 String: String A1                             │  │
 │ │ 🛠 MPFM Device: MPFM Type B                       │  │
@@ -82,7 +82,7 @@ Browser shows beautiful upload form:
 │ ✓ Auto-filled from task                                │
 │                                                         │
 │ [ Client        ] ┌────────────────────────────────┐  │
-│                  │ ADNOC                           │  │
+│                  │ Oil Field                           │  │
 │                  │ (readonly, gray background)     │  │
 │                  └────────────────────────────────┘  │
 │                                                         │
@@ -192,7 +192,7 @@ URL: http://127.0.0.1:8000/logs/results
 │                                                         │
 │ SUMMARY                                                 │
 │ ┌──────────────────────────────────────────────────┐  │
-│ │ Client: ADNOC                                    │  │
+│ │ Client: Oil Field                                    │  │
 │ │ Field: Upper Zakum                               │  │
 │ │ Well: ZK-23                                      │  │
 │ │ Operator: Operator 1                             │  │

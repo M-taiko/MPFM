@@ -56,7 +56,7 @@
 ### Step 5: Auto-Filled Form Data
 - **File:** `resources/views/logs/upload.blade.php` (Line 382-627)
 - **Auto-filled Fields:**
-  - ✅ Client: `ADNOC` (hardcoded)
+  - ✅ Client: `Oil Field` (hardcoded)
   - ✅ Field: from `$task->towerModel->oilField->name`
   - ✅ Well: from `$task->towerModel->well_name`
   - ✅ Wellhead Tower: from `$task->towerModel->name`
@@ -164,7 +164,7 @@
 5. **Verify Form Auto-Fill**
    ```
    Check that form fields are pre-filled:
-   - Client: Should show "ADNOC"
+   - Client: Should show "Oil Field"
    - Field: Should show field name from tower
    - Well: Should show well name
    - Tower: Should show tower name

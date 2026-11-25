@@ -246,7 +246,7 @@
 1. **Database Migration** - Enhanced TestData table
 2. **Enhanced Comparison Engine** - Test vs Test, Well vs Well
 3. **Dynamic Charts** - User-selectable columns
-4. **Role-Based Dashboard** - ADNOC-style KPIs
+4. **Role-Based Dashboard** - Oil Field-style KPIs
 5. **Modern UI/UX** - Responsive, dark mode, DataTables
 
 ---

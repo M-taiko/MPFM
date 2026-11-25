@@ -113,7 +113,7 @@ return redirect('/upload?task_id=' . $planTask->id)
 4. Task auto-marked as in_progress
    ↓
 5. Form auto-fills with task data:
-   ✅ Client: ADNOC
+   ✅ Client: Oil Field
    ✅ Field: (from task)
    ✅ Well: (from task) - FIXED
    ✅ Tower: (from task)
@@ -166,7 +166,7 @@ Not: /operator/tasks/X
 ### Step 4: Verify Form Auto-Fill
 ```
 Check all fields are populated:
-- Client: ADNOC
+- Client: Oil Field
 - Field: (value)
 - Well: (value) ← Check this specifically
 - Tower: (value)

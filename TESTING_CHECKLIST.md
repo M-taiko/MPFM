@@ -41,7 +41,7 @@ php artisan tinker
 #### الخطوة 1.1: دخول Operator Dashboard
 ```
 URL: http://localhost/MPFM/public/operator/dashboard
-Login: operator1@adnoc.ae / password
+Login: operator1@oilfield.com / password
 ```
 
 **ما يجب أن تراه:**
@@ -59,7 +59,7 @@ Login: operator1@adnoc.ae / password
 #### الخطوة 1.2: تحقق من أن التاسكات مسندة للـ Operator فقط
 ```php
 // تشغيل في tinker:
-$operator = App\Models\User::where('email', 'operator1@adnoc.ae')->first();
+$operator = App\Models\User::where('email', 'operator1@oilfield.com')->first();
 $operator->tasks()->count();  // يجب > 0
 ```
 
@@ -118,7 +118,7 @@ URL: http://localhost/MPFM/public/upload?task_id=X
 │         TASK CONTEXT CARD                  │
 ├────────────────────────────────────────────┤
 │  Task: Well 375 String A1                  │
-│  Field: ADNOC Onshore Field Alpha          │
+│  Field: Oil Field Onshore Field Alpha          │
 │  Tower: Tower 1                            │
 │  String: String A1                         │
 │  MPFM Device: MPFM Type A                  │
@@ -188,7 +188,7 @@ $task->stateHistories()->latest()->first();
 #### الخطوة 5.1: دخول MPFM Supervisor Dashboard
 ```
 URL: http://localhost/MPFM/public/mpfm-supervisor/dashboard
-Login: supervisor@adnoc.ae / password
+Login: supervisor@oilfield.com / password
 ```
 
 **المتوقع:**

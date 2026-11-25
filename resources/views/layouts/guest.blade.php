@@ -17,7 +17,7 @@
     <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet">
 
     <!-- Fevicon -->
-    <link rel="icon" href="{{ asset('assets/img/brand/favicon.png') }}" type="image/x-icon"/>
+    <link rel="icon" href="{{ asset('assets/img/brand/favicon.svg') }}" type="image/svg+xml"/>
 
     <style>
         .auth-background {

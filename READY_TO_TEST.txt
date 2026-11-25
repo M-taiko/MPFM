@@ -75,7 +75,7 @@ Step 9: Dashboard shows task as COMPLETED
 3. Click "Start Task" button
 4. Verify: URL shows /upload?task_id=X (not /operator/tasks/4/start)
 5. Verify: Form fields are filled:
-   - Client: ADNOC
+   - Client: Oil Field
    - Field: (from task)
    - Well: (from task) ✅ FIXED
    - Tower: (from task)

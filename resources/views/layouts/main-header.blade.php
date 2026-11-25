@@ -8,7 +8,7 @@
     $unreadCount = $unreadNotifications->count();
     $pageTitle = trim(\Illuminate\Support\Str::before(trim(strip_tags($__env->yieldContent('title'))), ' - ')) ?: 'Oil Field Management System';
     $section = request()->is('users*', 'roles*', 'permissions*') ? 'Administration' : (request()->is('mpfm-tests*', 'upload', 'well-tests*') ? 'MPFM'
-        : (request()->is('test-vessels*', 'tv-tests*', 'tv-test-requests*') ? 'Test Vessel'
+        : (request()->is('test-vessels*', 'tv-tests*', 'tv-test-requests*') ? 'Well Testing'
         : (request()->is('dashboard') ? 'Overview' : 'Workspace')));
 
     // quick-jump destinations (same visibility rules as the sidebar)
@@ -26,12 +26,12 @@
         if ($ofsIsAdmin || $ofsSurv || $ofsUser->hasRole('mpfm_supervisor')) $jump[] = ['Analytics / Trending', 'fe-trending-up', route('mpfm_tests.trending_dashboard'), 'MPFM'];
     }
     if ($ofsTv) {
-        $jump[] = ['Test Vessels', 'fe-anchor', route('test_vessels.index'), 'Test Vessel'];
-        if ($ofsIsAdmin || $ofsOfficer || $ofsSurv) $jump[] = ['Add Vessel', 'fe-plus-circle', route('test_vessels.create'), 'Test Vessel'];
-        $jump[] = ['Test Requests', 'fe-clipboard', route('tv_test_requests.index'), 'Test Vessel'];
-        $jump[] = ['TV Tests', 'fe-list', route('tv_tests.index'), 'Test Vessel'];
-        $jump[] = ['New TV Test', 'fe-plus-square', route('tv_tests.create'), 'Test Vessel'];
-        $jump[] = ['Compare vs MPFM', 'fe-repeat', route('tv_tests.compare'), 'Test Vessel'];
+        $jump[] = ['Vessels', 'fe-anchor', route('test_vessels.index'), 'Well Testing'];
+        if ($ofsIsAdmin || $ofsOfficer || $ofsSurv) $jump[] = ['Add Vessel', 'fe-plus-circle', route('test_vessels.create'), 'Well Testing'];
+        $jump[] = ['Test Requests', 'fe-clipboard', route('tv_test_requests.index'), 'Well Testing'];
+        $jump[] = ['TV Tests', 'fe-list', route('tv_tests.index'), 'Well Testing'];
+        $jump[] = ['New TV Test', 'fe-plus-square', route('tv_tests.create'), 'Well Testing'];
+        $jump[] = ['Compare vs MPFM', 'fe-repeat', route('tv_tests.compare'), 'Well Testing'];
     }
     if ($ofsUser->can('manage_users')) {
         $jump[] = ['Users', 'fe-users', route('users.index'), 'Administration'];

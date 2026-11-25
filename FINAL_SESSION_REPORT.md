@@ -107,13 +107,13 @@ Created comprehensive guides:
 ### User Access
 ```
 ✅ donia.a5ra2019@gmail.com     (admin)
-✅ job.officer@adnoc.ae         (job_officer)
-✅ supervisor@adnoc.ae          (mpfm_supervisor)
-✅ operator1@adnoc.ae           (mpfm_operator)
-✅ operator2@adnoc.ae           (mpfm_operator)
-✅ operator3@adnoc.ae           (mpfm_operator)
-✅ prod.supervisor@adnoc.ae     (production_supervisor)
-✅ reservoir.engineer@adnoc.ae  (reservoir_engineer)
+✅ job.officer@oilfield.com         (job_officer)
+✅ supervisor@oilfield.com          (mpfm_supervisor)
+✅ operator1@oilfield.com           (mpfm_operator)
+✅ operator2@oilfield.com           (mpfm_operator)
+✅ operator3@oilfield.com           (mpfm_operator)
+✅ prod.supervisor@oilfield.com     (production_supervisor)
+✅ reservoir.engineer@oilfield.com  (reservoir_engineer)
 ```
 
 ### Sample Data
@@ -237,9 +237,9 @@ URL: http://localhost/MPFM/public
 ### Login
 Use any test user with password "password":
 - Admin: donia.a5ra2019@gmail.com
-- Job Officer: job.officer@adnoc.ae
-- MPFM Supervisor: supervisor@adnoc.ae
-- Operator: operator1@adnoc.ae
+- Job Officer: job.officer@oilfield.com
+- MPFM Supervisor: supervisor@oilfield.com
+- Operator: operator1@oilfield.com
 
 ### View Monthly Plans
 Navigate to: Monthly Planning → Monthly Plans → All Plans

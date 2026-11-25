@@ -332,7 +332,7 @@ CREATE TABLE departments (
 
 ### Department Managers
 - **MPFM Supervisor** (migrated to department_manager)
-  - Email: supervisor@adnoc.ae
+  - Email: supervisor@oilfield.com
   - Department: MPFM
   - Role: department_manager
 
@@ -343,10 +343,10 @@ CREATE TABLE departments (
   - Role: mpfm_operator
 
 ### Global Users
-- **Job Officer**: job.officer@adnoc.ae
-- **Production Supervisor**: prod.supervisor@adnoc.ae
-- **Reservoir Engineer**: reservoir.engineer@adnoc.ae
-- **Surveillance Supervisor**: surveillance.supervisor@adnoc.ae
+- **Job Officer**: job.officer@oilfield.com
+- **Production Supervisor**: prod.supervisor@oilfield.com
+- **Reservoir Engineer**: reservoir.engineer@oilfield.com
+- **Surveillance Supervisor**: surveillance.supervisor@oilfield.com
 
 ### Sample Data
 - **Multi-Department Plan**: "February 2026 - Multi-Department Operations"
