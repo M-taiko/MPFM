@@ -255,24 +255,8 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
         <div class="center rv"><div class="kicker">Platform</div><h2 class="sh">Everything starts at the well</h2>
             <p class="sp">Every test, survey and intervention is tied to a well in the field hierarchy, so a single page can tell its full story.</p></div>
         <figure class="fig rv" style="margin-top:44px">
-            <svg viewBox="0 0 1000 420" role="img" aria-label="Platform diagram: modules connected around the well record">
-                <defs><radialGradient id="hubg" cx=".5" cy=".4"><stop offset="0" stop-color="#1d4ed8"/><stop offset="1" stop-color="#0b1a3a"/></radialGradient></defs>
-                <g fill="none" stroke-width="1.6" stroke-linecap="round" class="flowd">
-                    <path d="M500 210 L170 90" stroke="#22d3ee"/><path d="M500 210 L170 330" stroke="#fbbf24"/><path d="M500 210 L500 62" stroke="#a78bfa"/>
-                    <path d="M500 210 L830 90" stroke="#34d399"/><path d="M500 210 L830 330" stroke="#38bdf8"/><path d="M500 210 L500 358" stroke="#f87171"/>
-                </g>
-                <circle cx="500" cy="210" r="62" fill="url(#hubg)" stroke="#3b82f6" stroke-width="2"/><circle cx="500" cy="210" r="76" fill="none" stroke="#3b82f6" stroke-opacity=".3" class="pulse"/>
-                <text x="500" y="204" text-anchor="middle" font-size="15" font-weight="800" fill="#fff">WELL</text><text x="500" y="224" text-anchor="middle" font-size="10" fill="#9aaccb">single record</text>
-                <g font-size="12" font-weight="700" fill="#fff" text-anchor="middle">
-                    <g transform="translate(90,70)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#22d3ee"/><text x="80" y="28">MPFM</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Log upload &amp; validation</text></g>
-                    <g transform="translate(90,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#fbbf24"/><text x="80" y="28">Well Testing</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Separator tests &amp; requests</text></g>
-                    <g transform="translate(420,-2)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#a78bfa"/><text x="80" y="28">Wire Line</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Memory-gauge surveys</text></g>
-                    <g transform="translate(750,70)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#34d399"/><text x="80" y="28">Well Analysis</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Health &amp; recommendations</text></g>
-                    <g transform="translate(750,298)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#38bdf8"/><text x="80" y="28">Field Setup</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Field → Tower → Well</text></g>
-                    <g transform="translate(420,356)"><rect width="160" height="64" rx="12" fill="#0d1730" stroke="#f87171"/><text x="80" y="28">Governance</text><text x="80" y="46" font-size="10" fill="#9aaccb" font-weight="500">Roles, review, audit trail</text></g>
-                </g>
-            </svg>
-            <figcaption>Modules share one well record - no re-keying, no spreadsheets passed between teams.</figcaption>
+            @include('partials.welcome_platform')
+            <figcaption>Seven modules share one well record - no re-keying, no spreadsheets passed between teams.</figcaption>
         </figure>
         <div class="cards">
             <div class="c rv" style="--cc:#22d3ee"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div><h4>Measure</h4><p>Ingest MPFM logs and vessel results with automatic validation against configurable rules.</p><span class="live">Live</span></div>
@@ -543,23 +527,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             <div class="chips"><span class="chip">Vx logs</span><span class="chip">Validation rules</span><span class="chip">Trending</span></div>
         </div>
         <figure class="fig rv">
-            <svg viewBox="0 0 560 300">
-                <g font-size="11" font-weight="700" text-anchor="middle" fill="#fff">
-                    <g transform="translate(14,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#22d3ee"/><path d="M30 18h22l10 10v22H30z" fill="none" stroke="#22d3ee" stroke-width="1.8"/><text x="46" y="58" font-size="9.5" fill="#9aaccb">Vx log</text></g>
-                    <g transform="translate(130,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#3b82f6"/><text x="46" y="28" font-size="18" fill="#60a5fa">{ }</text><text x="46" y="52" font-size="9.5" fill="#9aaccb">Parse</text></g>
-                    <g transform="translate(246,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#fbbf24"/><path d="M34 32l8 8 16-18" fill="none" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round"/><text x="46" y="58" font-size="9.5" fill="#9aaccb">Validate</text></g>
-                    <g transform="translate(362,30)"><rect width="92" height="62" rx="10" fill="#0a1226" stroke="#a78bfa"/><circle cx="46" cy="28" r="10" fill="none" stroke="#a78bfa" stroke-width="1.8"/><text x="46" y="58" font-size="9.5" fill="#9aaccb">Review</text></g>
-                    <g transform="translate(470,30)"><rect width="78" height="62" rx="10" fill="#0d2a22" stroke="#34d399"/><text x="39" y="36" font-size="11" fill="#34d399">Approved</text></g>
-                </g>
-                <g stroke="#2e4170" stroke-width="1.6" fill="none" class="flowd"><path d="M106 61H130M222 61H246M338 61H362M454 61H470"/></g>
-                <rect x="14" y="116" width="534" height="170" rx="12" fill="#0a1226" stroke="#1d2b4d"/>
-                <text x="30" y="140" font-size="11" fill="#9aaccb" font-weight="700">Oil · gas · water per test</text>
-                <g stroke="#1b2847"><path d="M30 170H530M30 210H530M30 250H530"/></g>
-                <path class="draw" style="--len:560" d="M30 232 C90 224 130 200 180 204 S270 176 330 184 S430 150 530 144" fill="none" stroke="#22d3ee" stroke-width="2.4"/>
-                <path class="draw" style="--len:560" d="M30 252 C100 250 160 246 220 240 S360 232 530 214" fill="none" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="5 4"/>
-                <path class="draw" style="--len:560" d="M30 266 C120 262 200 258 280 256 S420 250 530 244" fill="none" stroke="#fbbf24" stroke-width="1.8"/>
-                <g font-size="10" fill="#9aaccb"><circle cx="360" cy="136" r="4" fill="#22d3ee"/><text x="370" y="140">Oil</text><circle cx="404" cy="136" r="4" fill="#38bdf8"/><text x="414" y="140">Water cut</text><circle cx="478" cy="136" r="4" fill="#fbbf24"/><text x="488" y="140">Gas</text></g>
-            </svg>
+            @include('partials.welcome_mpfm')
             <figcaption>Pipeline: upload → parse → validate → review → approved, feeding well trends.</figcaption>
         </figure>
     </div>
@@ -581,23 +549,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             <div class="chips"><span class="chip">Requests</span><span class="chip">Comparison</span><span class="chip">Fleet status</span></div>
         </div>
         <figure class="fig rv">
-            <svg viewBox="0 0 560 320">
-                <g transform="translate(0,6)">
-                    <rect x="22" y="40" width="150" height="70" rx="34" fill="#16233f" stroke="#7fb4ff" stroke-width="2"/>
-                    <clipPath id="vc"><rect x="22" y="40" width="150" height="70" rx="34"/></clipPath>
-                    <g clip-path="url(#vc)"><rect x="22" y="72" width="150" height="20" fill="#b45309"/><rect x="22" y="90" width="150" height="22" fill="#0369a1"/><rect x="22" y="40" width="150" height="32" fill="#1e3a5f" opacity=".5"/></g>
-                    <path d="M172 75H215" stroke="#fbbf24" stroke-width="3" class="flowd"/><path d="M50 40V18M150 40V18" stroke="#7fb4ff" stroke-width="3"/>
-                    <text x="97" y="136" text-anchor="middle" font-size="10" fill="#9aaccb" font-weight="700">TEST SEPARATOR</text>
-                </g>
-                <rect x="240" y="20" width="300" height="270" rx="12" fill="#0a1226" stroke="#1d2b4d"/>
-                <text x="256" y="44" font-size="11" fill="#9aaccb" font-weight="700">MPFM vs vessel · oil rate</text>
-                <path d="M280 262L520 52" stroke="#34d399" stroke-width="1.6" stroke-dasharray="6 4"/>
-                <path d="M280 262L520 28" stroke="#f87171" stroke-opacity=".5"/><path d="M280 262L520 78" stroke="#f87171" stroke-opacity=".5"/>
-                <path d="M280 262H524M280 262V50" stroke="#2e4170"/>
-                <g fill="#22d3ee"><circle cx="318" cy="228" r="5"/><circle cx="352" cy="205" r="5"/><circle cx="388" cy="170" r="5"/><circle cx="420" cy="150" r="5"/><circle cx="452" cy="116" r="5"/><circle cx="486" cy="88" r="5"/></g>
-                <circle cx="404" cy="172" r="6" fill="#f87171" class="pulse"/>
-                <g font-size="9.5" fill="#9aaccb"><text x="450" y="274">Vessel B/D</text><text x="250" y="150" transform="rotate(-90 250 150)">MPFM B/D</text><text x="470" y="46" fill="#f87171">±10%</text></g>
-            </svg>
+            @include('partials.welcome_vessel')
             <figcaption>Points on the dashed line mean the meters agree; outliers outside the red band are flagged.</figcaption>
         </figure>
     </div>
@@ -654,23 +606,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             <div class="chips"><span class="chip">Health score</span><span class="chip">Decline</span><span class="chip">Recommendations</span></div>
         </div>
         <figure class="fig rv">
-            <svg viewBox="0 0 560 330">
-                <g transform="translate(18,18)">
-                    <circle cx="70" cy="70" r="52" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12"/>
-                    <circle cx="70" cy="70" r="52" fill="none" stroke="#34d399" stroke-width="12" stroke-linecap="round" stroke-dasharray="327" stroke-dashoffset="59" transform="rotate(-90 70 70)"/>
-                    <text x="70" y="78" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Space Grotesk">82</text><text x="70" y="96" text-anchor="middle" font-size="9" fill="#64748b" font-weight="700">HEALTH</text>
-                </g>
-                <rect x="170" y="18" width="372" height="148" rx="10" fill="#0a1226" stroke="#1d2b4d"/>
-                <text x="184" y="38" font-size="10.5" fill="#9aaccb" font-weight="700">Oil rate · decline &amp; forecast</text>
-                <path class="draw" style="--len:300" d="M186 62 C220 70 250 84 290 96 S350 118 372 124" fill="none" stroke="#22d3ee" stroke-width="2.4"/>
-                <path d="M372 124 C410 134 450 146 524 156" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-dasharray="6 5"/>
-                <line x1="372" y1="50" x2="372" y2="156" stroke="#2e4170" stroke-dasharray="3 3"/><text x="380" y="62" font-size="9" fill="#64748b">forecast →</text>
-                <g transform="translate(18,186)" font-size="12">
-                    <g><rect width="524" height="40" rx="10" fill="#1b1015" stroke="#f87171" stroke-opacity=".5"/><rect width="4" height="40" rx="2" fill="#f87171"/><text x="18" y="25" fill="#fff" font-weight="700">Investigate oil-rate decline</text><text x="506" y="25" text-anchor="end" fill="#f87171" font-size="10" font-weight="800">HIGH</text></g>
-                    <g transform="translate(0,48)"><rect width="524" height="40" rx="10" fill="#1b1a10" stroke="#fbbf24" stroke-opacity=".5"/><rect width="4" height="40" rx="2" fill="#fbbf24"/><text x="18" y="25" fill="#fff" font-weight="700">Pressure survey overdue</text><text x="506" y="25" text-anchor="end" fill="#fbbf24" font-size="10" font-weight="800">MEDIUM</text></g>
-                    <g transform="translate(0,96)"><rect width="524" height="40" rx="10" fill="#0e1b2a" stroke="#60a5fa" stroke-opacity=".5"/><rect width="4" height="40" rx="2" fill="#60a5fa"/><text x="18" y="25" fill="#fff" font-weight="700">Gauge calibration older than 12 months</text><text x="506" y="25" text-anchor="end" fill="#60a5fa" font-size="10" font-weight="800">LOW</text></g>
-                </g>
-            </svg>
+            @include('partials.welcome_analysis')
             <figcaption>Illustrative well analysis: score, forecast and ranked recommendations.</figcaption>
         </figure>
     </div>
@@ -692,20 +628,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             </ul>
         </div>
         <figure class="fig rv">
-            <svg viewBox="0 0 560 300">
-                <g fill="none" stroke="#2e4170" stroke-width="1.6"><path d="M280 62V84M280 84H110V108M280 84H280V108M280 84H450V108M110 160V180M110 180H60V200M110 180H160V200M450 160V180M450 180H400V200M450 180H500V200"/></g>
-                <g font-size="11" font-weight="700" text-anchor="middle" fill="#fff">
-                    <rect x="200" y="14" width="160" height="48" rx="10" fill="#0d1730" stroke="#38bdf8"/><text x="280" y="43">Oil Field</text>
-                    <g><rect x="40" y="108" width="140" height="52" rx="10" fill="#0d1730" stroke="#22d3ee"/><text x="110" y="139">Tower A</text></g>
-                    <g><rect x="210" y="108" width="140" height="52" rx="10" fill="#0d1730" stroke="#22d3ee"/><text x="280" y="139">Tower B</text></g>
-                    <g><rect x="380" y="108" width="140" height="52" rx="10" fill="#0d1730" stroke="#22d3ee"/><text x="450" y="139">Tower C</text></g>
-                    <g font-size="10"><rect x="14" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#34d399"/><text x="60" y="225">Well 1</text>
-                    <rect x="114" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#34d399"/><text x="160" y="225">Well 2</text>
-                    <rect x="354" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#fbbf24"/><text x="400" y="225">Well 3</text>
-                    <rect x="454" y="200" width="92" height="40" rx="9" fill="#0a1226" stroke="#34d399"/><text x="500" y="225">Well 4</text></g>
-                </g>
-                <g font-size="9.5" fill="#9aaccb"><circle cx="190" cy="278" r="4" fill="#34d399"/><text x="200" y="282">Active</text><circle cx="260" cy="278" r="4" fill="#fbbf24"/><text x="270" y="282">Maintenance</text><circle cx="360" cy="278" r="4" fill="#64748b"/><text x="370" y="282">Inactive</text></g>
-            </svg>
+            @include('partials.welcome_field')
             <figcaption>Every module attaches its data to a well in this hierarchy.</figcaption>
         </figure>
     </div>
@@ -717,18 +640,8 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
         <div class="center rv"><div class="kicker">06 · Governance &amp; security</div><h2 class="sh">Controlled, reviewable, accountable</h2>
             <p class="sp">Role-based access, structured approval workflows and a recorded history keep data trustworthy and auditable.</p></div>
         <figure class="fig rv" style="margin-top:40px">
-            <svg viewBox="0 0 1000 200">
-                <g font-size="13" font-weight="700" text-anchor="middle" fill="#fff">
-                    <rect x="20" y="62" width="150" height="62" rx="12" fill="#0d1730" stroke="#64748b"/><text x="95" y="98">Draft</text>
-                    <rect x="260" y="62" width="150" height="62" rx="12" fill="#0d1730" stroke="#fbbf24"/><text x="335" y="98">Submitted</text>
-                    <rect x="520" y="14" width="150" height="62" rx="12" fill="#0d2a22" stroke="#34d399"/><text x="595" y="50">Approved</text>
-                    <rect x="520" y="112" width="150" height="62" rx="12" fill="#2a1216" stroke="#f87171"/><text x="595" y="148">Rejected</text>
-                    <rect x="780" y="112" width="190" height="62" rx="12" fill="#0d1730" stroke="#a78bfa"/><text x="875" y="148">Re-test requested</text>
-                </g>
-                <g fill="none" stroke="#2e4170" stroke-width="2" class="flowd"><path d="M170 93H260M410 93L520 45M410 93L520 143M670 143H780"/><path d="M875 112V93H95" stroke-opacity=".5" stroke-dasharray="2 6"/></g>
-                <g font-size="10" fill="#9aaccb" text-anchor="middle"><text x="215" y="84">submit</text><text x="465" y="56">review ✓</text><text x="465" y="140">review ✗</text></g>
-            </svg>
-            <figcaption>Review workflow applied to MPFM and test-vessel results.</figcaption>
+            @include('partials.welcome_governance')
+            <figcaption>Review workflow, audit trail and role access applied to MPFM and test results.</figcaption>
         </figure>
         <div class="cards">
             <div class="c rv" style="--cc:#f87171"><div class="ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h4>Role-based access</h4><p>Eight role profiles - administrators, managers, job officers, supervisors, engineers and operators - each see only what they should.</p></div>
@@ -750,7 +663,7 @@ footer .wrap { display:flex; justify-content:space-between; gap:20px; flex-wrap:
             <div class="c rv" style="--cc:#34d399"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/></svg></div><h4>Well analysis</h4><p>Health, forecast, reservoir and recommendations.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#2dd4bf"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h4>Well integrity</h4><p>Barriers, annulus pressures, wellhead checks and anomalies.</p><span class="live">Live</span></div>
             <div class="c rv" style="--cc:#60a5fa"><div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></div><h4>Tasks &amp; monthly plans</h4><p>Department task management with SLA tracking.</p><span class="soon">Coming soon</span></div>
-            <div class="c rv" style="--cc:#fb923c"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div><h4>Drilling · Completion · Workover · Maintenance</h4><p>Department workflows on the same well record.</p><span class="soon">Coming soon</span></div>
+            <div class="c rv" style="--cc:#fb923c;grid-column:1/-1"><div class="ic"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg></div><h4>Drilling · Completion · Workover · Maintenance</h4><p>Department workflows on the same well record.</p><span class="soon">Coming soon</span></div>
         </div>
     </div>
 </section>
