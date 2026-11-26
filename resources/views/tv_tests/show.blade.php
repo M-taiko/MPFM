@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Test Vessel Test #'.$tvTest->id)
+@section('title', 'Test Run #'.$tvTest->id)
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/css/oilfield-anim.css') }}">
@@ -223,7 +223,7 @@
     $yi = 324 - $waterH;
     $oilTop = 220;
 
-    $vesselName = $tvTest->testVessel->name ?? 'Test Vessel';
+    $vesselName = $tvTest->testVessel->name ?? 'Testing Unit';
     $stringName = $tvTest->oilString->name ?? '—';
     $status = $tvTest->status;
     $mpfm = $tvTest->mpfmTest;
@@ -240,7 +240,7 @@
         <div class="who">
             <span class="lg"></span>
             <div>
-                <div class="eyebrow"><i></i> Well Testing · Test Vessel Report</div>
+                <div class="eyebrow"><i></i> Well Testing · Testing Unit Report</div>
                 <h1>Test #{{ $tvTest->id }} <em>· {{ $vesselName }}</em></h1>
                 <div class="meta">
                     <span class="chip {{ $status }}">{{ ucfirst($status) }}</span>
@@ -277,11 +277,11 @@
     <div class="sec">
         <div class="panel rv">
             <div class="ph">
-                <h3><i class="fe fe-anchor"></i> Test Vessel V-101 · 3-phase horizontal separator</h3>
+                <h3><i class="fe fe-anchor"></i> Testing Unit V-101 · 3-phase horizontal separator</h3>
                 <span class="sub">{{ $vesselName }}@if($tvTest->testVessel?->code) · {{ $tvTest->testVessel->code }}@endif — levels drawn from this test's water cut</span>
             </div>
             <div class="scroll"><div class="vessel">
-<svg viewBox="0 0 1000 470" role="img" aria-label="Test vessel process drawing">
+<svg viewBox="0 0 1000 470" role="img" aria-label="Well testing process drawing">
 <defs>
     <linearGradient id="tvSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa8bd"/><stop offset=".18" stop-color="#e2e8f0"/><stop offset=".5" stop-color="#64748b"/><stop offset="1" stop-color="#1e293b"/></linearGradient>
     <linearGradient id="tvShell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8b6cb"/><stop offset=".12" stop-color="#f1f5f9"/><stop offset=".45" stop-color="#7c8aa1"/><stop offset="1" stop-color="#1b2433"/></linearGradient>
@@ -548,7 +548,7 @@
         <div class="panel rv">
             <div class="ph"><h3><i class="fe fe-info"></i> Test information</h3></div>
             <div class="infog">
-                <div class="info"><div class="l"><i class="fe fe-anchor"></i> Test vessel</div><div class="v">@if($tvTest->testVessel)<a href="{{ route('test_vessels.show', $tvTest->testVessel->id) }}">{{ $tvTest->testVessel->name }}</a>@else — @endif</div></div>
+                <div class="info"><div class="l"><i class="fe fe-anchor"></i> Well testing</div><div class="v">@if($tvTest->testVessel)<a href="{{ route('test_vessels.show', $tvTest->testVessel->id) }}">{{ $tvTest->testVessel->name }}</a>@else — @endif</div></div>
                 <div class="info"><div class="l"><i class="fe fe-layers"></i> Oil field</div><div class="v">@if($tvTest->oilField)<a href="{{ route('oil_fields.show', $tvTest->oilField->id) }}">{{ $tvTest->oilField->name }}</a>@else — @endif</div></div>
                 <div class="info"><div class="l"><i class="fe fe-corner-down-right"></i> Tower</div><div class="v">@if($tvTest->tower)<a href="{{ route('towers.show', $tvTest->tower->id) }}">{{ $tvTest->tower->name }}</a>@else — @endif</div></div>
                 <div class="info"><div class="l"><i class="fe fe-trending-up"></i> Oil string</div><div class="v">{{ $stringName }}</div></div>
@@ -600,7 +600,7 @@
                         <div class="crow">
                             <div class="n">{{ $n }}<br><span style="color:var(--mute);font-weight:500;text-transform:none;letter-spacing:0">{{ $un }}</span></div>
                             <div class="bars">
-                                <div class="bar tv"><i style="--w:{{ round($tvv / $mx * 100, 1) }}%">Test vessel · {{ $f($tvv) }}</i></div>
+                                <div class="bar tv"><i style="--w:{{ round($tvv / $mx * 100, 1) }}%">Well testing · {{ $f($tvv) }}</i></div>
                                 <div class="bar mp"><i style="--w:{{ round($mpv / $mx * 100, 1) }}%">MPFM · {{ $f($mpv) }}</i></div>
                             </div>
                             <div class="dev {{ $n === 'Water cut' ? ($d === null || abs($d) <= 2 ? 'ok' : (abs($d) <= 5 ? 'warn' : 'bad')) : $devCls($d) }}">{{ $d === null ? '—' : (($d > 0 ? '+' : '').number_format($d, 1).($n === 'Water cut' ? ' pt' : '%')) }}</div>

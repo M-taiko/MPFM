@@ -26,6 +26,7 @@ class StoreOilFieldRequest extends FormRequest
             'code' => 'required|string|max:255|unique:oil_fields,code',
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'location_id' => 'nullable|exists:locations,id',
             'status' => 'required|in:active,inactive,maintenance',
         ];
     }

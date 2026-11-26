@@ -104,7 +104,7 @@ class TestVesselTestController extends Controller
         }
 
         return redirect()->route('tv_tests.show', $tvTest->id)
-            ->with('success', 'Test Vessel Test created successfully. You can submit it for review now.');
+            ->with('success', 'Test Run created successfully. You can submit it for review now.');
     }
 
     /**
@@ -163,7 +163,7 @@ class TestVesselTestController extends Controller
         $tvTest->update($request->validated());
 
         return redirect()->route('tv_tests.index')
-            ->with('success', 'Test Vessel Test updated successfully.');
+            ->with('success', 'Test Run updated successfully.');
     }
 
     /**
@@ -174,7 +174,7 @@ class TestVesselTestController extends Controller
         $tvTest->delete();
 
         return redirect()->route('tv_tests.index')
-            ->with('success', 'Test Vessel Test deleted successfully.');
+            ->with('success', 'Test Run deleted successfully.');
     }
 
     /**

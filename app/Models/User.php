@@ -12,7 +12,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable;
+    use HasRoles { hasRole as protected spatieHasRole; }
 
     /**
      * The attributes that are mass assignable.
@@ -154,6 +155,49 @@ class User extends Authenticatable
         return $this->hasAnyRole(['admin', 'department_manager', 'job_officer', 'surveillance_supervisor']);
     }
 
+    /**
+     * Locations (onshore / offshore sites): same managers as Well Integrity
+     */
+    public function canManageLocations(): bool
+    {
+        return $this->canManageIntegrity();
+    }
+
+    /**
+     * "full_access" users pass every check that an admin passes, except user / role / permission management,
+     * which stays with real admins (see isStrictAdmin()).
+     */
+    public function hasRole($roles, ?string $guard = null): bool
+    {
+        if ($this->spatieHasRole($roles, $guard)) {
+            return true;
+        }
+        if ($this->isFullAccess()) {
+            $list = is_string($roles) ? explode('|', $roles) : (is_iterable($roles) ? collect($roles)->all() : []);
+            foreach ($list as $r) {
+                if ($r === 'admin') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function isFullAccess(): bool
+    {
+        $this->loadMissing('roles');
+
+        return $this->roles->contains('name', 'full_access');
+    }
+
+    /** A real admin: the only kind of user who may manage users, roles and permissions */
+    public function isStrictAdmin(): bool
+    {
+        $this->loadMissing('roles');
+
+        return $this->roles->contains('name', 'admin');
+    }
     /**
      * Check if user is admin
      */

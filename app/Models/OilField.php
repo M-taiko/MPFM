@@ -16,12 +16,18 @@ class OilField extends Model
         'code',
         'description',
         'location',
+        'location_id',
         'status',
     ];
 
     protected $casts = [
         'status' => 'string',
     ];
+
+    public function locationRef(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id');
+    }
 
     /**
      * Get all towers for this oil field

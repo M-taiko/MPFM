@@ -17,6 +17,7 @@ class OilString extends Model
         'tower_id',
         'name',
         'code',
+        'string_number',
         'description',
         'status',
     ];
@@ -31,6 +32,11 @@ class OilString extends Model
     public function tower(): BelongsTo
     {
         return $this->belongsTo(Tower::class);
+    }
+
+    public function stringLabel(): string
+    {
+        return $this->string_number ? 'String ' . $this->string_number : 'No string no.';
     }
 
     /**

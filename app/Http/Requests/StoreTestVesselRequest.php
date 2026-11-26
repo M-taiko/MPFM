@@ -25,6 +25,7 @@ class StoreTestVesselRequest extends FormRequest
             'description' => 'nullable|string',
             'oil_field_id' => 'nullable|exists:oil_fields,id',
             'status' => 'required|in:active,inactive,maintenance',
+            'location_id' => 'nullable|exists:locations,id',
         ];
     }
 }

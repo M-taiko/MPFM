@@ -55,7 +55,16 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                                        <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">String number <small class="text-muted">(1, 2, 3...)</small></label>
+                                <input type="number" min="1" max="99" class="form-control @error('string_number') is-invalid @enderror" name="string_number" value="{{ old('string_number', $oilString->string_number) }}">
+                                @error('string_number')<span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>@enderror
+                            </div>
+                        </div>
+                    </div>
+<div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Code <span class="text-danger">*</span></label>

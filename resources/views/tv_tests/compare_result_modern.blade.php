@@ -157,7 +157,7 @@
         'temperature' => ['Temperature', '°F', 1, 'rel'],
         'gor' => ['GOR', 'scf/stb', 0, 'rel'],
     ];
-    // deviation of the MPFM from the Test Vessel (the reference)
+    // deviation of the MPFM from the Testing Unit (the reference)
     $rows = [];
     foreach ($defs as $key => [$label, $unit, $dec, $type]) {
         $m = $metrics[$key] ?? null;
@@ -201,7 +201,7 @@
                 <span class="lg"></span>
                 <div>
                     <div class="eyebrow">Comparison report</div>
-                    <h1>Test Vessel <em>vs MPFM</em></h1>
+                    <h1>Testing Unit <em>vs MPFM</em></h1>
                     <div class="crumbs">
                         <a href="{{ route('tv_tests.index') }}"><i class="fe fe-home"></i> TV tests</a><span>/</span>
                         <a href="{{ route('tv_tests.show', $tvTest->id) }}">Test #{{ $tvTest->id }}</a><span>/</span>
@@ -221,7 +221,7 @@
         <div class="panel tv rv">
             <div class="ph">
                 <svg class="ic" viewBox="0 0 64 44"><path d="M4,10 H44 A10,12 0 0 1 44,34 H4 A10,12 0 0 1 4,10 Z" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/><path d="M8,26 H46 A6,6 0 0 1 46,34 H8 Z" fill="#b45309"/><rect x="8" y="30" width="38" height="4" fill="#0ea5e9"/><path d="M0,16 H4 M54,14 H64 M54,30 H64" stroke="#94a3b8" stroke-width="3"/><circle cx="24" cy="6" r="5" fill="#0a1222" stroke="#fbbf24" stroke-width="1.6"/></svg>
-                <div><h3>Test vessel</h3><small>Reference reading</small></div>
+                <div><h3>Well testing</h3><small>Reference reading</small></div>
             </div>
             <div class="kv">
                 <div><small>Test</small><b>#{{ $tvTest->id }}</b></div>
@@ -257,13 +257,13 @@
     {{-- BANNER --}}
     <div class="sec rv">
         @if($vstate === 'bad')
-            <div class="banner bad"><i class="fe fe-alert-circle"></i><div><b>Significant differences detected</b><p>At least one measurement differs from the test vessel by more than 10%. Review both measurements before relying on the MPFM for this well.</p></div></div>
+            <div class="banner bad"><i class="fe fe-alert-circle"></i><div><b>Significant differences detected</b><p>At least one measurement differs from the well testing by more than 10%. Review both measurements before relying on the MPFM for this well.</p></div></div>
         @elseif($vstate === 'warn')
             <div class="banner warn"><i class="fe fe-alert-triangle"></i><div><b>Differences worth monitoring</b><p>Some measurements differ by 5–10%. Watch the next test cycle for consistency.</p></div></div>
         @elseif($vstate === 'ok')
-            <div class="banner ok"><i class="fe fe-check-circle"></i><div><b>The two measurements agree</b><p>Every compared metric is within 5% of the test vessel reference.</p></div></div>
+            <div class="banner ok"><i class="fe fe-check-circle"></i><div><b>The two measurements agree</b><p>Every compared metric is within 5% of the well testing reference.</p></div></div>
         @else
-            <div class="banner warn"><i class="fe fe-info"></i><div><b>Not enough data to compare</b><p>The MPFM test has no values that match the test vessel metrics.</p></div></div>
+            <div class="banner warn"><i class="fe fe-info"></i><div><b>Not enough data to compare</b><p>The MPFM test has no values that match the well testing metrics.</p></div></div>
         @endif
     </div>
 
@@ -278,9 +278,9 @@
     {{-- PARALLEL LINES DIAGRAM --}}
     <div class="sec">
         <div class="panel diagram rv">
-            <div class="ph"><h3><i class="hi fe fe-git-branch"></i> Two independent measurements of the same stream</h3><span class="sub">The MPFM and the test vessel sit on separate, parallel lines</span></div>
+            <div class="ph"><h3><i class="hi fe fe-git-branch"></i> Two independent measurements of the same stream</h3><span class="sub">The MPFM and the well testing sit on separate, parallel lines</span></div>
             <div class="scroll"><div>
-<svg viewBox="0 0 900 300" role="img" aria-label="Parallel MPFM and test vessel lines">
+<svg viewBox="0 0 900 300" role="img" aria-label="Parallel MPFM and well testing lines">
 <defs>
     <linearGradient id="rSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8b6cb"/><stop offset=".15" stop-color="#f1f5f9"/><stop offset=".5" stop-color="#7c8aa1"/><stop offset="1" stop-color="#1b2433"/></linearGradient>
     <linearGradient id="rOil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#78350f"/></linearGradient>
@@ -309,7 +309,7 @@
 <text x="574" y="70" class="rv2">{{ $gv($g, 'mp') }}</text><text x="574" y="82" class="rvu">gas · MMscf/D</text>
 <text x="650" y="70" class="rv2">{{ $gv($w, 'mp') }}</text><text x="650" y="82" class="rvu">WC · %</text>
 <circle cx="686" cy="44" r="3.4" fill="#34d399" class="pulse"/></g>
-{{-- Test vessel (bottom) --}}
+{{-- Well testing (bottom) --}}
 <g>
 <rect x="354" y="258" width="26" height="22" fill="#334155"/><rect x="408" y="258" width="26" height="22" fill="#334155"/><rect x="336" y="278" width="118" height="5" rx="2" fill="#475569"/>
 <path d="M320,196 H460 A24,30 0 0 1 460,256 H320 A24,30 0 0 1 320,196 Z" fill="url(#rSteel)" stroke="#0b1220" stroke-width="1.4"/>
@@ -343,7 +343,7 @@
     {{-- DEVIATION CHART + PAIRED BARS --}}
     <div class="sec g2">
         <div class="panel dchart rv">
-            <div class="ph"><h3><i class="hi fe fe-sliders"></i> Deviation from the reference</h3><span class="sub">MPFM vs test vessel, %</span></div>
+            <div class="ph"><h3><i class="hi fe fe-sliders"></i> Deviation from the reference</h3><span class="sub">MPFM vs well testing, %</span></div>
             @if(count($relRows))
             <svg viewBox="0 0 600 {{ $ch }}" role="img" aria-label="Deviation chart">
                 @php $bandX = fn ($p) => $cx + $p * $sc; @endphp
@@ -379,7 +379,7 @@
                 <div class="crow">
                     <div class="n">{{ $r['label'] }}<span>{{ $r['unit'] }}</span></div>
                     <div class="bars">
-                        <div class="bar a"><i style="--w:{{ round($r['tv'] / $mx * 100, 1) }}%"></i><span>Test vessel · {{ $f($r['tv'], $r['dec']) }}</span></div>
+                        <div class="bar a"><i style="--w:{{ round($r['tv'] / $mx * 100, 1) }}%"></i><span>Well testing · {{ $f($r['tv'], $r['dec']) }}</span></div>
                         <div class="bar b"><i style="--w:{{ round($r['mp'] / $mx * 100, 1) }}%"></i><span>MPFM · {{ $f($r['mp'], $r['dec']) }}</span></div>
                     </div>
                     <div class="dev {{ $r['st'] }}">{{ $r['d'] === null ? '—' : (($r['d'] > 0 ? '+' : '').$f($r['d'], 1).($r['type'] === 'pt' ? ' pt' : '%')) }}</div>
@@ -398,7 +398,7 @@
                     @foreach($flagged as $r)
                         <div class="issue {{ $r['st'] }}">
                             <div class="p">{{ ($r['d'] > 0 ? '+' : '').$f($r['d'], 1) }}{{ $r['type'] === 'pt' ? ' pt' : '%' }}</div>
-                            <div><b>{{ $r['label'] }}</b><small>MPFM reads <b style="display:inline;color:#fff">{{ $r['d'] > 0 ? 'higher' : 'lower' }}</b> than the test vessel · {{ $r['st'] === 'bad' ? 'needs review' : 'monitor closely' }}</small></div>
+                            <div><b>{{ $r['label'] }}</b><small>MPFM reads <b style="display:inline;color:#fff">{{ $r['d'] > 0 ? 'higher' : 'lower' }}</b> than the well testing · {{ $r['st'] === 'bad' ? 'needs review' : 'monitor closely' }}</small></div>
                         </div>
                     @endforeach
                 </div>
@@ -417,14 +417,14 @@
         <div class="panel rv" style="--d:1">
             <div class="ph"><h3><i class="hi fe fe-zap"></i> Recommendations</h3></div>
             <ul class="tips">
-                @if($hasBad)<li><i class="fe fe-alert-triangle"></i><span><b>High priority:</b> check both sides — test vessel calibration and level stability, and the MPFM inputs (PVT, GVF, water cut).</span></li>
+                @if($hasBad)<li><i class="fe fe-alert-triangle"></i><span><b>High priority:</b> check both sides — well testing calibration and level stability, and the MPFM inputs (PVT, GVF, water cut).</span></li>
                 <li><i class="fe fe-check-circle"></i><span>Verify the data entry on both tests for manual input errors.</span></li>
                 <li><i class="fe fe-check-circle"></i><span>Repeat the comparison after a new stabilised test.</span></li>@endif
                 @if($hasWarn && ! $hasBad)<li><i class="fe fe-eye"></i><span><b>Monitor:</b> document well conditions during both tests and compare again next cycle.</span></li>@endif
                 @if(! $sameStr)<li><i class="fe fe-alert-triangle"></i><span><b>Different oil strings:</b> the tests are not on the same well, so the deviation is not meaningful.</span></li>@endif
                 @if($days > 7)<li><i class="fe fe-calendar"></i><span><b>Tests are {{ $days }} days apart</b> — re-run both under similar conditions.</span></li>
                 @else<li><i class="fe fe-calendar"></i><span><b>Good window:</b> only {{ $days }} day{{ $days === 1 ? '' : 's' }} apart, so the comparison is reliable.</span></li>@endif
-                <li><i class="fe fe-settings"></i><span>Keep a regular calibration schedule for the test vessel instruments.</span></li>
+                <li><i class="fe fe-settings"></i><span>Keep a regular calibration schedule for the well testing instruments.</span></li>
                 <li><i class="fe fe-trending-up"></i><span>Track this well's deviation over several tests to spot drift.</span></li>
             </ul>
         </div>
@@ -433,9 +433,9 @@
     {{-- TABLE --}}
     <div class="sec">
         <div class="panel rv">
-            <div class="ph"><h3><i class="hi fe fe-list"></i> Detailed measurements</h3><span class="sub">Reference = test vessel</span></div>
+            <div class="ph"><h3><i class="hi fe fe-list"></i> Detailed measurements</h3><span class="sub">Reference = well testing</span></div>
             <div class="scroll"><table class="t">
-                <thead><tr><th>Metric</th><th>Test vessel</th><th>MPFM</th><th>Absolute diff</th><th>Deviation</th><th>Direction</th></tr></thead>
+                <thead><tr><th>Metric</th><th>Well testing</th><th>MPFM</th><th>Absolute diff</th><th>Deviation</th><th>Direction</th></tr></thead>
                 <tbody>
                     @foreach($rows as $r)
                         <tr>

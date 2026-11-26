@@ -56,7 +56,7 @@ class TestVesselController extends Controller
         TestVessel::create($request->validated());
 
         return redirect()->route('test_vessels.index')
-            ->with('success', 'Test Vessel created successfully.');
+            ->with('success', 'Testing Unit created successfully.');
     }
 
     /**
@@ -85,7 +85,7 @@ class TestVesselController extends Controller
         $testVessel->update($request->validated());
 
         return redirect()->route('test_vessels.index')
-            ->with('success', 'Test Vessel updated successfully.');
+            ->with('success', 'Testing Unit updated successfully.');
     }
 
     /**
@@ -96,11 +96,11 @@ class TestVesselController extends Controller
         $testVessel->delete();
 
         return redirect()->route('test_vessels.index')
-            ->with('success', 'Test Vessel deleted successfully.');
+            ->with('success', 'Testing Unit deleted successfully.');
     }
 
     /**
-     * Get tests for a test vessel (AJAX endpoint)
+     * Get tests for a well testing (AJAX endpoint)
      */
     public function getTests(TestVessel $testVessel)
     {

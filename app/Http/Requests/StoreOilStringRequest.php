@@ -25,6 +25,7 @@ class StoreOilStringRequest extends FormRequest
             'tower_id' => 'required|exists:towers,id',
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:255|unique:oil_strings,code',
+            'string_number' => 'nullable|integer|min:1|max:99',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive,maintenance',
         ];

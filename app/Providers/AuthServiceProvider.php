@@ -41,7 +41,7 @@ class AuthServiceProvider extends ServiceProvider
 
         // Admin access gate - grants full system access
         Gate::define('admin-access', function ($user) {
-            return $user && $user->isAdmin();
+            return $user && $user->isStrictAdmin();
         });
 
         // Gate for reviewing tests
@@ -51,7 +51,7 @@ class AuthServiceProvider extends ServiceProvider
 
         // Before gate for admin bypass on all policies
         Gate::before(function ($user, $ability) {
-            if ($user->isAdmin()) {
+            if ($user->isStrictAdmin()) {
                 return true;
             }
         });

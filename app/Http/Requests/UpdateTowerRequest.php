@@ -30,6 +30,7 @@ class UpdateTowerRequest extends FormRequest
             'code' => ['required', 'string', 'max:255', Rule::unique('towers', 'code')->ignore($towerId)],
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive,maintenance',
+            'tower_type' => 'required|in:' . implode(',', array_keys(\App\Models\Tower::TYPES)),
         ];
     }
 }

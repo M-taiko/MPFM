@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Well Testing - Test Vessel Tests')
+@section('title', 'Well Testing - Test Runs')
 
 @section('css')
 <link href="{{ URL::asset('assets/plugins/datatable/css/jquery.dataTables.min.css') }}" rel="stylesheet">
@@ -154,11 +154,11 @@
             <div class="who">
                 <span class="lg"></span>
                 <div>
-                    <div class="eyebrow"><i></i> Well Testing · Test vessel tests</div>
+                    <div class="eyebrow"><i></i> Well Testing · Well testing runs</div>
                     <h1>Reference tests <em>on the vessel</em></h1>
                 </div>
             </div>
-            <p style="margin-top:14px">Every test run on a test vessel is the reference reading the MPFM is checked against. Record, review and compare them here.</p>
+            <p style="margin-top:14px">Every test run on a well testing is the reference reading the MPFM is checked against. Record, review and compare them here.</p>
             <div class="actions">
                 @can('create', App\Models\TestVesselTest::class)
                     <a href="{{ route('tv_tests.create') }}" class="btn2 p"><i class="fe fe-plus"></i> New test</a>
@@ -220,7 +220,7 @@
     {{-- PROCESS STRIP --}}
     <div class="sec">
         <div class="panel rv">
-            <div class="ph"><h3><i class="fe fe-git-merge"></i> Life of a test vessel test</h3><span class="sub">From request to MPFM comparison</span></div>
+            <div class="ph"><h3><i class="fe fe-git-merge"></i> Life of a well test</h3><span class="sub">From request to MPFM comparison</span></div>
             <div class="flow">
                 <div class="fs"><span class="n">1</span>
                     <svg class="ico" viewBox="0 0 96 96"><rect x="24" y="14" width="48" height="66" rx="7" fill="#0b1426" stroke="#60a5fa" stroke-width="2.5"/><path d="M34,34 H62 M34,46 H62 M34,58 H50" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/><circle cx="66" cy="68" r="12" fill="#3b82f6"/><path d="M66,62 V74 M60,68 H72" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
@@ -284,7 +284,7 @@
             <div class="filters">
                 <div><label>Oil field</label>
                     <select id="oilFieldFilter" class="form-control"><option value="">All fields</option>@foreach($oilFields as $field)<option value="{{ $field->id }}">{{ $field->name }}</option>@endforeach</select></div>
-                <div><label>Test vessel</label>
+                <div><label>Well testing</label>
                     <select id="testVesselFilter" class="form-control"><option value="">All vessels</option>@foreach($testVessels as $vessel)<option value="{{ $vessel->id }}">{{ $vessel->name }}</option>@endforeach</select></div>
                 <div><label>Status</label>
                     <select id="statusFilter" class="form-control"><option value="">All status</option><option value="draft">Draft</option><option value="submitted">Submitted</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
@@ -294,7 +294,7 @@
             </div>
             <div class="table-responsive">
                 <table class="table table-striped" id="tvTestsTable">
-                    <thead><tr><th>Date</th><th>Shift</th><th>Vessel</th><th>Operator</th><th>Oil field</th><th>Tower</th><th>String</th><th>Oil rate</th><th>MPFM test</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Date</th><th>Shift</th><th>Unit</th><th>Operator</th><th>Oil field</th><th>Tower</th><th>String</th><th>Oil rate</th><th>MPFM test</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>

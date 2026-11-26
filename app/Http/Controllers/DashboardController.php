@@ -20,7 +20,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Dashboard is focused on MPFM and Test Vessel data only for now.
+     * Dashboard is focused on MPFM and Testing Unit data only for now.
      */
     public function index()
     {
@@ -34,7 +34,7 @@ class DashboardController extends Controller
         $tvTotal = array_sum($tvByStatus);
         $approvedRate = $mpfmTotal > 0 ? round((($mpfmByStatus['approved'] ?? 0) / $mpfmTotal) * 100) : 0;
 
-        // MPFM vs Test Vessel: every TV test that is linked to an MPFM test
+        // MPFM vs Testing Unit: every TV test that is linked to an MPFM test
         $allPairs = TestVesselTest::with(['mpfmTest', 'testVessel', 'oilString'])
             ->whereNotNull('mpfm_test_id')
             ->latest('test_date')
@@ -103,7 +103,7 @@ class DashboardController extends Controller
         }
 
         // ---- production trends (MPFM) ------------------------------------------------------
-        $mpfm = MPFMTest::with('oilString.tower.oilField', 'user')
+        $mpfm = MPFMTest::with('oilString.tower.oilField.locationRef', 'user')
             ->orderBy('test_date')->orderBy('id')->get();
         $trend = $mpfm->filter(fn ($t) => $t->oil_rate !== null)->take(-40)->values()->map(fn ($t) => [
             'id' => $t->id,
@@ -184,7 +184,109 @@ class DashboardController extends Controller
             ->merge(WellTest::latest()->limit(4)->get()->map(fn ($w) => ['type' => 'log', 'title' => 'Log uploaded · '.($w->well ?? '—'), 'sub' => (string) $w->filename, 'who' => $w->operator ?? '', 'when' => $w->created_at, 'url' => route('well_tests.show', $w->id)]))
             ->filter(fn ($e) => $e['when'])->sortByDesc('when')->take(9)->values();
 
-        return view('dashboard', [
+        // ═════ Role-based extras ═════════════════════════════════════════════
+        $user = auth()->user();
+        $persona = $this->resolvePersona($user, request('view'));
+        $needs = fn (array $p) => in_array($persona, $p, true);
+        $extra = ['persona' => $persona, 'canSwitchView' => $user->hasRole('admin')];
+
+        // production by location (latest test per well)
+        $extra['byLocation'] = $latestPerString->groupBy(fn ($t) => optional(optional(optional($t->oilString)->tower)->oilField)->locationRef->name ?? 'No location')
+            ->map(fn ($g, $name) => ['name' => $name, 'oil' => round($g->sum(fn ($t) => (float) $t->oil_rate), 1), 'wells' => $g->count()])->sortByDesc('oil')->values();
+
+        // watch lists from the last six tests of every well
+        $watch = $mpfm->filter(fn ($t) => $t->oil_string_id && $t->status !== 'rejected' && $t->oil_rate !== null)->groupBy('oil_string_id')->map(function ($g) {
+            $g = $g->sortBy('test_date')->values()->take(-6);
+            if ($g->count() < 4) { return null; }
+            $a = $g->first(); $b = $g->last();
+            return [
+                'id' => $b->oil_string_id, 'name' => $b->oilString->name ?? '—', 'tower' => $b->oilString->tower->name ?? '',
+                'oil_from' => (float) $a->oil_rate, 'oil_to' => (float) $b->oil_rate,
+                'oil_pct' => (float) $a->oil_rate > 0 ? round(((float) $b->oil_rate - (float) $a->oil_rate) / (float) $a->oil_rate * 100, 1) : 0,
+                'wc_from' => (float) $a->water_cut, 'wc_to' => (float) $b->water_cut, 'wc_delta' => round((float) $b->water_cut - (float) $a->water_cut, 1),
+                'days' => $a->test_date->diffInDays($b->test_date), 'tests' => $g->count(),
+            ];
+        })->filter()->values();
+        $extra['declineWatch'] = $watch->sortBy('oil_pct')->filter(fn ($w) => $w['oil_pct'] < -3)->take(6)->values();
+        $extra['wcWatch'] = $watch->sortByDesc('wc_delta')->filter(fn ($w) => $w['wc_delta'] > 1.5)->take(6)->values();
+        $extra['declineCount'] = $watch->where('oil_pct', '<', -10)->count();
+        $extra['wcRiseCount'] = $watch->where('wc_delta', '>', 3)->count();
+
+        // wells that are due a test
+        $due = \App\Models\OilString::where('status', 'active')->with('tower')->withMax('mpfmTests as last_test', 'test_date')->get()
+            ->filter(fn ($w) => !$w->last_test || \Carbon\Carbon::parse($w->last_test)->lt(now()->subDays(30)))
+            ->sortBy(fn ($w) => $w->last_test ?? '0000')->values();
+        $extra['dueWells'] = $due->take(8);
+        $extra['dueCount'] = $due->count();
+
+        // integrity picture for the roles that may see it
+        $extra['integrity'] = ($user->canAccessIntegrity() && $needs(['admin', 'manager', 'supervisor', 'production', 'reservoir']))
+            ? app(\App\Services\Integrity\WellIntegrityOverview::class)->build() : null;
+
+        // review desk (supervisors, managers, admin)
+        if ($needs(['admin', 'manager', 'supervisor'])) {
+            $q = collect();
+            foreach (MPFMTest::with('oilString', 'user')->where('status', 'submitted')->orderBy('test_date')->limit(8)->get() as $t) {
+                $q->push(['type' => 'MPFM', 'color' => '#22d3ee', 'well' => $t->oilString->name ?? '—', 'date' => $t->test_date, 'who' => $t->user->name ?? '—', 'score' => $t->validation_score, 'vs' => $t->validation_status, 'oil' => $t->oil_rate, 'url' => route('mpfm_tests.show', $t->id)]);
+            }
+            foreach (TestVesselTest::with('oilString', 'user')->where('status', 'submitted')->orderBy('test_date')->limit(8)->get() as $t) {
+                $q->push(['type' => 'Well testing', 'color' => '#fbbf24', 'well' => $t->oilString->name ?? '—', 'date' => $t->test_date, 'who' => $t->user->name ?? '—', 'score' => null, 'vs' => null, 'oil' => $t->oil_rate, 'url' => route('tv_tests.show', $t->id)]);
+            }
+            $extra['reviewQueue'] = $q->sortBy('date')->take(9)->values();
+            $extra['validationAlerts'] = MPFMTest::with('oilString')->whereIn('validation_status', ['warning', 'fail'])->latest('test_date')->limit(6)->get();
+            $extra['turnaround'] = round((float) MPFMTest::where('status', 'approved')->whereNotNull('approved_by_surveillance_at')->where('test_date', '>=', now()->subDays(90))
+                ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, approved_by_surveillance_at)) as h')->value('h'), 1);
+            $extra['rejected30'] = MPFMTest::where('status', 'rejected')->where('test_date', '>=', now()->subDays(30))->count();
+        }
+
+        // manager view
+        if ($needs(['admin', 'manager'])) {
+            $extra['monthMpfm'] = MPFMTest::whereBetween('test_date', [now()->startOfMonth(), now()])->count();
+            $extra['prevMonthMpfm'] = MPFMTest::whereBetween('test_date', [now()->subMonthNoOverflow()->startOfMonth(), now()->subMonthNoOverflow()->endOfMonth()])->count();
+            $extra['upcomingWl'] = \App\Models\WirelineOperation::with('oilString')->whereIn('status', ['planned', 'in_progress'])->orderBy('operation_date')->limit(6)->get();
+            $extra['upcomingRequests'] = TVTestRequest::with(['testVessel', 'tower'])->whereIn('status', ['open', 'in_progress'])->orderBy('test_date')->limit(6)->get();
+        }
+
+        // reservoir view: static pressures from the memory-gauge surveys
+        if ($needs(['admin', 'reservoir'])) {
+            $runs = \App\Models\WirelineGaugeRun::with('operation.oilString')->whereHas('operation')->get()
+                ->filter(fn ($r) => isset($r->analysis['stats']['bhp']))
+                ->map(fn ($r) => ['well' => optional($r->operation->oilString)->name ?? '—', 'well_id' => $r->operation->oil_string_id, 'date' => ($r->started_at ?? $r->operation->operation_date)->copy()->startOfDay(),
+                    'bhp' => (float) $r->analysis['stats']['bhp'], 'bht' => (float) ($r->analysis['stats']['bht'] ?? 0), 'type' => $r->survey_type, 'op' => $r->operation, 'run' => $r])->sortBy('date')->values();
+            $static = $runs->filter(fn ($r) => in_array($r['type'], ['bhcip', 'static_gradient', 'pbu'], true));
+            $depl = $static->groupBy('well_id')->map(function ($g) {
+                $g = $g->sortBy('date')->values();
+                if ($g->count() < 2) { return null; }
+                $a = $g->first(); $b = $g->last();
+                return ['name' => $b['well'], 'id' => $b['well_id'], 'from' => $a['bhp'], 'to' => $b['bhp'], 'pct' => $a['bhp'] > 0 ? round(($a['bhp'] - $b['bhp']) / $a['bhp'] * 100, 1) : 0, 'months' => max(1, round($a['date']->diffInDays($b['date']) / 30.4)), 'date' => $b['date']];
+            })->filter()->sortByDesc('pct')->values();
+            $latestStatic = $static->groupBy('well_id')->map->last();
+            $monthAvg = $static->groupBy(fn ($r) => $r['date']->format('Y-m'))->map(fn ($g) => round($g->avg('bhp')))->sortKeys();
+            $extra['reservoir'] = [
+                'runs' => $runs->count(), 'static' => $static->count(), 'recent90' => $runs->filter(fn ($r) => $r['date']->gte(now()->subDays(90)))->count(),
+                'avgBhp' => $latestStatic->isNotEmpty() ? round($latestStatic->avg('bhp')) : null, 'avgBht' => $latestStatic->isNotEmpty() ? round($latestStatic->avg('bht'), 1) : null,
+                'maxDepl' => $depl->first()['pct'] ?? null, 'deplCount' => $depl->where('pct', '>', 5)->count(), 'depl' => $depl->take(7),
+                'trend' => ['labels' => $monthAvg->keys()->map(fn ($m) => \Carbon\Carbon::createFromFormat('Y-m', $m)->format('M y'))->all(), 'bhp' => $monthAvg->values()->all()],
+                'latest' => $runs->sortByDesc('date')->take(6)->values(),
+            ];
+        }
+
+        // operator view: my own work
+        if ($needs(['operator', 'admin'])) {
+            $mine = MPFMTest::where('user_id', $user->id);
+            $extra['mine'] = [
+                'byStatus' => (clone $mine)->selectRaw('status, COUNT(*) c')->groupBy('status')->pluck('c', 'status')->all(),
+                'recent' => (clone $mine)->with('oilString')->latest('test_date')->latest('id')->limit(7)->get(),
+                'todo' => (clone $mine)->with('oilString')->whereIn('status', ['draft', 'rejected'])->latest('test_date')->limit(6)->get(),
+                'month' => (clone $mine)->where('test_date', '>=', now()->startOfMonth())->count(),
+                'tv' => TestVesselTest::where('user_id', $user->id)->count(),
+            ];
+            $d14 = collect(range(13, 0))->map(fn ($i) => now()->subDays($i)->toDateString());
+            $per = (clone $mine)->where('test_date', '>=', $d14->first())->selectRaw('DATE(test_date) d, COUNT(*) c')->groupBy('d')->pluck('c', 'd');
+            $extra['mineDaily'] = ['labels' => $d14->map(fn ($d) => substr($d, 5))->all(), 'data' => $d14->map(fn ($d) => (int) ($per[$d] ?? 0))->all()];
+            $extra['myRequests'] = TVTestRequest::with(['testVessel', 'tower'])->whereIn('status', ['open', 'in_progress'])->orderBy('test_date')->limit(5)->get();
+        }
+        return view('dashboard', $extra + [
             'mpfmTotal' => $mpfmTotal,
             'mpfmWeek' => MPFMTest::where('test_date', '>=', now()->subDays(7))->count(),
             'mpfmPrevWeek' => MPFMTest::whereBetween('test_date', [now()->subDays(14), now()->subDays(7)])->count(),
@@ -195,6 +297,19 @@ class DashboardController extends Controller
             'requestsByStatus' => $requestsByStatus,
             'openRequests' => TVTestRequest::where('status', '!=', 'completed')->count(),
             'vessels' => TestVessel::withCount('tests')->withMax('tests as last_test_at', 'test_date')->orderBy('name')->get(),
+            'locSummary' => (function () {
+                $locs = \App\Models\Location::orderBy('environment')->orderBy('name')->get();
+                $stats = \App\Models\Location::stats();
+                return [
+                    'total' => $locs->count(),
+                    'types' => $locs->countBy('environment'),
+                    'stats' => $stats,
+                    'fields' => array_sum(array_column($stats, 'fields')),
+                    'towers' => array_sum(array_column($stats, 'towers')),
+                    'wells' => array_sum(array_column($stats, 'wells')),
+                    'list' => $locs->take(6),
+                ];
+            })(),
             'archiveCount' => WellTest::count(),
             'approvedRate' => $approvedRate,
             'avgOilDeviation' => $avgOilDeviation,
@@ -219,6 +334,24 @@ class DashboardController extends Controller
             'wireline' => auth()->user()?->canAccessWireline() ? app(\App\Services\Wireline\WirelineOverview::class)->build() : null,
             'recentRequests' => TVTestRequest::with('testVessel')->where('status', '!=', 'completed')->latest('test_date')->limit(5)->get(),
         ]);
+    }
+
+    /** Which dashboard a user gets. Admins may preview any of them with ?view= */
+    private function resolvePersona($user, ?string $view): string
+    {
+        $all = ['admin', 'manager', 'supervisor', 'production', 'reservoir', 'operator'];
+        if ($view && in_array($view, $all, true) && $user->hasRole('admin')) {
+            return $view;
+        }
+        return match (true) {
+            $user->hasRole('admin') => 'admin',
+            $user->hasAnyRole(['department_manager', 'job_officer']) => 'manager',
+            $user->hasAnyRole(['surveillance_supervisor', 'mpfm_supervisor', 'department_supervisor']) => 'supervisor',
+            $user->hasRole('production_supervisor') => 'production',
+            $user->hasRole('reservoir_engineer') => 'reservoir',
+            $user->hasAnyRole(['mpfm_operator', 'operator']) => 'operator',
+            default => 'production',
+        };
     }
 
     public function jobOfficerReport()

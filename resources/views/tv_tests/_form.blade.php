@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            <label for="test_vessel_id">Test Vessel <span class="text-danger">*</span></label>
+            <label for="test_vessel_id">Testing Unit <span class="text-danger">*</span></label>
             <select name="test_vessel_id" id="test_vessel_id"
                 class="form-control @error('test_vessel_id') is-invalid @enderror" required>
-                <option value="">-- Select Test Vessel --</option>
+                <option value="">-- Select Testing Unit --</option>
                 @foreach($testVessels as $vessel)
                 <option value="{{ $vessel->id }}"
                     {{ old('test_vessel_id', $tvTest->test_vessel_id ?? '') == $vessel->id ? 'selected' : '' }}>

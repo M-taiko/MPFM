@@ -38,7 +38,7 @@
             $isOp      = auth()->user()->hasRole('operator') || auth()->user()->hasRole('mpfm_operator');
             $userDeptId = auth()->user()->department_id;
 
-            /* Focus mode: only MPFM + Test Vessel are enabled, everything else is greyed out (config/app.php → focus_mpfm_tv) */
+            /* Focus mode: only MPFM + Testing Unit are enabled, everything else is greyed out (config/app.php → focus_mpfm_tv) */
             $focus = config('app.focus_mpfm_tv', true);
         @endphp
 
@@ -71,7 +71,7 @@
             </li>
 
             @if($focus)
-            {{-- ══════════ Focus mode: flat lists — Dashboard, MPFM links, Test Vessel links, then everything else as "Soon" ══════════ --}}
+            {{-- ══════════ Focus mode: flat lists — Dashboard, MPFM links, Testing Unit links, then everything else as "Soon" ══════════ --}}
             @php
                 $link = fn ($icon, $label, $href, $active) =>
                     '<li class="slide"><a class="side-menu__item ' . ($active ? 'active' : '') . '" href="' . e($href) . '">'
@@ -94,13 +94,13 @@
 
             @if($canTv)
             <li class="side-item side-item-category">Well Testing</li>
-            {!! $link('fe-anchor', 'Vessels', route('test_vessels.index'), request()->is('test-vessels*') && !request()->routeIs('test_vessels.create')) !!}
+            {!! $link('fe-anchor', 'Testing Units', route('test_vessels.index'), request()->is('test-vessels*') && !request()->routeIs('test_vessels.create')) !!}
             @if($canTvManage)
-                {!! $link('fe-plus-circle', 'Add Vessel', route('test_vessels.create'), request()->routeIs('test_vessels.create')) !!}
+                {!! $link('fe-plus-circle', 'Add Testing Unit', route('test_vessels.create'), request()->routeIs('test_vessels.create')) !!}
             @endif
             {!! $link('fe-clipboard', 'Test Requests', route('tv_test_requests.index'), request()->is('tv-test-requests*')) !!}
-            {!! $link('fe-list', 'TV Tests', route('tv_tests.index'), request()->is('tv-tests*') && !request()->routeIs('tv_tests.create', 'tv_tests.compare', 'tv_tests.compare_result')) !!}
-            {!! $link('fe-plus-square', 'New TV Test', route('tv_tests.create'), request()->routeIs('tv_tests.create')) !!}
+            {!! $link('fe-list', 'Test Runs', route('tv_tests.index'), request()->is('tv-tests*') && !request()->routeIs('tv_tests.create', 'tv_tests.compare', 'tv_tests.compare_result')) !!}
+            {!! $link('fe-plus-square', 'New Test Run', route('tv_tests.create'), request()->routeIs('tv_tests.create')) !!}
             {!! $link('fe-repeat', 'Compare vs MPFM', route('tv_tests.compare'), request()->routeIs('tv_tests.compare', 'tv_tests.compare_result')) !!}
             @endif
 
@@ -123,6 +123,12 @@
             {!! $link('fe-shield', 'Dashboard', route('integrity.dashboard'), request()->routeIs('integrity.dashboard')) !!}
             {!! $link('fe-list', 'Wells', route('integrity.wells'), request()->routeIs('integrity.wells', 'integrity.show', 'integrity.checks.*')) !!}
             {!! $link('fe-alert-octagon', 'Anomalies', route('integrity.anomalies'), request()->routeIs('integrity.anomalies')) !!}
+            @endif
+
+            <li class="side-item side-item-category">Locations</li>
+            {!! $link('fe-map-pin', 'All Locations', route('locations.index'), request()->routeIs('locations.index', 'locations.show', 'locations.edit')) !!}
+            @if(auth()->user()->canManageLocations())
+                {!! $link('fe-plus-circle', 'Add Location', route('locations.create'), request()->routeIs('locations.create')) !!}
             @endif
 
             @can('manage_users')
@@ -311,7 +317,7 @@
             @endif
             @endif
 
-            {{-- ══════════ Test Vessel (enabled) ══════════ --}}
+            {{-- ══════════ Testing Unit (enabled) ══════════ --}}
             @if($isAdmin || auth()->user()->hasRole('surveillance_supervisor') || auth()->user()->hasRole('job_officer') || $isOp)
             <li class="side-item side-item-category">Well Testing</li>
             <li class="slide">
@@ -356,6 +362,7 @@
                 </a>
                 <ul class="slide-menu">
                     <li><a class="slide-item {{ request()->is('oil-fields*') ? 'active' : '' }}" href="{{ route('oil_fields.index') }}">Oil Fields</a></li>
+                    <li><a class="slide-item {{ request()->is('locations*') ? 'active' : '' }}" href="{{ route('locations.index') }}">Locations</a></li>
                     <li><a class="slide-item {{ request()->is('towers*') ? 'active' : '' }}" href="{{ route('towers.index') }}">Towers</a></li>
                     <li><a class="slide-item {{ request()->is('oil-strings*') ? 'active' : '' }}" href="{{ route('oil_strings.index') }}">Oil Strings</a></li>
                 </ul>

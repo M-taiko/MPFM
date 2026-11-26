@@ -301,6 +301,32 @@ Route::middleware('auth')->prefix('wireline')->name('wireline.')->group(function
 
 /*
 |--------------------------------------------------------------------------
+| Locations (onshore / offshore sites: wellhead towers, desert wellsites, platforms...)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::resource('locations', \App\Http\Controllers\LocationController::class)->names('locations');
+    Route::post('locations/{location}/assign', [\App\Http\Controllers\LocationController::class, 'attach'])->name('locations.assign');
+    Route::post('locations/{location}/release', [\App\Http\Controllers\LocationController::class, 'detach'])->name('locations.release');
+    $lf = \App\Http\Controllers\LocationFieldController::class;
+    Route::post('locations/{location}/towers', [$lf, 'storeLocationTower'])->name('locations.towers.store');
+    Route::put('locations/{location}/towers/{tower}', [$lf, 'updateLocationTower'])->name('locations.towers.update');
+    Route::delete('locations/{location}/towers/{tower}', [$lf, 'destroyLocationTower'])->name('locations.towers.destroy');
+    Route::post('locations/{location}/fields', [$lf, 'storeField'])->name('locations.field.store');
+    Route::get('locations/{location}/fields/{field}', [$lf, 'field'])->name('locations.field');
+    Route::put('locations/{location}/fields/{field}', [$lf, 'updateField'])->name('locations.field.update');
+    Route::delete('locations/{location}/fields/{field}', [$lf, 'destroyField'])->name('locations.field.destroy');
+    Route::post('locations/{location}/fields/{field}/towers', [$lf, 'storeTower'])->name('locations.tower.store');
+    Route::get('locations/{location}/fields/{field}/towers/{tower}', [$lf, 'tower'])->name('locations.tower');
+    Route::put('locations/{location}/fields/{field}/towers/{tower}', [$lf, 'updateTower'])->name('locations.tower.update');
+    Route::delete('locations/{location}/fields/{field}/towers/{tower}', [$lf, 'destroyTower'])->name('locations.tower.destroy');
+    Route::post('locations/{location}/fields/{field}/towers/{tower}/wells', [$lf, 'storeWell'])->name('locations.well.store');
+    Route::put('locations/{location}/fields/{field}/towers/{tower}/wells/{well}', [$lf, 'updateWell'])->name('locations.well.update');
+    Route::delete('locations/{location}/fields/{field}/towers/{tower}/wells/{well}', [$lf, 'destroyWell'])->name('locations.well.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Well Integrity (barriers, annulus pressures, inspections, anomalies)
 |--------------------------------------------------------------------------
 */

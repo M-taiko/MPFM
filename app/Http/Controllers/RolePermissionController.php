@@ -13,7 +13,7 @@ class RolePermissionController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            if (! auth()->user()->hasRole('admin')) {
+            if (! auth()->user()->isStrictAdmin()) {
                 abort(403, 'Unauthorized access to roles and permissions.');
             }
 

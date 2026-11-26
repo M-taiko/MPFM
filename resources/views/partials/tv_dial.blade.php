@@ -1,4 +1,4 @@
-{{-- Pressure/temperature dial for the test vessel drawing. Vars: $cx $cy $r $val $max $text $unit --}}
+{{-- Pressure/temperature dial for the well testing drawing. Vars: $cx $cy $r $val $max $text $unit --}}
 @php
     $frac = $max > 0 ? min(max($val / $max, 0), 1) : 0;
     $ang = round(-120 + 240 * $frac, 1);

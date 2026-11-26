@@ -30,6 +30,11 @@ class DepartmentUserController extends Controller
     {
         $user = auth()->user();
 
+        // full-access users run operations but do not manage people
+        if ($user->isFullAccess() && ! $user->isStrictAdmin()) {
+            abort(403, 'User management is not available for this account.');
+        }
+
         // Admin can access all departments
         if ($user->hasRole('admin')) {
             return true;

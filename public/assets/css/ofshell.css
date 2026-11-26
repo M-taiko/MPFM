@@ -158,10 +158,10 @@ body.main-body.app { background:#030712 !important; }
 .main-content .breadcrumb { background:transparent; } .main-content .breadcrumb-item, .main-content .breadcrumb-item.active { color:#9fb0cf; } .main-content .breadcrumb-item a { color:#22d3ee; }
 .main-content .page-title, .main-content .main-content-title { color:#fff; }
 /* white components keep dark text on top of the dark page */
-.main-content .card:not(.ofd .card), .main-content .card-modern, .main-content .form-section, .main-content .modern-table-wrapper, .main-content .modern-filters, .main-content .stat-card, .main-content .stats-card, .main-content .metric-card-modern, .main-content .chart-card, .main-content .data-table-card, .main-content .table-card, .main-content .comparison-card, .main-content .modal-content, .main-content .alert, .main-content .list-group-item { color:#1e293b; }
-.main-content .card:not(.ofd .card) .text-muted, .main-content .card-modern .text-muted { color:#64748b !important; }
-.main-content .card:not(.ofd .card) h1, .main-content .card:not(.ofd .card) h2, .main-content .card:not(.ofd .card) h3, .main-content .card:not(.ofd .card) h4, .main-content .card:not(.ofd .card) h5, .main-content .card:not(.ofd .card) h6 { color:#1e293b; }
-.main-content .card:not(.ofd .card) { border-color:rgba(96,165,250,.25); box-shadow:0 10px 40px rgba(0,0,0,.35); }
+.main-content .card:not(.ofd .card):not(.ent .card), .main-content .card-modern, .main-content .form-section, .main-content .modern-table-wrapper, .main-content .modern-filters, .main-content .stat-card, .main-content .stats-card, .main-content .metric-card-modern, .main-content .chart-card, .main-content .data-table-card, .main-content .table-card, .main-content .comparison-card, .main-content .modal-content, .main-content .alert, .main-content .list-group-item { color:#1e293b; }
+.main-content .card:not(.ofd .card):not(.ent .card) .text-muted, .main-content .card-modern .text-muted { color:#64748b !important; }
+.main-content .card:not(.ofd .card):not(.ent .card) h1, .main-content .card:not(.ofd .card):not(.ent .card) h2, .main-content .card:not(.ofd .card):not(.ent .card) h3, .main-content .card:not(.ofd .card):not(.ent .card) h4, .main-content .card:not(.ofd .card):not(.ent .card) h5, .main-content .card:not(.ofd .card):not(.ent .card) h6 { color:#1e293b; }
+.main-content .card:not(.ofd .card):not(.ent .card) { border-color:rgba(96,165,250,.25); box-shadow:0 10px 40px rgba(0,0,0,.35); }
 /* footer strip */
 .main-footer { background:#040913 !important; border-top:1px solid var(--ofs-line) !important; color:#64748b !important; box-shadow:none !important; }
 .main-footer span, .main-footer a { color:#64748b !important; }

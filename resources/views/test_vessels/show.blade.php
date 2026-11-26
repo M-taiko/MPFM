@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Test Vessel Details')
+@section('title', 'Testing Unit Details')
 
 @push('styles')
 <link href="{{URL::asset('assets/plugins/datatable/css/jquery.dataTables.min.css')}}" rel="stylesheet">
@@ -12,7 +12,7 @@
     <div class="col-xl-12 col-lg-12 col-md-12">
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title">Test Vessel Details: {{ $testVessel->name }}</h3>
+                <h3 class="card-title">Testing Unit Details: {{ $testVessel->name }}</h3>
                 <div class="card-options">
                     @can('update', $testVessel)
                     <a href="{{ route('test_vessels.edit', $testVessel->id) }}" class="btn btn-primary btn-sm">

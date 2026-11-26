@@ -63,7 +63,7 @@
                     <div><small>Production state</small><b style="color:{{ ['ok'=>'#34d399','warn'=>'#fbbf24','bad'=>'#f87171'][$st['production_class']] }}">{{ $st['production_state'] }}</b></div>
                     <div><small>Last test</small><b>{{ $st['last_test_date']?->format('d M Y') ?? '—' }}@if($st['days_since_test'] !== null) <span style="color:var(--mute);font-weight:500">({{ $st['days_since_test'] }} d ago)</span>@endif</b></div>
                     <div><small>Reservoir pressure</small><b>{{ $rs['has_data'] ? $nf($rs['current_p']) . ' psi' : 'No survey' }}</b></div>
-                    <div><small>Data basis</small><b>{{ (($pr['source'] ?? 'mpfm') === 'mpfm' ? 'MPFM' : 'Test vessel') . ' · ' . (($pr['basis'] ?? 'all') === 'approved' ? 'approved tests' : 'all non-rejected') }}</b></div>
+                    <div><small>Data basis</small><b>{{ (($pr['source'] ?? 'mpfm') === 'mpfm' ? 'MPFM' : 'Well testing') . ' · ' . (($pr['basis'] ?? 'all') === 'approved' ? 'approved tests' : 'all non-rejected') }}</b></div>
                     <div><small>Meter agreement</small><b>{{ $mt ? $mt['mean_abs_pct'] . '% (' . $mt['pairs'] . ' pairs)' : 'No paired tests' }}</b></div>
                 </div>
                 @if($st['factors'])
@@ -178,7 +178,7 @@
             @endphp
             <div class="hb">
                 <div><span>MPFM tests</span><span class="tr"><i style="--w:{{ min(100, $bk['tests']['mpfm'] * 100 / max(1, $bk['tests']['mpfm'] + $bk['tests']['tv'])) }}%;--bc:#22d3ee"></i></span><b style="color:#fff">{{ $bk['tests']['mpfm'] }}</b></div>
-                <div><span>Test vessel</span><span class="tr"><i style="--w:{{ min(100, $bk['tests']['tv'] * 100 / max(1, $bk['tests']['mpfm'] + $bk['tests']['tv'])) }}%;--bc:#fbbf24"></i></span><b style="color:#fff">{{ $bk['tests']['tv'] }}</b></div>
+                <div><span>Well testing</span><span class="tr"><i style="--w:{{ min(100, $bk['tests']['tv'] * 100 / max(1, $bk['tests']['mpfm'] + $bk['tests']['tv'])) }}%;--bc:#fbbf24"></i></span><b style="color:#fff">{{ $bk['tests']['tv'] }}</b></div>
                 @foreach($bk['wireline'] as $w)
                     <div><span>{{ $w['label'] }}</span><span class="tr"><i style="--w:{{ $w['count'] * 100 / $maxW }}%;--bc:{{ $w['color'] }}"></i></span><b style="color:#fff">{{ $w['count'] }}</b></div>
                 @endforeach

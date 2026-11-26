@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Create Test Vessel Test')
+@section('title', 'Create Test Run')
 
 @section('css')
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -136,7 +136,7 @@
             <div>
                 <div class="eyebrow">Well Testing · New reading</div>
                 <h1>Record a <em>vessel test</em></h1>
-                <p>Enter the readings from the test vessel — the drawing on the right follows your numbers.</p>
+                <p>Enter the readings from the testing unit — the drawing on the right follows your numbers.</p>
             </div>
         </div>
         <a href="{{ route('tv_tests.index') }}" class="btn2"><i class="fe fe-arrow-left"></i> Back to list</a>
@@ -159,7 +159,7 @@
                     <div class="ph"><span class="n">1</span><div><h3>Vessel &amp; location</h3><small>Which vessel, and which well is being tested</small></div></div>
                     @if($fromRequest)<div class="locknote"><i class="fe fe-lock"></i> Filled from the test request — vessel and well can't be changed here.</div>@endif
                     <div class="row {{ $fromRequest ? 'lock' : '' }}">
-                        <div class="f {{ $errors->has('test_vessel_id') ? 'has-err' : '' }}"><label for="test_vessel_id"><i class="fe fe-anchor"></i> Test vessel <b>*</b></label>
+                        <div class="f {{ $errors->has('test_vessel_id') ? 'has-err' : '' }}"><label for="test_vessel_id"><i class="fe fe-anchor"></i> Testing unit <b>*</b></label>
                             <select name="test_vessel_id" id="test_vessel_id" class="fc" required>
                                 <option value="">Select vessel…</option>
                                 @foreach($testVessels as $tv)<option value="{{ $tv->id }}" @selected($v('test_vessel_id') == $tv->id)>{{ $tv->name }}{{ $tv->code ? ' ('.$tv->code.')' : '' }}</option>@endforeach
@@ -261,7 +261,7 @@
             <aside class="side">
                 <div class="panel live rv">
                     <div class="ph" style="margin-bottom:6px"><div><h3>Live vessel preview</h3><small>Levels and gauges follow your inputs</small></div></div>
-                    <svg viewBox="0 0 420 290" aria-label="Live test vessel preview">
+                    <svg viewBox="0 0 420 290" aria-label="Live well testing preview">
                         <defs>
                             <linearGradient id="lvShell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8b6cb"/><stop offset=".14" stop-color="#f1f5f9"/><stop offset=".5" stop-color="#7c8aa1"/><stop offset="1" stop-color="#1b2433"/></linearGradient>
                             <linearGradient id="lvOil" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#78350f"/></linearGradient>

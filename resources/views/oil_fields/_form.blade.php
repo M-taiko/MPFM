@@ -27,9 +27,23 @@
 </div>
 
 <div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="location_id">Location <small class="text-muted">(onshore, offshore...)</small></label>
+            <select name="location_id" id="location_id" class="form-control @error('location_id') is-invalid @enderror">
+                <option value="">No location</option>
+                @foreach(\App\Models\Location::orderBy('name')->get() as $__l)
+                    <option value="{{ $__l->id }}" {{ old('location_id', $oilField->location_id ?? null) == $__l->id ? 'selected' : '' }}>{{ $__l->name }} · {{ $__l->envLabel() }}</option>
+                @endforeach
+            </select>
+            @error('location_id')<span class="invalid-feedback">{{ $message }}</span>@enderror
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-6">
         <div class="form-group">
-            <label for="location">Location</label>
+            <label for="location">Area note</label>
             <input type="text" name="location" id="location"
                 class="form-control @error('location') is-invalid @enderror"
                 value="{{ old('location', $oilField->location ?? '') }}">

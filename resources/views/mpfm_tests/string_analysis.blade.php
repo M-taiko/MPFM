@@ -91,7 +91,7 @@
     {{-- WELL DRAWING + STATS --}}
     <div class="top">
         <div class="panel well rv">
-            <div class="ph" style="margin-bottom:6px"><h3><i class="fe fe-map-pin"></i> The string</h3><span class="sub">{{ $lt ? 'Latest reading · '.($ltType === 'mpfm' ? 'MPFM' : 'Test vessel') : 'No tests yet' }}</span></div>
+            <div class="ph" style="margin-bottom:6px"><h3><i class="fe fe-map-pin"></i> The string</h3><span class="sub">{{ $lt ? 'Latest reading · '.($ltType === 'mpfm' ? 'MPFM' : 'Well testing') : 'No tests yet' }}</span></div>
 <svg viewBox="0 0 360 430" role="img" aria-label="Well string drawing">
 <defs>
     <linearGradient id="saSteel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#475569"/><stop offset=".35" stop-color="#e2e8f0"/><stop offset=".65" stop-color="#94a3b8"/><stop offset="1" stop-color="#334155"/></linearGradient>
@@ -149,9 +149,9 @@
         <div style="display:grid;gap:18px;align-content:start">
             <div class="kpis rv">
                 <div class="kpi" style="--c:#22d3ee"><div class="ic"><i class="fe fe-activity"></i></div><div class="l">Total tests</div><div class="v cu" data-to="{{ $total }}" data-dec="0">{{ $total }}</div><div class="u">on this string</div></div>
-                <div class="kpi" style="--c:#a78bfa"><div class="ic"><i class="fe fe-calendar"></i></div><div class="l">Latest test</div><div class="v" style="font-size:19px">{{ $lt ? $lt->test_date->format('d M Y') : 'N/A' }}</div><div class="u">{{ $lt ? ($ltType === 'mpfm' ? 'MPFM' : 'Test vessel') : '' }}</div></div>
+                <div class="kpi" style="--c:#a78bfa"><div class="ic"><i class="fe fe-calendar"></i></div><div class="l">Latest test</div><div class="v" style="font-size:19px">{{ $lt ? $lt->test_date->format('d M Y') : 'N/A' }}</div><div class="u">{{ $lt ? ($ltType === 'mpfm' ? 'MPFM' : 'Well testing') : '' }}</div></div>
                 <div class="kpi" style="--c:#22d3ee"><div class="ic"><i class="fe fe-bar-chart-2"></i></div><div class="l">MPFM tests</div><div class="v cu" data-to="{{ $mpfmTests->count() }}" data-dec="0">{{ $mpfmTests->count() }}</div><div class="u">{{ $f($mpfmTests->avg('oil_rate'), 0) }} B/D avg oil</div></div>
-                <div class="kpi" style="--c:#fbbf24"><div class="ic"><i class="fe fe-anchor"></i></div><div class="l">Test vessel tests</div><div class="v cu" data-to="{{ $tvTests->count() }}" data-dec="0">{{ $tvTests->count() }}</div><div class="u">{{ $f($tvTests->avg('oil_rate'), 0) }} B/D avg oil</div></div>
+                <div class="kpi" style="--c:#fbbf24"><div class="ic"><i class="fe fe-anchor"></i></div><div class="l">Well testing runs</div><div class="v cu" data-to="{{ $tvTests->count() }}" data-dec="0">{{ $tvTests->count() }}</div><div class="u">{{ $f($tvTests->avg('oil_rate'), 0) }} B/D avg oil</div></div>
             </div>
             <div class="panel rv" style="--d:1">
                 <div class="ph"><h3><i class="fe fe-info"></i> String information</h3></div>
@@ -189,7 +189,7 @@
     @if($total)
     <div class="sec">
         <div class="panel rv">
-            <div class="ph"><h3><i class="fe fe-trending-up"></i> Oil rate — MPFM vs test vessel</h3><span class="sub">{{ $dates->count() }} test dates · click a legend chip to hide a series</span></div>
+            <div class="ph"><h3><i class="fe fe-trending-up"></i> Oil rate — MPFM vs well testing</h3><span class="sub">{{ $dates->count() }} test dates · click a legend chip to hide a series</span></div>
             <div id="chOil"></div>
         </div>
     </div>
@@ -211,7 +211,7 @@
                     <span class="ftabs">
                         <button class="tab on" data-t="all">All ({{ $total }})</button>
                         <button class="tab" data-t="mpfm">MPFM ({{ $mpfmTests->count() }})</button>
-                        <button class="tab" data-t="tv">Test vessel ({{ $tvTests->count() }})</button>
+                        <button class="tab" data-t="tv">Well testing ({{ $tvTests->count() }})</button>
                     </span>
                     <span class="srch"><i class="fe fe-search"></i><input type="text" id="q" placeholder="Search…" autocomplete="off"></span>
                 </span></div>
@@ -266,7 +266,7 @@
             labels: D.labels, height: key.h || 260,
             series: [
                 { name: 'MPFM', data: D[key.k].mpfm, color: '#22d3ee', unit: key.u },
-                { name: 'Test vessel', data: D[key.k].tv, color: '#fbbf24', unit: key.u }
+                { name: 'Well testing', data: D[key.k].tv, color: '#fbbf24', unit: key.u }
             ]
         }, o));
     }

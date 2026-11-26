@@ -255,7 +255,7 @@
         @if($hasTask)<div class="tinfo rv"><i class="fe fe-info"></i><div><b style="color:#fff">Task completion</b><br>Saving this test marks your assigned task as completed and notifies the supervisor.</div></div>@endif
         <div class="save rv">
             <svg viewBox="0 0 96 96" aria-hidden="true"><path d="M20,16 H62 L78,32 V80 H20 Z" fill="#0b1426" stroke="#34d399" stroke-width="2.6" stroke-linejoin="round"/><path d="M62,16 V32 H78" fill="none" stroke="#34d399" stroke-width="2.6"/><rect x="32" y="52" width="32" height="28" rx="3" fill="rgba(52,211,153,.18)" stroke="#34d399" stroke-width="2"/><rect x="38" y="56" width="16" height="9" rx="1.5" fill="#34d399"/></svg>
-            <div><h3>{{ $hasTask ? 'Complete task & save test' : 'Save test to archive' }}</h3><p>Everything looks right? Saving stores the metrics, the curves and the original log so the test can be reviewed, compared with the test vessel and tracked over time.</p></div>
+            <div><h3>{{ $hasTask ? 'Complete task & save test' : 'Save test to archive' }}</h3><p>Everything looks right? Saving stores the metrics, the curves and the original log so the test can be reviewed, compared with the well testing and tracked over time.</p></div>
             <form action="{{ route('tests.store') }}" method="POST" class="go">
                 @csrf
                 <input type="hidden" name="summary" value="{{ json_encode($summary) }}">

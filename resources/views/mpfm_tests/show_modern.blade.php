@@ -297,9 +297,9 @@
     @if($relatedTv->count())
     <div class="sec">
         <div class="panel rv">
-            <div class="ph"><h3><i class="fe fe-anchor"></i> Test vessel tests on this string</h3><span class="sub">Compare this MPFM test with a reference</span></div>
+            <div class="ph"><h3><i class="fe fe-anchor"></i> Well testing runs on this string</h3><span class="sub">Compare this MPFM test with a reference</span></div>
             <div class="scroll"><table class="t">
-                <thead><tr><th>Test</th><th>Date</th><th>Vessel</th><th>Oil</th><th>Gas</th><th>WC</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>Test</th><th>Date</th><th>Unit</th><th>Oil</th><th>Gas</th><th>WC</th><th>Status</th><th></th></tr></thead>
                 <tbody>@foreach($relatedTv as $t)
                     <tr><td>TV #{{ $t->id }}</td><td>{{ $t->test_date->format('Y-m-d') }}</td><td>{{ $t->testVessel->name ?? '—' }}</td><td>{{ $f($t->oil_rate, 0) }}</td><td>{{ $f($t->gas_rate, 1) }}</td><td>{{ $f($t->water_cut, 1) }}%</td><td><span class="chip {{ $t->status }}">{{ $t->status }}</span></td>
                         <td style="white-space:nowrap"><a class="lnk" href="{{ route('tv_tests.show', $t->id) }}">View</a> <a class="lnk w" href="{{ route('tv_tests.compare_result', ['tv_test_id' => $t->id, 'mpfm_test_id' => $mpfmTest->id]) }}"><i class="fe fe-shuffle"></i> Compare</a></td></tr>

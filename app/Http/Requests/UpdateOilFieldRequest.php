@@ -29,6 +29,7 @@ class UpdateOilFieldRequest extends FormRequest
             'code' => ['required', 'string', 'max:255', Rule::unique('oil_fields', 'code')->ignore($oilFieldId)],
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'location_id' => 'nullable|exists:locations,id',
             'status' => 'required|in:active,inactive,maintenance',
         ];
     }

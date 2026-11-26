@@ -87,6 +87,18 @@
 
 @media (max-width:1200px) { .ent .kpis { grid-template-columns:repeat(2,1fr); } .ent .r21, .ent .r3, .ent .r2, .ent .r12 { grid-template-columns:1fr; } }
 @media (max-width:560px) { .ent { padding:14px; } .ent .kpis { grid-template-columns:1fr; } }
+.ent .vsw { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:12px; font-size:11px; }
+.ent .vsw span { color:var(--mute); font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-right:4px; }
+.ent .vsw a { padding:5px 13px; border-radius:20px; border:1px solid var(--line); color:var(--sub); font-weight:600; transition:all .2s; }
+.ent .vsw a:hover { border-color:var(--cyan); color:#fff; }
+.ent .vsw a.on { background:linear-gradient(135deg,rgba(59,130,246,.35),rgba(34,211,238,.25)); border-color:var(--cyan); color:#fff; }
+.ent .hm { display:grid; grid-template-columns:repeat(12,1fr); gap:5px; }
+.ent .hm > div { display:grid; gap:5px; }
+.ent .hm i { display:block; aspect-ratio:1; border-radius:4px; background:var(--cyan); }
+.ent .card .list .n small { font-weight:500; }
+#ent .card { background:var(--card) !important; border:1px solid var(--line) !important; box-shadow:none !important; color:var(--ink) !important; }
+#ent .card h3 { color:#fff; }
+#ent .card.ill { background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015)); }
 </style>
 @endsection
 
@@ -109,207 +121,25 @@
     $flow = $pair0
         ? ['mpfm' => (float) $pair0['mpfm']->oil_rate, 'tv' => (float) $pair0['tv']->oil_rate, 'dev' => $pair0['oil']]
         : ['mpfm' => $latest ? (float) $latest->oil_rate : null, 'tv' => null, 'dev' => null];
+    // sections of each role's dashboard, in order
+    $layout = [
+        'admin'      => ['_illustrations', '_production', '_review', '_activity', '_integrity', '_locations', '_wireline', '_wells', '_vessels', '_team', '_launcher'],
+        'manager'    => ['_manager', '_illustrations', '_review', '_integrity', '_locations', '_wireline', '_team', '_launcher'],
+        'supervisor' => ['_review', '_watch', '_illustrations', '_activity', '_integrity', '_team', '_launcher'],
+        'production' => ['_illustrations', '_production', '_bylocation', '_watch', '_wells', '_integrity', '_locations', '_vessels', '_launcher'],
+        'reservoir'  => ['_reservoir', '_wireline', '_watch', '_integrity', '_wells', '_launcher'],
+        'operator'   => ['_my_work', '_illustrations', '_launcher'],
+    ][$persona];
 @endphp
 
-<div class="ent" id="ent">
-
-    {{-- ═════ HEADER ═════ --}}
-    <div class="top hero">
-        <div class="who">
-            <span class="lg" role="img" aria-label="Company logo"></span>
-        <div>
-            <div class="eyebrow"><i></i> Operations command center</div>
-            <h1>{{ $greet }}, {{ $first }}</h1>
-            <div class="meta">
-                <span>{{ now()->format('l, d F Y') }}</span>
-                <span class="tag">{{ str_replace('_', ' ', $user->roles->pluck('name')->first() ?? 'User') }}</span>
-                <span>{{ $counts['activeStrings'] }} active wells · {{ $counts['fields'] }} field(s) · {{ $counts['towers'] }} tower(s)</span>
-            </div>
-        </div>
-        </div>
-        <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
-        <div class="acts">
-            <a href="{{ route('upload.form') }}" class="btn p"><i class="fe fe-upload"></i> Upload MPFM log</a>
-            <a href="{{ route('tv_test_requests.create') }}" class="btn"><i class="fe fe-clipboard"></i> Test request</a>
-            @if($wl)<a href="{{ route('wireline.create') }}" class="btn"><i class="fe fe-git-branch"></i> Wire Line operation</a>@endif
-            <a href="{{ route('tv_tests.compare') }}" class="btn"><i class="fe fe-repeat"></i> Compare vs MPFM</a>
-        </div>
-        @include('partials.rig')
-        </div>
-    </div>
-
-    {{-- ═════ EXECUTIVE KPIs ═════ --}}
-    <div class="kpis">
-        <div class="kpi" style="--c:#22d3ee"><div class="l">Oil production <i class="fe fe-droplet"></i></div>
-            <div class="v">{{ $nf($snap['oil'], 0) }}<small>B/D</small></div><div class="d">latest test of {{ $snap['strings'] }} well(s)</div></div>
-        <div class="kpi" style="--c:#fbbf24"><div class="l">Gas production <i class="fe fe-wind"></i></div>
-            <div class="v">{{ $nf($snap['gas'], 2) }}<small>MMscf/D</small></div><div class="d">field GOR {{ $nf($snap['gor']) }}</div></div>
-        <div class="kpi" style="--c:#38bdf8"><div class="l">Water cut <i class="fe fe-percent"></i></div>
-            <div class="v">{{ $nf($snap['wc'], 1) }}<small>%</small></div><div class="d">{{ $nf($snap['water'], 0) }} B/D water</div></div>
-        <div class="kpi" style="--c:#34d399"><div class="l">Well test coverage <i class="fe fe-target"></i></div>
-            <div class="v">{{ $covPct }}<small>%</small></div><div class="d">{{ $counts['testedStrings'] }} of {{ $counts['strings'] }} wells tested in 30 days</div></div>
-
-        <div class="kpi" style="--c:#3b82f6"><div class="l">MPFM tests <i class="fe fe-bar-chart-2"></i></div>
-            <div class="v">{{ $mpfmTotal }}</div>
-            <div class="d">{{ $mpfmWeek }} this week <span class="{{ $wow >= 0 ? 'up' : 'dn' }}">{{ $wow >= 0 ? '▲' : '▼' }} {{ abs($wow) }}</span> · {{ $approvedRate }}% approved</div></div>
-        <div class="kpi" style="--c:#fbbf24"><div class="l">Test vessel tests <i class="fe fe-anchor"></i></div>
-            <div class="v">{{ $tvTotal }}</div><div class="d">{{ $tvWeek }} this week · {{ $openRequests }} open request(s)</div></div>
-        @if($wl)
-        <div class="kpi" style="--c:#a78bfa"><div class="l">Wire Line operations <i class="fe fe-git-branch"></i></div>
-            <div class="v">{{ $wl['stats']['total'] }}</div><div class="d">{{ $wl['stats']['month'] }} this month · {{ $wl['stats']['open'] }} open</div></div>
-        <div class="kpi" style="--c:{{ $wl['overdueCount'] ? '#f87171' : '#34d399' }}"><div class="l">Pressure surveys <i class="fe fe-activity"></i></div>
-            <div class="v">{{ $wl['stats']['runs'] }}</div><div class="d">{{ $wl['overdueCount'] }} well(s) overdue (180 d)</div></div>
-        @else
-        <div class="kpi" style="--c:#34d399"><div class="l">Approval rate <i class="fe fe-check-circle"></i></div>
-            <div class="v">{{ $approvedRate }}<small>%</small></div><div class="d">of all MPFM tests</div></div>
-        <div class="kpi" style="--c:#f87171"><div class="l">Meter agreement <i class="fe fe-shuffle"></i></div>
-            <div class="v">{{ $avgOilDeviation !== null ? '±' . $avgOilDeviation : '—' }}<small>%</small></div><div class="d">{{ $pairCount }} paired test(s)</div></div>
-        @endif
-    </div>
-
-    {{-- ═════ FIELD & PROCESS ILLUSTRATIONS ═════ --}}
-    <div class="sech"><h2>Field &amp; process overview</h2><span class="ln"></span></div>
-    <div class="row r21">
-        <div class="card pano ill" style="position:relative">
-            <div class="ct"><span>Field overview · live cross-section</span></div>
-            @include('partials.dash_platform')
-            @include('partials.dash_strata')
-            <span class="cap">Figures = latest test of every oil string</span>
-        </div>
-        <div class="card tankc ill">
-            <div class="ct"><span>Fluid split</span><a href="{{ route('mpfm_tests.index') }}">Tests →</a></div>
-            @include('partials.dash_tank', ['fill' => 78])
-            <div class="sx">
-                <div style="--c:#fbbf24"><small>Oil</small><b>{{ number_format($snap['oil'], 0) }}<i>B/D</i></b></div>
-                <div style="--c:#fb923c"><small>Gas</small><b>{{ number_format($snap['gas'], 1) }}<i>MMscf/d</i></b></div>
-                <div style="--c:#38bdf8"><small>Water</small><b>{{ number_format($snap['water'], 0) }}<i>B/D</i></b></div>
-                <div style="--c:#a78bfa"><small>GOR</small><b>{{ $snap['gor'] !== null ? number_format($snap['gor']) : '—' }}<i>scf/stb</i></b></div>
-            </div>
-        </div>
-    </div>
-    <div class="card ill" style="margin-bottom:16px">
-        <div class="ct"><span>Process flow · wells → MPFM → test separator → storage</span><a href="{{ route('tv_tests.compare') }}">Compare tests →</a></div>
-        @include('partials.dash_flow')
-    </div>
-
-    {{-- ═════ PRODUCTION ═════ --}}
-    <div class="sech"><h2>Production &amp; priorities</h2><span class="ln"></span><a href="{{ route('mpfm_tests.trending_dashboard') }}">Analytics →</a></div>
-    <div class="row r21">
-        <div class="card"><header><div><h3>Production trend</h3><small>Latest MPFM tests · oil &amp; gas rate with water cut</small></div></header>
-            @if(count($trend)) <div class="cv t"><canvas id="cTrend"></canvas></div> @else <div class="empty">No MPFM data yet.</div> @endif</div>
-        <div class="card"><header><div><h3>Needs attention</h3><small>Across tests, requests, vessels @if($wl)and surveys @endif</small></div></header>
-            @php
-                $items = $attention->map(fn ($a) => ['n' => $a['n'], 'c' => $a['color'], 'tx' => $a['label'], 'url' => $a['url']]);
-                if ($wl) {
-                    if ($wl['overdueCount']) $items->push(['n' => $wl['overdueCount'], 'c' => '#f87171', 'tx' => 'active wells without a pressure survey in 180 days', 'url' => route('wireline.dashboard')]);
-                    if ($wl['stats']['open']) $items->push(['n' => $wl['stats']['open'], 'c' => '#a78bfa', 'tx' => 'open Wire Line operations', 'url' => route('wireline.operations', ['status' => 'planned'])]);
-                }
-            @endphp
-            @if($items->isEmpty())
-                <div class="ok"><i class="fe fe-check-circle"></i> Nothing needs attention right now.</div>
-            @else
-                <ul class="list">@foreach($items as $a)<li><span class="n" style="--c:{{ $a['c'] }}">{{ $a['n'] }}</span><span class="tx">{{ $a['tx'] }}</span><a class="go" href="{{ $a['url'] }}">Open →</a></li>@endforeach</ul>
-            @endif
-        </div>
-    </div>
-
-    <div class="row r3">
-        <div class="card"><header><div><h3>Test activity</h3><small>Tests per day · last 30 days</small></div></header><div class="cv s"><canvas id="cActivity"></canvas></div></div>
-        <div class="card"><header><div><h3>MPFM review pipeline</h3><small>{{ $mpfmTotal }} tests by status</small></div></header>
-            @if($mpfmTotal) <div class="cv s"><canvas id="cStatus"></canvas></div> @else <div class="empty">No tests yet.</div> @endif</div>
-        <div class="card"><header><div><h3>MPFM vs test vessel</h3><small>Oil rate agreement{{ $avgOilDeviation !== null ? ' · mean ±' . $avgOilDeviation . '%' : '' }}</small></div></header>
-            @if(count($scatter)) <div class="cv s"><canvas id="cScatter"></canvas></div> @else <div class="empty">No paired tests yet.</div> @endif</div>
-    </div>
-
-    {{-- ═════ WIRE LINE ═════ --}}
-    @if($wl)
-    <div class="sech"><h2>Wire Line</h2><span class="ln"></span><a href="{{ route('wireline.dashboard') }}">Open Wire Line →</a></div>
-    <div class="card ill" style="margin-bottom:16px">
-        <div class="ct"><span>Wire Line operation · memory-gauge survey</span><a href="{{ route('wireline.create') }}">New operation →</a></div>
-        @include('partials.wireline_rig')
-    </div>
-    <div class="row r3">
-        <div class="card"><header><div><h3>Operations per month</h3><small>Last 12 months</small></div></header><div class="cv s"><canvas id="cWlMonth"></canvas></div></div>
-        <div class="card"><header><div><h3>Operations by type</h3><small>{{ $wl['stats']['total'] }} total on {{ $wl['stats']['wells'] }} well(s)</small></div></header>
-            @if($wl['byType']->isEmpty()) <div class="empty">No operations recorded.</div> @else <div class="cv s"><canvas id="cWlType"></canvas></div> @endif</div>
-        <div class="card"><header><div><h3>Surveys overdue</h3><small>Active wells, no survey in 180 days</small></div><span class="tag">{{ $wl['overdueCount'] }}</span></header>
-            @if($wl['overdue']->isEmpty()) <div class="ok"><i class="fe fe-check-circle"></i> All active wells are up to date.</div>
-            @else <ul class="list">@foreach($wl['overdue']->take(6) as $o)<li><span class="tx"><a href="{{ route('mpfm_tests.string_analysis', $o['well']->id) }}" style="color:#fff;font-weight:600">{{ $o['well']->name }}</a><br><small style="color:var(--mute)">{{ $o['last'] ? $o['days'] . ' days since last survey' : 'never surveyed' }}</small></span><a class="go" href="{{ route('wireline.create', ['well' => $o['well']->id]) }}">Schedule →</a></li>@endforeach</ul> @endif</div>
-    </div>
-    <div class="row r2">
-        <div class="card"><header><div><h3>Latest memory-gauge surveys</h3><small>Final bottom-hole pressure &amp; temperature</small></div></header>
-            @if($wl['runs']->isEmpty()) <div class="empty">No gauge data uploaded yet.</div>
-            @else <div class="scroll"><table><thead><tr><th>Well</th><th>Date</th><th>Type</th><th>BHP (psi)</th><th>BHT (°C)</th><th></th></tr></thead><tbody>
-                @foreach($wl['runs']->take(6) as $r)
-                <tr><td>{{ $r->operation->oilString->name ?? '—' }}</td><td>{{ ($r->started_at ?? $r->operation->operation_date)->format('d M Y') }}</td><td>{{ strtoupper($r->survey_type) }}</td>
-                    <td>{{ $nf($r->bhp, 1) }}</td><td>{{ $nf($r->bht, 1) }}</td><td><a href="{{ route('wireline.show', [$r->operation, 'run' => $r->id]) }}">Open</a></td></tr>
-                @endforeach</tbody></table></div> @endif</div>
-        <div class="card"><header><div><h3>Recent Wire Line operations</h3><small>Latest interventions across the field</small></div></header>
-            @if($wl['recent']->isEmpty()) <div class="empty">No operations yet.</div>
-            @else <div class="scroll"><table><thead><tr><th>Date</th><th>Well</th><th>Operation</th><th>Status</th><th></th></tr></thead><tbody>
-                @foreach($wl['recent']->take(6) as $o)
-                <tr><td>{{ $o->operation_date->format('d M') }}</td><td>{{ $o->oilString->name ?? '—' }}</td><td>{{ $o->typeLabel() }}</td><td><span class="pill {{ $o->status }}">{{ $o->statusLabel() }}</span></td><td><a href="{{ route('wireline.show', $o) }}">Open</a></td></tr>
-                @endforeach</tbody></table></div> @endif</div>
-    </div>
-    @endif
-
-    {{-- ═════ WELLS & FIELDS ═════ --}}
-    <div class="sech"><h2>Wells &amp; fields</h2><span class="ln"></span><a href="{{ route('oil_fields.index') }}">Field setup →</a></div>
-    <div class="row r3">
-        <div class="card"><header><div><h3>Oil by field</h3><small>B/D · latest test per well</small></div></header>
-            @if($byField->isEmpty()) <div class="empty">No data.</div> @else <div class="cv s"><canvas id="cField"></canvas></div> @endif</div>
-        <div class="card"><header><div><h3>Top producing wells</h3><small>Latest oil rate</small></div></header>
-            @if($topStrings->isEmpty()) <div class="empty">No data.</div>
-            @else <div class="scroll"><table><thead><tr><th>Well</th><th>Oil (B/D)</th><th>WC %</th><th></th></tr></thead><tbody>
-                @foreach($topStrings as $s)<tr><td>{{ $s['name'] }}</td><td>{{ $nf($s['oil'], 1) }}</td><td>{{ $nf($s['wc'], 1) }}</td><td style="width:80px"><div class="bar"><i style="--w:{{ $s['oil'] / $maxTop * 100 }}%"></i></div></td></tr>@endforeach
-            </tbody></table></div> @endif</div>
-        <div class="card"><header><div><h3>Test coverage</h3><small>Wells tested in the last 30 days</small></div></header>
-            <div class="cv s"><canvas id="cCover"></canvas></div></div>
-    </div>
-
-    {{-- ═════ TEST VESSELS ═════ --}}
-    <div class="sech"><h2>Test vessels</h2><span class="ln"></span><a href="{{ route('test_vessels.index') }}">All vessels →</a></div>
-    <div class="row r21">
-        <div class="card"><header><div><h3>Vessel utilisation</h3><small>Tests performed per vessel</small></div></header>
-            @if($vessels->isEmpty()) <div class="empty">No vessels registered.</div>
-            @else <div class="scroll"><table><thead><tr><th>Vessel</th><th>Status</th><th>Tests</th><th>Last test</th><th></th></tr></thead><tbody>
-                @foreach($vessels as $v)<tr><td><a href="{{ route('test_vessels.show', $v) }}">{{ $v->name }}</a></td><td><span class="pill {{ $v->status }}">{{ $v->status }}</span></td><td>{{ $v->tests_count }}</td>
-                    <td>{{ $v->last_test_at ? \Carbon\Carbon::parse($v->last_test_at)->format('d M Y') : '—' }}</td><td style="width:110px"><div class="bar"><i style="--w:{{ $v->tests_count / $maxVessel * 100 }}%;--bc:#fbbf24"></i></div></td></tr>@endforeach
-            </tbody></table></div> @endif</div>
-        <div class="card"><header><div><h3>Test requests</h3><small>{{ $openRequests }} open</small></div></header>
-            @if(empty($requestsByStatus)) <div class="empty">No requests yet.</div> @else <div class="cv s"><canvas id="cReq"></canvas></div> @endif</div>
-    </div>
-
-    {{-- ═════ TEAM & ACTIVITY ═════ --}}
-    <div class="sech"><h2>Team &amp; activity</h2><span class="ln"></span></div>
-    <div class="row r3">
-        <div class="card"><header><div><h3>Recent activity</h3><small>Tests, requests and log uploads</small></div></header>
-            @if($feed->isEmpty()) <div class="empty">No activity yet.</div>
-            @else <ul class="list feed">@foreach($feed->take(7) as $e)<li style="--c:{{ $feedColors[$e['type']] ?? '#64748b' }}"><span class="dot"></span><span><b><a href="{{ $e['url'] }}">{{ $e['title'] }}</a></b><small>{{ $e['sub'] }}{{ $e['who'] ? ' · ' . $e['who'] : '' }} · {{ $e['when']->diffForHumans() }}</small></span></li>@endforeach</ul> @endif</div>
-        <div class="card"><header><div><h3>Tests by shift</h3><small>MPFM and vessel tests</small></div></header><div class="cv s"><canvas id="cShift"></canvas></div></div>
-        <div class="card"><header><div><h3>Most active operators</h3><small>Tests recorded</small></div></header>
-            @if($operators->isEmpty()) <div class="empty">No data.</div>
-            @else <ul class="list">@foreach($operators as $o)<li><span class="tx" style="color:#fff;font-weight:600">{{ $o['name'] }}<div class="bar" style="margin-top:6px"><i style="--w:{{ $o['total'] / $maxOp * 100 }}%;--bc:#3b82f6"></i></div></span><span class="n" style="--c:#fff;font-size:15px">{{ $o['total'] }}</span></li>@endforeach</ul> @endif</div>
-    </div>
-
-    {{-- ═════ LAUNCHER ═════ --}}
-    <div class="sech"><h2>Modules</h2><span class="ln"></span></div>
-    <div class="tiles">
-        <a class="tile" style="--tc:#22d3ee" href="{{ route('mpfm_tests.index') }}"><i class="fe fe-activity"></i><span><b>MPFM tests</b><small>Review &amp; approve</small></span></a>
-        <a class="tile" style="--tc:#34d399" href="{{ route('well_tests.index') }}"><i class="fe fe-folder"></i><span><b>Test archive</b><small>Uploaded logs</small></span></a>
-        <a class="tile" style="--tc:#3b82f6" href="{{ route('mpfm_tests.trending_dashboard') }}"><i class="fe fe-trending-up"></i><span><b>Analytics</b><small>Trends &amp; alerts</small></span></a>
-        <a class="tile" style="--tc:#fbbf24" href="{{ route('test_vessels.index') }}"><i class="fe fe-anchor"></i><span><b>Test vessels</b><small>Fleet &amp; status</small></span></a>
-        <a class="tile" style="--tc:#f59e0b" href="{{ route('tv_tests.index') }}"><i class="fe fe-list"></i><span><b>Vessel tests</b><small>Results</small></span></a>
-        <a class="tile" style="--tc:#a78bfa" href="{{ route('tv_test_requests.index') }}"><i class="fe fe-clipboard"></i><span><b>Test requests</b><small>Plan &amp; track</small></span></a>
-        @if($wl)
-        <a class="tile" style="--tc:#a78bfa" href="{{ route('wireline.dashboard') }}"><i class="fe fe-git-branch"></i><span><b>Wire Line</b><small>Surveys &amp; interventions</small></span></a>
-        <a class="tile" style="--tc:#22d3ee" href="{{ route('wireline.operations') }}"><i class="fe fe-list"></i><span><b>Wire Line jobs</b><small>All operations</small></span></a>
-        @endif
-        <a class="tile" style="--tc:#38bdf8" href="{{ route('oil_fields.index') }}"><i class="fe fe-map"></i><span><b>Field setup</b><small>Fields, towers, wells</small></span></a>
-    </div>
+<div class="ent" id="ent" data-persona="{{ $persona }}">
+    @include('dashboard._header')
+    @include('dashboard._kpis')
+    @foreach($layout as $__part)
+        @include('dashboard.' . $__part)
+    @endforeach
 </div>
 @endsection
-
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -335,7 +165,7 @@
     var A = @json($activity);
     make('cActivity', { type: 'bar', data: { labels: A.labels, datasets: [
         { label: 'MPFM', data: A.mpfm, backgroundColor: '#22d3ee', borderRadius: 3 },
-        { label: 'Test vessel', data: A.tv, backgroundColor: '#fbbf24', borderRadius: 3 }
+        { label: 'Well testing', data: A.tv, backgroundColor: '#fbbf24', borderRadius: 3 }
     ] }, options: Object.assign({}, base, { scales: { x: { stacked: true, ticks: { maxTicksLimit: 6 }, grid: { display: false } }, y: { stacked: true, grid: grid, ticks: { precision: 0 } } } }) });
 
     var S = @json($mpfmByStatus), sc = { draft: '#64748b', submitted: '#fbbf24', approved: '#34d399', rejected: '#f87171' };
@@ -349,7 +179,7 @@
         { label: '+10%', type: 'line', data: [{ x: 0, y: 0 }, { x: mx, y: mx * 1.1 }], borderColor: 'rgba(248,113,113,.5)', borderWidth: 1, pointRadius: 0 },
         { label: '-10%', type: 'line', data: [{ x: 0, y: 0 }, { x: mx, y: mx * .9 }], borderColor: 'rgba(248,113,113,.5)', borderWidth: 1, pointRadius: 0 }
     ] }, options: Object.assign({}, base, { plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return (c.raw.n || '') + ' · TV ' + c.raw.x + ' / MPFM ' + c.raw.y; } } } },
-        scales: { x: { title: { display: true, text: 'Test vessel (B/D)' }, grid: grid, min: 0, max: mx }, y: { title: { display: true, text: 'MPFM (B/D)' }, grid: grid, min: 0, max: mx } } }) });
+        scales: { x: { title: { display: true, text: 'Well testing (B/D)' }, grid: grid, min: 0, max: mx }, y: { title: { display: true, text: 'MPFM (B/D)' }, grid: grid, min: 0, max: mx } } }) });
 
     @if($wl)
     make('cWlMonth', { type: 'bar', data: { labels: @json($wl['monthLabels']), datasets: [{ label: 'Operations', data: @json($wl['perMonth']), backgroundColor: '#a78bfa', borderRadius: 4 }] },
@@ -373,6 +203,32 @@
     var SH = @json($shift);
     make('cShift', { type: 'bar', data: { labels: ['Morning', 'Afternoon', 'Night'], datasets: [{ data: [SH.morning, SH.afternoon, SH.night], backgroundColor: ['#fbbf24', '#22d3ee', '#6366f1'], borderRadius: 6 }] },
         options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: grid, ticks: { precision: 0 } } } }) });
+    var MD = @json($mineDaily ?? null);
+    if (MD) { make('cMyDaily', { type: 'bar', data: { labels: MD.labels, datasets: [{ label: 'My tests', data: MD.data, backgroundColor: '#22d3ee', borderRadius: 4 }] },
+        options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 7 } }, y: { beginAtZero: true, grid: grid, ticks: { precision: 0 } } } }) }); }
+    var MS = @json($mine['byStatus'] ?? null);
+    if (MS) { make('cMyStatus', { type: 'doughnut', data: { labels: Object.keys(MS), datasets: [{ data: Object.values(MS), backgroundColor: Object.keys(MS).map(function (k) { return sc[k] || '#3b82f6'; }), borderWidth: 0 }] },
+        options: Object.assign({}, base, { cutout: '66%', plugins: { legend: { position: 'bottom' } } }) }); }
+
+    var BH = @json($reservoir['trend'] ?? null);
+    if (BH && BH.labels.length > 1) { make('cBhp', { type: 'line', data: { labels: BH.labels, datasets: [{ label: 'Average static BHP (psi)', data: BH.bhp, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.16)', fill: true, tension: .3, pointRadius: 3 }] },
+        options: Object.assign({}, base, { plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: grid, title: { display: true, text: 'psi' } } } }) }); }
+
+    var LO = @json($byLocation ?? []);
+    make('cLocOil', { type: 'bar', data: { labels: LO.map(function (l) { return l.name; }), datasets: [{ label: 'Oil (B/D)', data: LO.map(function (l) { return l.oil; }), backgroundColor: ['#38bdf8', '#fbbf24', '#a78bfa', '#34d399', '#fb923c', '#22d3ee'], borderRadius: 4 }] },
+        options: Object.assign({}, base, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { grid: grid }, y: { grid: { display: false } } } }) });
+
+    var MO = @json($monthly);
+    make('cMonthly', { type: 'bar', data: { labels: MO.map(function (m) { return m.label; }), datasets: [
+        { label: 'MPFM', data: MO.map(function (m) { return m.mpfm; }), backgroundColor: '#22d3ee', borderRadius: 3 },
+        { label: 'Well testing', data: MO.map(function (m) { return m.tv; }), backgroundColor: '#fbbf24', borderRadius: 3 }
+    ] }, options: Object.assign({}, base, { scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: grid, ticks: { precision: 0 } } } }) });
+
+    @if($integrity)
+    var IS = @json($integrity['stats']);
+    make('cIntStatus', { type: 'doughnut', data: { labels: ['Green', 'Amber', 'Red', 'Not assessed'], datasets: [{ data: [IS.green, IS.amber, IS.red, IS.none], backgroundColor: ['#34d399', '#fbbf24', '#f87171', '#64748b'], borderWidth: 0 }] },
+        options: Object.assign({}, base, { cutout: '64%', plugins: { legend: { position: 'bottom' } } }) });
+    @endif
 })();
 </script>
 @endsection

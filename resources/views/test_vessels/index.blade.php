@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Test Vessels')
+@section('title', 'Testing Units')
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('assets/css/ofpage.css') }}">
@@ -159,7 +159,7 @@
         @empty
             <div class="panel empty" style="grid-column:1/-1">
                 <svg viewBox="0 0 120 90"><path d="M20,30 H92 A14,18 0 0 1 92,66 H20 A14,18 0 0 1 20,30 Z" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="6 5"/></svg>
-                No test vessels yet.
+                No testing units yet.
                 @can('manage', App\Models\TestVessel::class)<br><a class="btn2 p" style="margin-top:14px" href="{{ route('test_vessels.create') }}"><i class="fe fe-plus"></i> Add the first vessel</a>@endcan
             </div>
         @endforelse

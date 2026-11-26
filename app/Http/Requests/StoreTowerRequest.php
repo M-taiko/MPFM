@@ -27,6 +27,7 @@ class StoreTowerRequest extends FormRequest
             'code' => 'required|string|max:255|unique:towers,code',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive,maintenance',
+            'tower_type' => 'required|in:' . implode(',', array_keys(\App\Models\Tower::TYPES)),
         ];
     }
 }

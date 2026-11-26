@@ -164,7 +164,7 @@
                     <h1>Well tests <em>from the meter</em></h1>
                 </div>
             </div>
-            <p style="margin-top:14px">Every MPFM test comes from an uploaded VX log. The meter reads oil, gas and water without separating them — review, approve and compare each test against the test vessel.</p>
+            <p style="margin-top:14px">Every MPFM test comes from an uploaded VX log. The meter reads oil, gas and water without separating them — review, approve and compare each test against the well testing.</p>
             <div class="actions">
                 @can('create', App\Models\MPFMTest::class)
                     <a href="{{ route('upload.form') }}" class="btn2 p"><i class="fe fe-upload"></i> Upload log</a>

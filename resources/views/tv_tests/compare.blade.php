@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Compare Test Vessel with MPFM')
+@section('title', 'Compare Testing Unit with MPFM')
 
 @section('css')
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -141,9 +141,9 @@
         <div class="who">
             <span class="lg"></span>
             <div>
-                <div class="eyebrow">Test Vessel vs MPFM</div>
+                <div class="eyebrow">Testing Unit vs MPFM</div>
                 <h1>Compare <em>two readings</em></h1>
-                <p>Pick a test vessel test as the reference and an MPFM test to check against it. Tests on the same oil string give the most meaningful comparison.</p>
+                <p>Pick a well test as the reference and an MPFM test to check against it. Tests on the same oil string give the most meaningful comparison.</p>
             </div>
         </div>
         <a href="{{ route('tv_tests.index') }}" class="btn2"><i class="fe fe-arrow-left"></i> Back to list</a>
@@ -158,7 +158,7 @@
             <div class="panel tv rv">
                 <div class="ph">
                     <svg viewBox="0 0 64 44" aria-hidden="true"><path d="M4,10 H44 A10,12 0 0 1 44,34 H4 A10,12 0 0 1 4,10 Z" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/><path d="M8,26 H46 A6,6 0 0 1 46,34 H8 Z" fill="#b45309"/><rect x="8" y="30" width="38" height="4" fill="#0ea5e9"/><path d="M0,16 H4 M54,14 H64 M54,30 H64" stroke="#94a3b8" stroke-width="3"/><circle cx="24" cy="6" r="5" fill="#0a1222" stroke="#fbbf24" stroke-width="1.6"/></svg>
-                    <div><h3>Test vessel</h3><small>Reference reading</small></div><span class="cnt" id="tvCnt">0</span>
+                    <div><h3>Well testing</h3><small>Reference reading</small></div><span class="cnt" id="tvCnt">0</span>
                 </div>
                 <div class="srch"><i class="fe fe-search"></i><input type="text" id="tvQ" placeholder="Search vessel, string, date…" autocomplete="off"></div>
                 <div class="list" id="tvList"></div>
@@ -223,7 +223,7 @@
         var q = $('tvQ').value.toLowerCase(), box = $('tvList'); box.innerHTML = '';
         var rows = TV.filter(function (t) { return !q || (t.vessel + ' ' + t.string + ' ' + t.date + ' ' + t.field + ' ' + t.id).toLowerCase().indexOf(q) > -1; });
         $('tvCnt').textContent = rows.length;
-        if (!rows.length) box.appendChild(el('div', 'none', 'No test vessel tests found'));
+        if (!rows.length) box.appendChild(el('div', 'none', 'No test runs found'));
         rows.forEach(function (t) { box.appendChild(card(t, 'tv', { sel: selTv && selTv.id === t.id, pick: function () { selTv = (selTv && selTv.id === t.id) ? null : t; sync(); } })); });
     }
     function renderMp() {
@@ -246,7 +246,7 @@
         var mx = Math.max(tv, mp, 0.0001), r = el('div', 'crow');
         var n = el('div', 'n', name); n.appendChild(el('span', null, unit));
         var bars = el('div', 'bars');
-        [['a', 'Test vessel · ' + fmt(tv, dec), tv], ['b', 'MPFM · ' + fmt(mp, dec), mp]].forEach(function (x) {
+        [['a', 'Well testing · ' + fmt(tv, dec), tv], ['b', 'MPFM · ' + fmt(mp, dec), mp]].forEach(function (x) {
             var b = el('div', 'bar ' + x[0]), i = el('i'); i.style.width = '0'; i.dataset.w = (x[2] / mx * 100).toFixed(1) + '%'; b.appendChild(i); b.appendChild(el('span', 'lb', x[1])); bars.appendChild(b);
         });
         var dv = el('div', 'dev ' + cls(d, pt), d === null ? '—' : (d > 0 ? '+' : '') + d.toFixed(1) + (pt ? ' pt' : '%'));
@@ -257,7 +257,7 @@
         if (!selTv || !selMp) {
             var e = el('div', 'empty');
             e.innerHTML = '<svg viewBox="0 0 120 60" aria-hidden="true"><rect x="8" y="30" width="14" height="22" rx="3" fill="#fbbf24" opacity=".5"/><rect x="28" y="18" width="14" height="34" rx="3" fill="#fbbf24" opacity=".5"/><rect x="62" y="24" width="14" height="28" rx="3" fill="#22d3ee" opacity=".5"/><rect x="82" y="12" width="14" height="40" rx="3" fill="#22d3ee" opacity=".5"/><path d="M8,10 Q60,-6 110,8" fill="none" stroke="#fff" stroke-opacity=".5" stroke-dasharray="4 4"/></svg>';
-            e.appendChild(document.createTextNode(!selTv && !selMp ? 'Choose a test vessel test and an MPFM test to preview the comparison.' : (!selTv ? 'Now choose a test vessel test.' : 'Now choose an MPFM test.')));
+            e.appendChild(document.createTextNode(!selTv && !selMp ? 'Choose a well test and an MPFM test to preview the comparison.' : (!selTv ? 'Now choose a well test.' : 'Now choose an MPFM test.')));
             box.appendChild(e); return;
         }
         var ok = selTv.string_id === selMp.string_id;

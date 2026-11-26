@@ -292,7 +292,7 @@
                         <li><span class="ic"><i class="fe fe-upload"></i></span><div><b>Log is read</b><small>Rates, pressure, temperature and GVF are extracted.</small></div></li>
                         <li><span class="ic"><i class="fe fe-bar-chart-2"></i></span><div><b>Preview &amp; charts</b><small>You check the numbers and curves before anything is saved.</small></div></li>
                         <li><span class="ic"><i class="fe fe-check-circle"></i></span><div><b>Save the test</b><small>It joins the MPFM tests list and goes for review.</small></div></li>
-                        <li><span class="ic"><i class="fe fe-shuffle"></i></span><div><b>Compare with the vessel</b><small>Check the MPFM against the test vessel reading.</small></div></li>
+                        <li><span class="ic"><i class="fe fe-shuffle"></i></span><div><b>Compare with the vessel</b><small>Check the MPFM against the well testing reading.</small></div></li>
                     </ul>
                 </div>
                 <div class="panel rv" style="--d:2">

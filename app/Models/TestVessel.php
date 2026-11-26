@@ -17,6 +17,7 @@ class TestVessel extends Model
         'code',
         'description',
         'oil_field_id',
+        'location_id',
         'status',
     ];
 
@@ -55,4 +56,10 @@ class TestVessel extends Model
     {
         return $query->where('oil_field_id', $oilFieldId);
     }
+
+    public function location(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
 }

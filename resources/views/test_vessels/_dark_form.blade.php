@@ -1,4 +1,4 @@
-{{-- Shared create/edit form for test vessels. Vars: $oilFields, $testVessel (nullable) --}}
+{{-- Shared create/edit form for testing units. Vars: $oilFields, $testVessel (nullable) --}}
 @php
     $edit = isset($testVessel) && $testVessel && $testVessel->exists;
     $val = fn ($k, $d = '') => old($k, $edit ? ($testVessel->{$k} ?? $d) : $d);
@@ -91,6 +91,12 @@
                                 @foreach($oilFields as $f)<option value="{{ $f->id }}" @selected($val('oil_field_id') == $f->id)>{{ $f->name }}</option>@endforeach
                             </select>
                             @error('oil_field_id')<span class="em">{{ $message }}</span>@enderror</div>
+                        <div class="f {{ $errors->has('location_id') ? 'has-err' : '' }}"><label class="lb" for="location_id"><i class="fe fe-map-pin"></i> Location</label>
+                            <select class="fc" name="location_id" id="location_id">
+                                <option value="">No location</option>
+                                @foreach(\App\Models\Location::orderBy('name')->get() as $__l)<option value="{{ $__l->id }}" @selected($val('location_id') == $__l->id)>{{ $__l->name }} · {{ $__l->envLabel() }}</option>@endforeach
+                            </select>
+                            @error('location_id')<span class="em">{{ $message }}</span>@enderror</div>
                     </div>
                 </div>
 

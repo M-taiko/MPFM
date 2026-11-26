@@ -53,7 +53,21 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                                                            <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label">Tower type <span class="text-danger">*</span></label>
+                                <select class="form-control @error('tower_type') is-invalid @enderror" name="tower_type" required>
+                                    @foreach(\App\Models\Tower::TYPES as $__k => $__t)
+                                        <option value="{{ $__k }}" {{ old('tower_type', 'wellhead_tower') == $__k ? 'selected' : '' }}>{{ $__t[0] }}</option>
+                                    @endforeach
+                                </select>
+                                @error('tower_type')<span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>@enderror
+                            </div>
+                        </div>
+                    </div>
+
+<div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Code <span class="text-danger">*</span></label>

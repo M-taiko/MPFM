@@ -352,14 +352,14 @@
         <i class="fe fe-shuffle"></i>
         Test Comparison Analysis
     </h1>
-    <p>Test Vessel vs MPFM Test on the same Oil String</p>
+    <p>Testing Unit vs MPFM Test on the same Oil String</p>
 </div>
 
 <!-- Test Information Cards -->
 <div class="comparison-header">
     <div class="test-info-card tv">
         <div class="test-info-label">
-            <i class="fe fe-anchor"></i> Test Vessel Test
+            <i class="fe fe-anchor"></i> Test Run
         </div>
         <div class="test-info-value">#{{ $tvTest->id }}</div>
 
@@ -435,7 +435,7 @@
         <!-- TV Test Data -->
         <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border: 2px solid #667eea; border-radius: 0.75rem; padding: 1.5rem;">
             <h4 style="margin-top: 0; color: #667eea; border-bottom: 2px solid #667eea; padding-bottom: 0.75rem;">
-                <i class="fe fe-anchor"></i> Test Vessel Test #{{ $tvTest->id }}
+                <i class="fe fe-anchor"></i> Test Run #{{ $tvTest->id }}
             </h4>
             <table style="width: 100%; font-size: 0.9rem;">
                 <tr>
@@ -635,11 +635,11 @@
             <i class="fe fe-layers"></i> Possible Root Causes
         </h5>
         <ul style="margin: 0; padding-left: 1.5rem; color: #4a5568;">
-            <li><strong>Calibration Issues:</strong> Test Vessel sensors may need recalibration</li>
+            <li><strong>Calibration Issues:</strong> Testing Unit sensors may need recalibration</li>
             <li><strong>Equipment Malfunction:</strong> Sensors might be giving inaccurate readings</li>
             <li><strong>Well Condition Changes:</strong> Production conditions changed between tests</li>
             <li><strong>Measurement Timing:</strong> Tests conducted at different production stages</li>
-            <li><strong>Data Entry Errors:</strong> Manual data input mistakes in Test Vessel readings</li>
+            <li><strong>Data Entry Errors:</strong> Manual data input mistakes in Testing Unit readings</li>
         </ul>
     </div>
 
@@ -650,8 +650,8 @@
         </h5>
         <ul style="margin: 0; padding-left: 1.5rem; color: #22543d;">
             @if(!empty($issues))
-                <li><strong>High Priority:</strong> Review Test Vessel equipment for errors. Consider running a new test after calibration.</li>
-                <li>Check Test Vessel sensor connections and battery levels</li>
+                <li><strong>High Priority:</strong> Review Testing Unit equipment for errors. Consider running a new test after calibration.</li>
+                <li>Check Testing Unit sensor connections and battery levels</li>
                 <li>Compare with recent MPFM baseline readings to identify trends</li>
             @endif
 
@@ -668,7 +668,7 @@
                 <li><strong>✓ No Action Required:</strong> Test results are within acceptable limits</li>
             @endif
 
-            <li>Schedule regular calibration checks for Test Vessel equipment</li>
+            <li>Schedule regular calibration checks for Testing Unit equipment</li>
             <li>Maintain detailed logs of all test conditions and parameters</li>
         </ul>
     </div>
@@ -728,7 +728,7 @@
             <thead>
                 <tr>
                     <th>Metric</th>
-                    <th>Test Vessel</th>
+                    <th>Testing Unit</th>
                     <th>MPFM</th>
                     <th>Absolute Difference</th>
                     <th>% Difference</th>
@@ -863,7 +863,7 @@ document.addEventListener('DOMContentLoaded', function() {
             labels: labels,
             datasets: [
                 {
-                    label: 'Test Vessel',
+                    label: 'Testing Unit',
                     data: tvValues,
                     backgroundColor: '#667eea',
                     borderColor: '#667eea',

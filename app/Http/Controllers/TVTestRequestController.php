@@ -122,7 +122,7 @@ class TVTestRequestController extends Controller
     }
 
     /**
-     * Approve a test vessel test
+     * Approve a well testing test
      */
     public function approveTest(TestVesselTest $tvTest)
     {
@@ -156,7 +156,7 @@ class TVTestRequestController extends Controller
     }
 
     /**
-     * Reject a test vessel test
+     * Reject a well testing test
      */
     public function rejectTest(TestVesselTest $tvTest, Request $request)
     {

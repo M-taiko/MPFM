@@ -98,6 +98,12 @@ class MPFMTest extends Model
         // Timing fields
         'test_started_at' => 'datetime',
         'test_completed_at' => 'datetime',
+        // Review workflow timestamps (the review screens call ->format() on these)
+        'approved_by_department_at' => 'datetime',
+        'approved_by_surveillance_at' => 'datetime',
+        'rejected_at' => 'datetime',
+        'retest_requested_at' => 'datetime',
+        'last_validated_at' => 'datetime',
         // Detailed metrics JSON fields
         'detailed_metrics' => 'array',
         'flow_rate_metrics' => 'array',
