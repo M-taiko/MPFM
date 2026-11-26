@@ -9,6 +9,7 @@ use App\Models\TestVessel;
 use App\Models\Tower;
 use App\Models\User;
 use App\Models\WellBarrierElement;
+use App\Models\WellTest;
 use App\Models\WellIntegrityAnnulus;
 use App\Models\WellIntegrityAnnulusReading;
 use App\Models\WellIntegrityAnomaly;
@@ -48,11 +49,13 @@ class DemoDataSeeder extends Seeder
 
         DB::transaction(function () {
             $this->users();
+            $this->ensureBase();
             $this->hierarchy();
             $this->pickWells();
             $this->vessels();
             $this->cleanup();
             $this->mpfmAndVesselTests();
+            $this->archive();
             $this->vesselRequests();
             $this->wireline();
             $this->integrity();
@@ -70,9 +73,122 @@ class DemoDataSeeder extends Seeder
         foreach (['admin'] as $role) {
             if (!$user->hasRole($role)) { $user->assignRole($role); }
         }
-        $this->operators = User::whereIn('email', ['operator1@adnoc.ae', 'operator2@adnoc.ae', 'operator3@adnoc.ae', 'operator1@oilfield.com'])->pluck('id')->all() ?: [$user->id];
-        $this->supervisor = User::where('email', 'like', 'supervisor@%')->value('id') ?? $user->id;
-        $this->surveillance = User::where('email', 'like', 'surveillance@%')->value('id') ?? $user->id;
+        $this->operators = User::role(['mpfm_operator', 'operator'])->pluck('id')->all() ?: [$user->id];
+        $this->supervisor = User::role('department_manager')->value('id') ?? $user->id;
+        $this->surveillance = User::role('surveillance_supervisor')->value('id') ?? $user->id;
+    }
+
+    // ═════ base fields, towers and wells (so the seeder also works on an empty database) ═════
+    private function ensureBase(): void
+    {
+        $defs = ['ZK' => 'Lower Zakum West Field', 'UM' => 'Umm Shaif Field'];
+        foreach ($defs as $prefix => $name) {
+            $field = OilField::firstOrCreate(['code' => $prefix], ['name' => $name, 'status' => 'active', 'description' => 'Offshore field']);
+            foreach (range(100, 109) as $n) {
+                $tn = "$prefix-$n";
+                $tower = Tower::where('name', $tn)->first()
+                    ?? Tower::create(['oil_field_id' => $field->id, 'name' => $tn, 'code' => strtolower($tn), 'tower_type' => 'wellhead_tower', 'status' => 'active']);
+                foreach ([1, 2] as $s) {
+                    $sn = "$tn/$s";
+                    if (!OilString::where('name', $sn)->exists()) {
+                        OilString::create(['tower_id' => $tower->id, 'name' => $sn, 'code' => $sn, 'string_number' => $s, 'status' => 'active']);
+                    }
+                }
+            }
+        }
+    }
+
+    // ═════ Test archive: the two latest approved MPFM tests of every well, as uploaded Vx log files ═════
+    private const VX_COLUMNS = ['Date & Time', 'N32[cps]', 'N81[cps]', 'N356[cps]', 'NTotal[cps]', 'qo_lc[bbl/d]', 'qw_lc[bbl/d]', 'qg_lc[Mcf/d]', 'qo_sc[STB/d]', 'qw_sc[STB/d]', 'qg_sc[MMScf/d]',
+        'qo_scnp[STB/d]', 'qw_scnp[STB/d]', 'qg_scnp[MMScf/d]', 'Fo_lc[%]', 'Fw_lc[%]', 'Fg_lc[%]', 'mo_lc[kg/d]', 'mw_lc[kg/d]', 'mg_lc[kg/d]', 'm_lc[kg/d]', 'mo_sc[kg/d]', 'mw_sc[kg/d]', 'mg_sc[kg/d]',
+        'Do_lc[kg/m³]', 'Dw_lc[kg/m³]', 'Dg_lc[kg/m³]', 'Dm_lc[kg/m³]', 'Dl_lc[kg/m³]', 'Mu_o_lc[cP]', 'Mu_l_lc[cP]', 'WLR[%]', 'BSW[%]', 'GVF[%]', 'GLR[m³/m³]', 'GOR[Scf/STB]', 'GOR1[Scf/STB]', 'CGRAvg[Scf/STB]',
+        'bo[Sm³/m³]', 'bw[Sm³/m³]', 'bg[Sm³/m³]', 'Z', 'Rst[Scf/STB]', 'Rwst[Scf/STB]', 'rgmp[STB/Scf]', 'Dyn_DP[mbar]', 'DPV[mbar]', 'PIN[bara]', 'TL[°C]', 'Pthroat', 'DAFC_InputVolt[V]', 'DAFC_InputCurr[A]',
+        'DAFC_5Volt[V]', 'DAFC_24Volt[V]', 'DAFC_Temp[°C]', 'DAFC_Hum[%RH]', 'HVGain[V]', 'DetectorTemp[°C]', 'cvo_lc[bbl]', 'cvw_lc[bbl]', 'cvg_lc[cf]', 'cvo_sc[STB]', 'cvw_sc[STB]', 'cvg_sc[Scf]',
+        'cvo_scnp[STB]', 'cvw_scnp[STB]', 'cvg_scnp[Scf]', 'cmo_lc[kg]', 'cmw_lc[kg]', 'cmg_lc[kg]', 'cmt_lc[kg]', 'OperatingPointLE[1/m]', 'OperatingPointHE[1/m]', 'OilPointLE[1/m]', 'OilPointHE[1/m]',
+        'WaterPointLE[1/m]', 'WaterPointHE[1/m]', 'GasPointLE[1/m]', 'GasPointHE[1/m]', 'EVODeconvN32[cps]', 'EVODeconvN81[cps]', 'EVODeconvN356[cps]', 'EVOChiSquare', 'EVOPHR[%]', 'EVOHECenter',
+        'EVOLP_VHE_VHE', 'EVOLP_HE_HE', 'EVOLP_VHE_HE', 'EVOLP_LE_LE', 'EVOLP_VHE_LE', 'EVOLP_HE_LE'];
+
+    private function archive(): void
+    {
+        WellTest::where('log_file_path', 'like', 'demo/%')->delete();
+        $cols = self::VX_COLUMNS;
+        $colTypes = collect($cols)->mapWithKeys(fn ($c) => [$c => $c === 'Date & Time' ? 'text' : 'numeric'])->all();
+        $fieldNames = OilField::pluck('name', 'id');
+        $towerNames = Tower::pluck('name', 'id');
+        $stringNames = OilString::pluck('name', 'id');
+        $userNames = User::pluck('name', 'id');
+        $fmt = fn ($v) => sprintf('%20s', rtrim(rtrim(number_format((float) $v, abs($v) >= 1000 ? 1 : 3, '.', ''), '0'), '.') ?: '0');
+        $seq = 0;
+
+        foreach ($this->wells as $w) {
+            $tests = DB::table('mpfm_tests')->where('oil_string_id', $w['id'])->where('notes', 'like', self::TAG . '%')->where('status', 'approved')
+                ->orderByDesc('test_date')->limit(2)->get();
+            foreach ($tests as $t) {
+                $seq++;
+                $start = Carbon::parse($t->test_started_at);
+                $nRows = 64; $stepMin = max(2, (int) round(($t->test_duration_minutes ?? 220) / $nRows));
+                $oil = (float) $t->oil_rate; $wc = (float) $t->water_cut; $gor = (float) $t->gor; $gasMm = (float) $t->gas_rate;
+                $water = $wc < 100 ? $oil * $wc / (100 - $wc) : 0.0;
+                $pBar = (float) $t->pressure / 14.5038; $temp = (float) $t->temperature;
+                $cumO = $cumW = $cumG = 0.0;
+                $rows = []; $sumP = []; $sumT = [];
+                for ($i = 0; $i < $nRows; $i++) {
+                    $n = fn ($a = .02) => 1 + mt_rand(-1000, 1000) / 1000 * $a;
+                    $ro = $oil * $n(); $rw = $water * $n(.04); $rg = $gasMm * $n(); $p = $pBar * $n(.004); $tp = $temp + mt_rand(-30, 30) / 100;
+                    $dtDay = $stepMin / 1440; $cumO += $ro * $dtDay; $cumW += $rw * $dtDay; $cumG += $rg * 1e6 * $dtDay;
+                    $liq = max(1e-6, $ro + $rw); $fo = 100 * $ro / ($liq + $rg * 40); $fw = 100 * $rw / ($liq + $rg * 40); $fg = 100 - $fo - $fw;
+                    $gvf = min(95, max(20, $fg + mt_rand(-10, 10) / 10));
+                    $v = [
+                        'Date & Time' => $start->copy()->addMinutes($i * $stepMin)->addSeconds(mt_rand(0, 40))->format('d-M-Y H:i:s'),
+                        'N32[cps]' => 20800 * $n(.03), 'N81[cps]' => 9880 * $n(.03), 'N356[cps]' => 5140 * $n(.03), 'NTotal[cps]' => 44200 * $n(.03),
+                        'qo_lc[bbl/d]' => $ro * 1.18, 'qw_lc[bbl/d]' => $rw * 1.1, 'qg_lc[Mcf/d]' => $rg * 1000 * 0.09,
+                        'qo_sc[STB/d]' => $ro, 'qw_sc[STB/d]' => $rw, 'qg_sc[MMScf/d]' => $rg, 'qo_scnp[STB/d]' => $ro, 'qw_scnp[STB/d]' => $rw, 'qg_scnp[MMScf/d]' => $rg * 0.93,
+                        'Fo_lc[%]' => $fo, 'Fw_lc[%]' => $fw, 'Fg_lc[%]' => $fg,
+                        'WLR[%]' => $wc * $n(.03), 'BSW[%]' => $wc * $n(.03), 'GVF[%]' => $gvf, 'GOR[Scf/STB]' => $gor * $n(.03), 'GOR1[Scf/STB]' => $gor * $n(.05),
+                        'Dyn_DP[mbar]' => 380 * $n(.05), 'DPV[mbar]' => 470 * $n(.04), 'PIN[bara]' => $p, 'TL[°C]' => $tp,
+                        'DAFC_InputVolt[V]' => 23.8 * $n(.01), 'DAFC_InputCurr[A]' => .565 * $n(.02), 'DAFC_5Volt[V]' => 4.977 * $n(.002), 'DAFC_24Volt[V]' => 24.1 * $n(.004),
+                        'DAFC_Temp[°C]' => 35 + mt_rand(-20, 20) / 10, 'DAFC_Hum[%RH]' => 64 + mt_rand(-30, 30) / 10, 'HVGain[V]' => 580 * $n(.003), 'DetectorTemp[°C]' => 40.4 * $n(.01),
+                        'cvo_sc[STB]' => $cumO, 'cvw_sc[STB]' => $cumW, 'cvg_sc[Scf]' => $cumG, 'cvo_lc[bbl]' => $cumO * 1.18, 'cvw_lc[bbl]' => $cumW * 1.1, 'cvg_lc[cf]' => $cumG * .09,
+                        'Z' => .85 * $n(.01), 'bo[Sm³/m³]' => .83 * $n(.01), 'bw[Sm³/m³]' => .98 * $n(.005), 'bg[Sm³/m³]' => 68 * $n(.01), 'Rst[Scf/STB]' => 330 * $n(.02),
+                        'Do_lc[kg/m³]' => 750 * $n(.01), 'Dw_lc[kg/m³]' => 1176 * $n(.005), 'Dg_lc[kg/m³]' => 64 * $n(.02), 'Mu_o_lc[cP]' => .64 * $n(.02),
+                    ];
+                    $r = [];
+                    foreach ($cols as $c) {
+                        $r[$c] = $c === 'Date & Time' ? $v[$c] : $fmt($v[$c] ?? (mt_rand(0, 100) / 100 * 5));
+                    }
+                    $rows[] = $r; $sumP[] = $p * 14.5038; $sumT[] = $tp;
+                }
+                $towerName = $towerNames[$w['tower_id']] ?? '';
+                $stringName = $stringNames[$w['id']] ?? '';
+                $stringNo = (int) (substr(strrchr($stringName, '/'), 1) ?: 1);
+                $filename = sprintf('%s %d-wp%03d-%s-%s.vxlog', $towerName, $stringNo, $seq % 1000, $start->format('dMY'), $start->format('His'));
+                $metrics = [
+                    'oil_rate' => $oil, 'water_rate' => round($water, 2), 'gas_rate' => round($gasMm * 1000 * 0.09, 3), 'gor' => $gor, 'bsw' => $wc, 'wlr' => $wc,
+                    'gvf' => round(collect($rows)->avg(fn ($r) => (float) $r['GVF[%]']), 2),
+                    'max_pressure' => round(max($sumP), 1), 'min_pressure' => round(min($sumP), 1), 'avg_pressure' => round(array_sum($sumP) / count($sumP), 1),
+                    'max_temperature' => round(max($sumT), 2), 'min_temperature' => round(min($sumT), 2), 'avg_temperature' => round(array_sum($sumT) / count($sumT), 2),
+                    'cumulative_oil_volume' => round($cumO, 1), 'cumulative_water_volume' => round($cumW, 1), 'cumulative_gas_volume' => round($cumG, 0),
+                    'h2s_avg' => 'N/A', 'h2s_max' => 'N/A', 'h2s_min' => 'N/A',
+                    'bo' => .83, 'bw' => .978, 'bg' => 68.1, 'z_factor' => .87, 'rst' => 329.4, 'po' => 749.8, 'pw' => 1176.2, 'pg' => 64.1,
+                    'wlr_formula' => $wc, 'gor_formula' => round($gor / 100000, 5), 'bsw_formula' => $wc, 'gvf_formula' => 4.27, 'safety_issues' => [],
+                    'water_cut' => $wc, 'pressure' => round(array_sum($sumP) / count($sumP), 1), 'temperature' => round(array_sum($sumT) / count($sumT), 2),
+                ];
+                $wt = WellTest::create([
+                    'client' => 'National Oil Company', 'field' => $fieldNames[$w['field_id']] ?? '', 'well' => $towerName, 'wellhead_tower' => $towerName, 'wellhead_string' => $stringName,
+                    'operator' => $userNames[$t->user_id] ?? 'Operator', 'test_date' => $t->test_date, 'test_type' => 'flow',
+                    'choke_size' => (string) [20, 24, 28, 32, 36, 40, 48][mt_rand(0, 6)], 'upstream_choke' => 'N/A', 'downstream_choke' => 'N/A',
+                    'start_time' => $start, 'end_time' => $start->copy()->addMinutes(($nRows - 1) * $stepMin),
+                    'metadata' => ['Log File Version' => '04.20', 'Vx DAFC version' => '4.6.25.1', 'File created:' => $start->format('d M Y, H:i:s'), 'DAFC Serial Number' => (string) (31140000 + $w['id']),
+                        'DAFC HW Version' => '0103', 'DAFC SW Version' => '4.6.25.1', 'DAFC FW Version' => 'v0', 'GD Serial Number' => (string) (8200 + $w['id']),
+                        'Configuration name' => $stringName, 'Mode' => 'Full Range Mode', 'total_rows' => $nRows, 'total_columns' => count($cols), 'delimiter' => "\t", 'column_types' => $colTypes],
+                    'test_data' => ['columns' => $cols, 'rows' => array_map('array_values', $rows)],
+                    'calculated_metrics' => $metrics, 'filename' => $filename, 'log_file_path' => 'demo/' . $filename,
+                ]);
+                // the log was uploaded the day it was tested
+                DB::table('well_tests')->where('id', $wt->id)->update(['created_at' => $start->copy()->addHours(5), 'updated_at' => $start->copy()->addHours(5)]);
+                DB::table('mpfm_tests')->where('id', $t->id)->update(['well_test_id' => $wt->id, 'log_file_path' => 'demo/' . $filename]);
+            }
+        }
     }
 
     // ═════ Location > Field > Tower > Well ═══════════════════════
